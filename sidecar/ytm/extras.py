@@ -102,6 +102,7 @@ def build(server):
                 ydl = checkout()
                 try:
                     server.apply_cookies(ydl)
+                    ydl.params["extractor_args"] = LIGHT_ARGS
                     info = ydl.extract_info("https://music.youtube.com/watch?v=" + video, download=False)
                 finally:
                     pool.put(ydl)

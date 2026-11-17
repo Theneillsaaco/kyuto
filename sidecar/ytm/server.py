@@ -203,7 +203,7 @@ def apply_cookies(ydl):
         if name:
             ydl.cookiejar.set_cookie(Cookie(0, name, value, None, False, ".youtube.com", True, True,
                                             "/", True, True, None, False, None, None, {}))
-    ydl.params["extractor_args"] = {"youtube": {"player_client": ["default", "web_safari"]}}
+    ydl.params["extractor_args"] = {"youtube": {"player_client": ["visionos", "default", "web_safari"]}}
 
 # ---- catalogue ----
 
