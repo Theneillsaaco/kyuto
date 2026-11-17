@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using Player.Core;
 using Player.Core.Contracts;
 using Player.Core.Domain;
 using Player.Core.Playback;
@@ -19,8 +18,11 @@ namespace Player.App.Services;
 /// queued entry.
 /// A track that is not cached or resolved yet no longer goes through mpv's yt-dlp hook (seconds of cold
 /// start): its stream is asked from the warm sidecar and mpv loads it when it lands (<see cref="_awaitingId"/>).
+/// PlaybackService is partial so each feature lives in its own file and shares the state declared here:
+/// Polling (what mpv did), Prefetch (streams and the queued entry), Autoplay, Listening (history and scrobbles),
+/// Session (save and restore), Mpris and Sound.
 /// </summary>
-internal sealed class PlaybackService
+internal sealed partial class PlaybackService
 {
     #region What the UI asks for
 
@@ -304,606 +306,9 @@ internal sealed class PlaybackService
         AfterQueueEdit();
         Poll();
     }
-    
+
     /// <summary>The next tracks in play order (shuffle and repeat respected), at most <paramref name="count"/>.</summary>
     public IReadOnlyList<Track> UpcomingTracks(int count) => [.. Prefetch.upcoming(_queue).Take(count)];
-
-    #endregion
-
-    #region Sound
-
-    /// <summary>Playback speed, 0.5 to 3.</summary>
-    public double Speed => _prefs.Speed;
-
-    /// <summary>Goes to the next speed of the list (the pitch stays).</summary>
-    public void CycleSpeed() => ChooseSpeed(PlaybackSpeed.next(_prefs.Speed));
-
-    public void ChooseSpeed(double speed)
-    {
-        var value = PlaybackSpeed.normalize(speed);
-        _prefs.SaveSpeed(value);
-        _engine.SetSpeed(value);
-        Poll();
-    }
-
-    /// <summary>Gives mpv the saved speed. Called once at start.</summary>
-    public void ApplyStartupSound() => _engine.SetSpeed(_prefs.Speed);
-
-    /// <summary>The levelling setting changed: look the levels up and apply the gain again.</summary>
-    public void RefreshSound()
-    {
-        RequestPrefetch();
-        ApplyGain();
-    }
-
-    /// <summary>Turns the current track down to the common level, when its loudness is known. Never turns it up.</summary>
-    private void ApplyGain()
-    {
-        var db = 0.0;
-
-        if (_prefs.Normalize && PlayQueue.current(_queue) is { } current && _loudness.TryGet(current.Value.Id) is { } measured)
-            db = TrackLoudness.gainDb(measured);
-
-        if (Math.Abs(db - _appliedGain) < 0.05)
-            return;
-
-        _appliedGain = db;
-        _engine.SetGain(db);
-    }
-
-    /// <summary>A playback error as the listener should read it: the known reasons in words, the rest as they are.</summary>
-    private static string ErrorText(string raw)
-    {
-        var key = PlayErrors.reason(raw);
-        return key.Length > 0 ? Tr.T(key) : Tr.F("status.error", PlayErrors.firstLine(raw));
-    }
-
-    #endregion
-
-    #region Polling
-
-    public void Poll()
-    {
-        PollCore();
-        UpdateWaiting();
-        PublishMpris();
-        Changed?.Invoke();
-    }
-
-    private void PollCore()
-    {
-        var error = _engine.DrainEvents();
-        var ended = _engine.TakeEnded();
-
-        if (_engine.TakeNextFailed() && _queuedNextId is { } failedNext)
-        {
-            _prefetch.Forget(failedNext);
-            _cache?.Remove(failedNext);
-            _queuedNextId = null;
-            Log.Warn("playback", "queued stream failed to open: " + failedNext);
-        }
-        
-        // mpv finished a track and went on into the entry we queued: follow it in our own state.
-        if (ended && _queuedNextId is not null)
-            OnEngineAdvanced();
-
-        if (error.Length > 0)
-        {
-            // The track that should be playing failed, and the engine already stopped.
-            _queuedNextId = null;
-            
-            if (TryFallback())
-                return;
-
-            if (PlayQueue.current(_queue) is { } failed)
-            {
-                _prefetch.Forget(failed.Value.Id); // so pressing play resolves it again instead of reusing the dead URL
-                _cache?.Remove(failed.Value.Id);
-            }
-            
-            IsLoaded = false;
-            _sawActive = false;
-            Log.Warn("playback", "play failed: " + error);
-            _status.Text = ErrorText(error);
-            return;
-        }
-
-        var awaiting = _awaitingId is not null;
-        Position = awaiting ? _pendingSeek : _engine.Position;
-        var d = _engine.Duration;
-        Duration = d > 0 ? d : _knownDuration;
-        Paused = awaiting ? _startPaused : _engine.Paused;
-
-        // idle-active can still read "yes" for a moment right after loadfile.
-        if (!_engine.Idle)
-        {
-            _sawActive = true;
-            if (d > 0 && _status.Text == Loading)
-                _status.Text = Tr.T("status.playing");
-            if (_pendingSeek > 0 && d > 0)
-            {
-                _engine.Seek(_pendingSeek); // a restored track resumes where it was left
-                _pendingSeek = 0;
-            }
-            ObserveListening();
-            if (!Paused && _clock.Elapsed.TotalSeconds - _lastSavedAt > 5)
-                SaveProgress();
-        }
-        else if (_sawActive)
-        {
-            OnTrackEnded();
-        }
-
-        if (_autoplay.Version != _seenAutoplay)
-        {
-            _seenAutoplay = _autoplay.Version;
-            ApplyAutoplay();
-        }
-
-        if (_loudness.Version != _seenLoudness)
-        {
-            _seenLoudness = _loudness.Version;
-            ApplyGain();
-        }
-
-        var version = _prefetch.Version;
-        if (version != _seenPrefetch)
-        {
-            _seenPrefetch = version;
-            ContinueAwaiting();
-            FeedCache();
-            SyncNext(); // a stream we were waiting for is ready
-        }
-
-        if (_awaitingId is not null)
-            ContinueAwaiting();
-
-        var cacheVersion = _cache?.Version ?? 0;
-        if (cacheVersion != _seenCache)
-        {
-            _seenCache = cacheVersion;
-            SyncNext(); // a song just reached the disk: the next one may now come from there
-        }
-    }
-
-    /// <summary>
-    /// Whether the sound is supposed to be playing and is not (still opening the track, or mpv is paused for the
-    /// cache). The video holds still while it lasts; the loading bar only shows after a moment, so a quick seek
-    /// does not make it flash.
-    /// </summary>
-    private void UpdateWaiting()
-    {
-        var waiting = IsLoaded && !Paused && (!_sawActive || _engine.Buffering);
-        AudioWaiting = waiting;
-
-        if (!waiting)
-        {
-            _waitingSince = -1;
-            Buffering = false;
-            return;
-        }
-
-        var now = _clock.Elapsed.TotalSeconds;
-        if (_waitingSince < 0)
-            _waitingSince = now;
-
-        Buffering = now - _waitingSince > 0.4;
-    }
-
-    private void OnTrackEnded()
-    {
-        var next = PlayQueue.advance(_queue);
-        if (next is not null)
-        {
-            _queue = next.Value;
-            PlayCurrent();
-            return;
-        }
-
-        _sawActive = false;
-        IsLoaded = false;
-        Position = 0;
-
-        if (_prefs.AutoPlay && Autoplay.wanted(_queue) && PlayQueue.current(_queue) is { } last)
-        {
-            _waitingAutoplay = true;
-            _status.Text = Tr.T("status.autoplay");
-            _autoplay.Request(last.Value.Id);
-            ApplyAutoplay(); // already known: goes on at once; otherwise the poll picks the answer up
-        }
-        else
-        {
-            _status.Text = Tr.T("status.finished");
-        }
-
-        PersistQueue();
-    }
-
-    /// <summary>The queued entry started by itself (gapless): the queue moves on, mpv is not touched.</summary>
-    private void OnEngineAdvanced()
-    {
-        _queuedNextId = null;
-        _audioOverride = null;
-
-        var next = PlayQueue.advance(_queue);
-        if (next is null || PlayQueue.current(next.Value) is not { } current)
-            return;
-
-        _queue = next.Value;
-        var t = current.Value;
-        SetCurrent(t);
-        _viaPrefetch = true;
-        _pendingSeek = 0;
-        Position = 0;
-        _status.Text = Tr.T("status.playing");
-        StartListening(t);
-        RefreshQueue();
-        AfterQueueEdit();
-    }
-
-    /// <summary>
-    /// A direct stream or a cached file failed (expired, 403, a bad file): play the same track once through the
-    /// yt-dlp route of mpv, which resolves it again. False when that is not what was playing.
-    /// </summary>
-    private bool TryFallback()
-    {
-        if (!_viaPrefetch || PlayQueue.current(_queue) is not { } current || TrackSource.IsDirect(current.Value.Id))
-            return false;
-
-        var t = current.Value;
-        Log.Warn("playback", "direct stream failed, using the yt-dlp route");
-        _cache?.Remove(t.Id);
-        _prefetch.Forget(t.Id);
-        _viaPrefetch = false;
-        _queuedNextId = null;
-        _sawActive = false;
-        _pendingSeek = Position;
-        _status.Text = Loading;
-
-        _engine.Load(SourceFor(t), []);
-        _engine.SetVolume(Volume);
-        _engine.SetPaused(false);
-        SyncNext();
-        return true;
-    }
-
-    /// <summary>Feeds the listen tracker; when the track counts it goes to the history and the queue to Last.fm.</summary>
-    private void ObserveListening()
-    {
-        if (_tracker is not { } tracker)
-            return;
-
-        var (next, due) = Listening.observe(_clock.Elapsed.TotalSeconds, Position, Paused, Duration, tracker);
-        _tracker = next;
-        if (!due.IsSome)
-            return;
-
-        try
-        {
-            _db?.AddHistory(due.Value, next.Listened, CurrentId);
-        }
-        catch (Exception ex)
-        {
-            Log.Warn("playback", " history: ", ex);
-        }
-        _scrobble?.Submit(due.Value);
-    }
-
-    #endregion
-
-    #region Autoplay
-
-    /// <summary>The queue is about to run out: ask for what plays after it, so it is there when the track ends.</summary>
-    private void RequestAutoplay()
-    {
-        if (_prefs.AutoPlay && Autoplay.wanted(_queue) && PlayQueue.current(_queue) is { } current)
-            _autoplay.Request(current.Value.Id);
-    }
-
-    /// <summary>
-    /// Something is still being waited for while nothing plays (the stream of the track that was just chosen, or
-    /// the autoplay answer): pick it up even though the main poll is not running. QML calls Pump from an always-on timer.
-    /// </summary>
-    private void PumpWaiting()
-    {
-        if (_awaitingId is not null || (_waitingAutoplay && _autoplay.Version != _seenAutoplay))
-            Poll();
-    }
-
-    /// <summary>
-    /// Adds the radio of the last track to the end of the queue (so the next track is prefetched and the switch stays
-    /// gapless). If the queue had already ended, it goes on with the first new song.
-    /// </summary>
-    private void ApplyAutoplay()
-    {
-        var waiting = _waitingAutoplay && !IsLoaded;
-        _waitingAutoplay = waiting;
-
-        if (_prefs.AutoPlay && Autoplay.wanted(_queue) && PlayQueue.current(_queue) is { } current
-            && _autoplay.TryGet(current.Value.Id) is { Length: > 0 } found)
-        {
-            var fresh = Autoplay.fresh(_queue.Items.Select(item => item.Id), found);
-
-            if (fresh.Length > 0)
-            {
-                foreach (var added in fresh)
-                    _radioIds.Add(added.Id);
-
-                _queue = PlayQueue.add(fresh, _queue);
-                RefreshQueue();
-
-                if (waiting)
-                {
-                    _waitingAutoplay = false;
-                    _queue = PlayQueue.next(_queue);
-                    PlayCurrent();
-                }
-                else
-                {
-                    AfterQueueEdit();
-                }
-
-                return;
-            }
-        }
-
-        if (waiting && !_autoplay.Busy)
-        {
-            _waitingAutoplay = false;
-            _status.Text = Tr.T("status.finished");
-        }
-    }
-
-    #endregion
-
-    #region Prefetch
-
-    /// <summary>The queue order or settings changed: resolve what plays now and next and line up mpv's queued entry.</summary>
-    private void AfterQueueEdit()
-    {
-        RequestPrefetch();
-        RequestAutoplay();
-        SyncNext();
-    }
-
-    // primero, y le dice a la caché de disco qué no debe borrar y en qué orden bajar.
-    private void RequestPrefetch()
-    {
-        string[] ids = [.. Prefetch.plan(_queue).Select(t => t.Id).Where(id => !TrackSource.IsDirect(id)).Distinct()];
-        _planIds = ids;
-
-        _cache?.Protect(ids);
-        _prefetch.Want(ids);
-        FeedCache();
-
-        if (_prefs.Normalize)
-            _loudness.Want(ids);
-    }
-
-    /// <summary>Hands every resolved stream of the plan to the disk cache, which downloads what it does not have.</summary>
-    private void FeedCache()
-    {
-        if (_cache is null || _cache.Limit == 0)
-            return;
-
-        foreach (var id in _planIds)
-            if (_prefetch.TryGet(id) is { } stream)
-                _cache.Add(id, stream.Url, stream.Headers);
-    }
-
-    /// <summary>
-    /// Loads the track into mpv if it is available now: a link or a path, a song on the disk or an already
-    /// resolved stream. False when it has to be resolved first.
-    /// </summary>
-    private bool TryLoadNow(Track t)
-    {
-        if (TrackSource.IsDirect(t.Id))
-        {
-            LoadSource(TrackSource.SourceOf(t), [], viaPrefetch: false);
-            return true;
-        }
-
-        if (_cache?.Get(t.Id) is { } file)
-        {
-            Log.Info("playback", "from the disk cache: " + t.Id);
-            LoadSource(file, [], viaPrefetch: true);
-            return true;
-        }
-
-        if (_prefetch.TryGet(t.Id) is { } stream)
-        {
-            LoadSource(stream.Url, stream.Headers, viaPrefetch: true);
-            return true;
-        }
-
-        return false;
-    }
-
-    private void LoadSource(string source, string[] headers, bool viaPrefetch)
-    {
-        _viaPrefetch = viaPrefetch;
-        _engine.Load(source, headers);
-        _engine.SetVolume(Volume);
-        _engine.SetPaused(_startPaused);
-    }
-
-    /// <summary>
-    /// The track that was chosen is waiting for its stream. When the sidecar answers (or the file lands on the disk),
-    /// mpv loads it. If the resolve failed or takes too long, mpv gets the plain link and uses its own yt-dlp.
-    /// </summary>
-    private void ContinueAwaiting()
-    {
-        if (_awaitingId is not { } id)
-            return;
-
-        if (PlayQueue.current(_queue) is not { } current || current.Value.Id != id)
-        {
-            _awaitingId = null; // the user moved on
-            return;
-        }
-
-        var t = current.Value;
-
-        if (TryLoadNow(t))
-        {
-            _awaitingId = null;
-            SyncNext();
-            return;
-        }
-
-        var waited = _clock.Elapsed.TotalSeconds - _awaitingSince;
-
-        if (_prefetch.Failed(id) || waited > GiveUpSeconds)
-        {
-            Log.Warn("playback", $"no stream for {id} after {waited:0.0} s, using the yt-dlp route of mpv");
-            _awaitingId = null;
-            LoadSource(TrackSource.SourceOf(t), [], viaPrefetch: false);
-            SyncNext();
-        }
-    }
-
-    /// <summary>
-    /// Makes mpv's second playlist entry the track that plays after the current one, when its audio is already
-    /// at hand (on the disk, or its stream resolved); otherwise leaves it empty (the normal end-of-track path then
-    /// takes over).
-    /// </summary>
-    private void SyncNext()
-    {
-        if (!IsLoaded || _awaitingId is not null)
-            return;
-
-        var following = PlayQueue.advance(_queue);
-        var track = following is null ? null : PlayQueue.current(following.Value)?.Value;
-
-        if (track is null || TrackSource.IsDirect(track.Id))
-        {
-            ClearQueuedNext();
-            return;
-        }
-        if (_queuedNextId == track.Id)
-            return;
-
-        if (_cache?.Get(track.Id) is { } file)
-        {
-            _engine.QueueNext(file, []);
-            _queuedNextId = track.Id;
-        }
-        else if (_prefetch.TryGet(track.Id) is { } stream)
-        {
-            _engine.QueueNext(stream.Url, stream.Headers);
-            _queuedNextId = track.Id;
-        }
-        else
-        {
-            ClearQueuedNext();
-        }
-    }
-
-    private void ClearQueuedNext()
-    {
-        if (_queuedNextId is null)
-            return;
-
-        _engine.ClearNext();
-        _queuedNextId = null;
-    }
-
-    #endregion
-
-    #region Save and restore
-
-    /// <summary>Where listening resumes: the playback position, or the restored one while nothing is loaded.</summary>
-    private double ResumeSeconds => IsLoaded ? Position : _restoreSeek;
-
-    /// <summary>Writes the whole queue. Called when it changes, not on every tick.</summary>
-    private void PersistQueue()
-    {
-        if (_db is null)
-            return;
-
-        try
-        {
-            _db.SaveQueueState(_queue.Items, PlayQueue.currentIndex(_queue), ResumeSeconds, Volume,
-                PlayQueue.repeatName(_queue), _queue.Shuffle);
-        }
-        catch (Exception ex)
-        {
-            Log.Warn("playback", " save queue: ", ex);
-        }
-    }
-
-    /// <summary>Writes only the position and volume (every few seconds, on pause and at exit).</summary>
-    public void SaveProgress()
-    {
-        _lastSavedAt = _clock.Elapsed.TotalSeconds;
-
-        try
-        {
-            _db?.SaveProgress(ResumeSeconds, Volume);
-        }
-        catch (Exception ex)
-        {
-            Log.Warn("playback", "save progress", ex);
-        }
-    }
-
-    /// <summary>
-    /// Brings back the last session, paused, as the "Al iniciar" setting says: queue and position, the
-    /// queue with the track from 0, or nothing (volume, repeat and shuffle always come back). Nothing is
-    /// loaded into mpv until the user presses play. but the stream of the current track is asked for in the
-    /// background (and its song saved to the disk), so that pressing play starts at once.
-    /// </summary>
-    public void Restore()
-    {
-        if (_db is null)
-            return;
-
-        SavedQueue? saved;
-        StartupMode mode;
-
-        try
-        {
-            mode = Resume.parse(_db.GetSetting(Resume.settingKey));
-            saved = _db.LoadQueueState();
-        }
-        catch (Exception ex)
-        {
-            Log.Warn("playback", "restore", ex);
-            return;
-        }
-
-        if (saved is null)
-            return;
-
-        SetVolume(saved.Volume);
-
-        var repeat = saved.Repeat switch
-        {
-            "one" => Player.Core.Domain.RepeatMode.One,
-            "all" => Player.Core.Domain.RepeatMode.All,
-            _ => Player.Core.Domain.RepeatMode.Off
-        };
-
-        var queue = PlayQueue.setShuffle(_rng.Next(), saved.Shuffle, PlayQueue.setRepeat(repeat, PlayQueue.empty));
-        var plan = Resume.plan(mode, saved.Seconds);
-
-        if (!plan.Queue || saved.Items.Count == 0)
-        {
-            _queue = queue;
-            return;
-        }
-
-        _queue = PlayQueue.replace(_rng.Next(), saved.Items, Math.Clamp(saved.Index, 0, saved.Items.Count - 1), queue);
-        RefreshQueue(persist: false);
-
-        if (PlayQueue.current(_queue) is { } current)
-            SetCurrent(current.Value);
-
-        _restoreSeek = plan.Seconds;
-        Position = _restoreSeek;
-        _status.Text = Tr.T("status.restored");
-        RequestPrefetch();
-    }
 
     public void Shutdown()
     {
@@ -913,140 +318,7 @@ internal sealed class PlaybackService
 
     #endregion
 
-    #region MPRIS
-
-    public void StartMpris()
-    {
-        if (!OperatingSystem.IsLinux())
-            return;
-
-        var service = new MprisService();
-        _ = Task.Run(async () =>
-        {
-            try
-            {
-                await service.StartAsync();
-                _mpris = service;
-            }
-            catch (Exception ex)
-            {
-                Log.Warn("playback", "mpris unavailable", ex);
-                service.Dispose();
-            }
-        });
-    }
-
-    /// <summary>
-    /// Runs what the desktop asked for (playerctl, media keys). QML calls it from an always-on timer,
-    /// because a command can arrive while the player is idle and the main poll is not running.
-    /// </summary>
-    public void Pump()
-    {
-        PumpWaiting();
-        PumpCore();
-    }
-
-    private void PumpCore()
-    {
-        if (_mpris is not { } mpris)
-            return;
-
-        var any = false;
-        while (mpris.TryDequeue(out var command))
-        {
-            any = true;
-            try
-            {
-                Handle(command);
-            }
-            catch (Exception ex)
-            {
-                Log.Warn("playback", "mpris command", ex);
-            }
-        }
-        if (any)
-            Poll();
-        else if (!_mprisPublished)
-            PublishMpris();
-    }
-
-    private void Handle(MprisCommand command)
-    {
-        switch (command.Action)
-        {
-            case MprisAction.Play:
-                if (!IsLoaded || Paused)
-                    Toggle();
-                break;
-            case MprisAction.Pause:
-                if (IsLoaded && !Paused)
-                    Toggle();
-                break;
-            case MprisAction.PlayPause: Toggle(); break;
-            case MprisAction.Stop:
-                if (IsLoaded && _awaitingId is null)
-                {
-                    _engine.SetPaused(true);
-                    _engine.Seek(0);
-                    _mpris?.Seeked(0);
-                }
-                break;
-            case MprisAction.Next: Next(); break;
-            case MprisAction.Previous: Previous(); break;
-            case MprisAction.SeekRelative: Seek(Math.Clamp(Position + command.Number / 1e6, 0, Duration)); break;
-            case MprisAction.SeekTo: Seek(Math.Clamp(command.Number / 1e6, 0, Duration)); break;
-            case MprisAction.SetVolume: SetVolume((int)Math.Round(Math.Clamp(command.Number, 0, 1) * 100)); break;
-            case MprisAction.SetRate: ChooseSpeed(command.Number); break;
-            case MprisAction.SetShuffle:
-                if (_queue.Shuffle != command.Number > 0) ToggleShuffle();
-                break;
-            case MprisAction.SetLoop:
-                _queue = PlayQueue.setRepeat(command.Text switch
-                {
-                    "Track" => Player.Core.Domain.RepeatMode.One,
-                    "Playlist" => Player.Core.Domain.RepeatMode.All,
-                    _ => Player.Core.Domain.RepeatMode.Off,
-                }, _queue);
-                PersistQueue();
-                AfterQueueEdit();
-                break;
-        }
-        Poll();
-    }
-
-    private void PublishMpris()
-    {
-        if (_mpris is not { } mpris)
-            return;
-
-        _mprisPublished = true;
-
-        var track = PlayQueue.current(_queue)?.Value;
-        string[] artists = track is null ? []
-            : track.Artists is { Length: > 0 } list ? list
-            : track.Artist.Length > 0 ? [track.Artist] : [];
-
-        mpris.Publish(new MprisState(
-            Status: IsLoaded ? (Paused ? "Paused" : "Playing") : track is null ? "Stopped" : "Paused",
-            TrackKey: track?.Id ?? "",
-            Title: track?.Title ?? "",
-            Artists: artists,
-            Album: track?.Album ?? "",
-            ArtUrl: track?.ArtUrl ?? "",
-            LengthMicros: (long)(Duration * 1e6),
-            PositionMicros: (long)(Position * 1e6),
-            Volume: Volume / 100.0,
-            Rate: Speed,
-            Loop: RepeatMode switch { "one" => "Track", "all" => "Playlist", _ => "None" },
-            Shuffle: Shuffle,
-            CanGoNext: CanNext,
-            CanGoPrevious: CanPrevious,
-            CanPlay: QueueCount > 0,
-            CanSeek: IsLoaded && _awaitingId is null
-        ));
-    }
-
-    #endregion
+    #region The current track
 
     /// <summary>Loads the queue's current track into mpv. Never calls Poll (it may run inside Poll).</summary>
     private void PlayCurrent()
@@ -1106,15 +378,6 @@ internal sealed class PlaybackService
         Duration = t.DurationSeconds;
     }
 
-    private void StartListening(Track t)
-    {
-        var tracker = Listening.start(DateTimeOffset.UtcNow.ToUnixTimeSeconds(), t);
-        _tracker = _radioIds.Contains(t.Id) ? Listening.unchosen(tracker) : tracker;
-        _account?.ReportPlayback(t.Id);
-        ApplyGain();
-        if (_tracker.Listen is { IsSome: true } listen) _scrobble?.NowPlaying(listen.Value);
-    }
-
     /// <summary>The queue content or its order changed: bump the revision so the queue panel rebuilds its rows.</summary>
     private void RefreshQueue(bool persist = true)
     {
@@ -1123,6 +386,8 @@ internal sealed class PlaybackService
         if (persist)
             PersistQueue();
     }
+
+    #endregion
 
     #region Fields
 
@@ -1137,6 +402,7 @@ internal sealed class PlaybackService
     private readonly StatusLine _status;
     private readonly Random _rng = new();
     private readonly Stopwatch _clock = Stopwatch.StartNew();
+    private readonly BufferingMonitor _buffering = new();
 
     private QueueState _queue = PlayQueue.empty;
     private volatile MprisService? _mpris; // set by the task that connects to the session bus
@@ -1144,7 +410,6 @@ internal sealed class PlaybackService
     private double _restoreSeek;  // where the restored track resumes when it is played
     private double _pendingSeek;  // the same, once the track is loading
     private double _lastSavedAt;
-    private double _waitingSince = -1;
     private ListenTracker? _tracker;
     private double _knownDuration;
     private bool _sawActive;
@@ -1161,13 +426,16 @@ internal sealed class PlaybackService
     private int _seenLoudness;
     private bool _waitingAutoplay; // the queue ended and autoplay is still looking for more
     private double _appliedGain;
-    
+
     private readonly AudioCache? _cache;
     private string[] _planIds = []; // the ids the prefetch is working on, most urgent first
     private string? _awaitingId;    // the chosen track whose stream is still being resolved; mpv has nothing loaded
     private double _awaitingSince;
     private bool _startPaused;      // the user paused (or resumed) while the stream was awaited
     private int _seenCache;
+
+    private SessionStore? _session;
+    private SessionStore Session => _session ??= new SessionStore(_db);
 
     public PlaybackService(IAudioEngine engine, PlayerDatabase? db, ScrobbleService? scrobble, PrefetchService prefetch, StatusLine status,
         PlaybackPrefs prefs, AutoplayService autoplay, LoudnessService loudness, AccountService? account,
