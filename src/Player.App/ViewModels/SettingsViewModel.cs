@@ -16,6 +16,7 @@ public class SettingsViewModel : ViewModelBase
         Startup = ReadStartup();
         AutoPlay = AppServices.Prefs.AutoPlay;
         NormalizeVolume = AppServices.Prefs.Normalize;
+        Notifications = AppServices.Prefs.Notify;
         CacheLimit = AppServices.Cache?.Limit ?? AppServices.Prefs.CacheLimit;
         SyncCache();
         SyncScrobbler();
@@ -29,6 +30,8 @@ public class SettingsViewModel : ViewModelBase
     public bool AutoPlay { get; private set => Set(ref field, value); } = true;
     /// <summary>Turn loud songs down to a common level (needs a YouTube Music account).</summary>
     public bool NormalizeVolume { get; private set => Set(ref field, value); } = true;
+    
+    public bool Notifications { get; private set => Set(ref field, value); } = true;
     
     /// <summary>How many songs the disk cache keeps; 0 is off.</summary>
     public int CacheLimit { get; private set => Set(ref field, value); } = 30;
@@ -88,6 +91,12 @@ public class SettingsViewModel : ViewModelBase
         AppServices.Prefs.SaveNormalize(on);
         NormalizeVolume = on;
         AppServices.Playback.RefreshSound();
+    }
+
+    public void ChooseNotifications(bool on)
+    {
+        AppServices.Prefs.SaveNotify(on);
+        Notifications = on;
     }
 
     /// <summary>How many songs to keep on the disk (0 turns the cache off and empties it).</summary>

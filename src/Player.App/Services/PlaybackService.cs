@@ -403,6 +403,7 @@ internal sealed partial class PlaybackService
     private readonly Random _rng = new();
     private readonly Stopwatch _clock = Stopwatch.StartNew();
     private readonly BufferingMonitor _buffering = new();
+    private readonly DesktopNotifier? _notifier;
 
     private QueueState _queue = PlayQueue.empty;
     private volatile MprisService? _mpris; // set by the task that connects to the session bus
@@ -439,9 +440,9 @@ internal sealed partial class PlaybackService
 
     public PlaybackService(IAudioEngine engine, PlayerDatabase? db, ScrobbleService? scrobble, PrefetchService prefetch, StatusLine status,
         PlaybackPrefs prefs, AutoplayService autoplay, LoudnessService loudness, AccountService? account,
-        AudioCache? cache) =>
-        (_engine, _db, _scrobble, _prefetch, _status, _prefs, _autoplay, _loudness, _account, _cache) =
-            (engine, db, scrobble, prefetch, status, prefs, autoplay, loudness, account, cache);
+        AudioCache? cache, DesktopNotifier? notifier) =>
+        (_engine, _db, _scrobble, _prefetch, _status, _prefs, _autoplay, _loudness, _account, _cache, _notifier) =
+        (engine, db, scrobble, prefetch, status, prefs, autoplay, loudness, account, cache, notifier);
 
     public event Action? Changed;
 

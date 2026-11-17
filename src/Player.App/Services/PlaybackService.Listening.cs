@@ -14,7 +14,10 @@ internal sealed partial class PlaybackService
         _tracker = _radioIds.Contains(t.Id) ? Listening.unchosen(tracker) : tracker;
         _account?.ReportPlayback(t.Id);
         ApplyGain();
-        if (_tracker.Listen is { IsSome: true } listen) _scrobble?.NowPlaying(listen.Value);
+        Announce(t);
+        
+        if (_tracker.Listen is { IsSome: true } listen)
+            _scrobble?.NowPlaying(listen.Value);
     }
 
     /// <summary>Feeds the listen tracker; when the track counts it goes to the history and the queue to Last.fm.</summary>

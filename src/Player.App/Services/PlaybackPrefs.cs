@@ -14,6 +14,7 @@ internal sealed class PlaybackPrefs
     private const string NormalizeKey = "playback.normalize";
     private const string SpeedKey = "playback.speed";
     private const string CacheKey = "cache.limit";
+    private const string NotifyKey = "notifications.enabled";
 
     private readonly SafeSettings _settings;
 
@@ -21,6 +22,7 @@ internal sealed class PlaybackPrefs
     {
         _settings = settings;
         AutoPlay = settings.Get(AutoPlayKey) != "0";
+        Notify = settings.Get(NotifyKey) != "0";
         Normalize = settings.Get(NormalizeKey) != "0";
         Speed = double.TryParse(settings.Get(SpeedKey), NumberStyles.Float, CultureInfo.InvariantCulture, out var speed)
             ? PlaybackSpeed.normalize(speed)
@@ -43,6 +45,8 @@ internal sealed class PlaybackPrefs
     /// <summary>How many songs the disk cache keeps; 0 turns it off.</summary>
     public int CacheLimit { get; private set; }
 
+    public bool Notify { get; private set; }
+    
     public void SaveCacheLimit(int limit)
     {
         CacheLimit = CachePolicy.normalizeLimit(limit);
@@ -65,5 +69,11 @@ internal sealed class PlaybackPrefs
     {
         Speed = PlaybackSpeed.normalize(speed);
         _settings.Set(SpeedKey, Speed.ToString("0.##", CultureInfo.InvariantCulture));
+    }
+    
+    public void SaveNotify(bool on)
+    {
+        Notify = on;
+        _settings.Set(NotifyKey, on ? "1" : "0");
     }
 }

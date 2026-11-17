@@ -3,6 +3,7 @@ using Player.Audio.Mpv;
 using Player.Core;
 using Player.Core.Contracts;
 using Player.Core.Localization;
+using Player.Mpris;
 using Player.Providers.Lyrics;
 using Player.Providers.YoutubeMusic;
 using Player.Scrobble.LastFm;
@@ -85,7 +86,8 @@ internal static class AppServices
             LoudnessLookup = new LoudnessService(Provider, () => Account?.SignedIn == true);
             Prefetcher = new PrefetchService(Provider);
             Stats = new StatsService(Provider);
-            Playback = new PlaybackService(Engine, Db, Scrobble, Prefetcher, Status, Prefs, AutoplayFeed, LoudnessLookup, Account, Cache);
+            Notifier = OperatingSystem.IsLinux() ? new DesktopNotifier() : null;
+            Playback = new PlaybackService(Engine, Db, Scrobble, Prefetcher, Status, Prefs, AutoplayFeed, LoudnessLookup, Account, Cache, Notifier);
             Playback.Restore();
             Playback.ApplyStartupSound();
             Playback.StartMpris();
@@ -108,6 +110,7 @@ internal static class AppServices
     private static void Shutdown()
     {
         Playback.Shutdown();
+        Notifier?.Dispose();
         Cache?.Dispose();
         Scrobble?.Dispose();
         Theme.Dispose();
@@ -136,6 +139,7 @@ internal static class AppServices
     public static PlaybackPrefs Prefs { get; private set; } = null!;
     public static AutoplayService AutoplayFeed { get; private set; } = null!;
     public static LoudnessService LoudnessLookup { get; private set; } = null!;
+    public static DesktopNotifier? Notifier { get; private set; }
     /// <summary>The songs saved on the disk. Null when the folder could not be made.</summary>
     public static AudioCache? Cache { get; private set; }
     public static PlaybackService Playback { get; private set; } = null!;

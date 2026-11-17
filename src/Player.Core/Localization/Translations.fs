@@ -154,6 +154,7 @@ module Translations =
         "settings.playback", "Reproducción", "Playback"
         "settings.autoplay", "Seguir con música similar al acabar la cola", "Keep playing similar music when the queue ends"
         "settings.normalize", "Igualar el volumen entre canciones", "Level the volume between songs"
+        "settings.notifications", "Avisar al cambiar de canción", "Notify when the song changes"
         "status.autoplay", "Buscando más música…", "Finding more music…"
         "tip.speed", "Velocidad", "Speed"
         "error.region", "Esto no está disponible en tu país.", "This is not available in your country."

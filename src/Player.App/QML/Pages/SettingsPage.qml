@@ -303,6 +303,13 @@ Rectangle {
                             onToggled: root.vm.chooseNormalizeVolume(checked)
                             Binding { target: normalizeSwitch; property: "checked"; value: root.vm.normalizeVolume }
                         }
+                        MSwitch {
+                            id: notifySwitch
+                            Layout.fillWidth: true
+                            text: root.tr("settings.notifications")
+                            onToggled: root.vm.chooseNotifications(checked)
+                            Binding { target: notifySwitch; property: "checked"; value: root.vm.notifications }
+                        }
                     }
                     Card {
                         Heading { text: root.tr("settings.cache") }
