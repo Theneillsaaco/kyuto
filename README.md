@@ -1,4 +1,4 @@
-# Player
+# Kyuto
 
 A desktop YouTube Music player for Linux, built with **.NET 10**, **Qt Bridge for C#** (custom Material 3 QML) and **libmpv**.
 
