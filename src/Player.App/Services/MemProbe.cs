@@ -6,7 +6,7 @@ namespace Player.App.Services;
 //     PLAYER_MEMPROBE=1  player      cada 30 s escribe una línea en el log (~/.local/state/player/player.log)
 //     PLAYER_MEMPROBE=gc player      igual, pero fuerza un GC antes de medir (el "managed live" es lo que de verdad vive)
 // La línea separa lo que ve el sistema (rss, y de él anon / file / shmem) de lo que ve .NET (managed, heap), y lista
-// los procesos hijos (el sidecar de Python, deno...). Lectura:
+// los procesos hijos (el sidecar de Python, node...). Lectura:
 //   - rss sube y "managed live" no  -> es nativo: Qt (imágenes, texturas, shaders), mpv o QtMultimedia.
 //   - "managed live" sube           -> es .NET: algo que se guarda y no se suelta.
 //   - un hijo sube                  -> es el sidecar (yt-dlp), no la app.

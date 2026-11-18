@@ -132,5 +132,5 @@ MIT, see [LICENSE](LICENSE).
 ## Credits
 
 - Color solver ported from [Sung](https://github.com/yappologistic/Sung)'s `m3color.cpp` (MIT); item normalization in the sidecar follows Sung's `helper/catalog.py` (MIT)
-- Thanks to [Meiro](https://github.com/elianiva/meiro?tab=contributing-ov-file), which I used as the basis for several functions and the UI
+- Thanks to [Meiro](https://github.com/elianiva/meiro?tab=contributing-ov-file), which I used as the basis for several ideas, functions and the UI
 - [mpv](https://mpv.io), [ytmusicapi](https://github.com/sigma67/ytmusicapi), [yt-dlp](https://github.com/yt-dlp/yt-dlp), [LRCLIB](https://lrclib.net), [Qt Bridge for C#](https://github.com/qt/qtbridge-csharp)
