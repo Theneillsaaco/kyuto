@@ -102,13 +102,15 @@
         ];
 
         postInstall = ''
-          d=src/Kyuto.App/bin/Release/net10.0/linux-x64
-          for f in kyuto Application qt_bridge_metadata.json qtdeploy.txt; do
-            if [ -e "$d/$f" ]; then
-              cp -r "$d/$f" "$out/lib/kyuto-app/"
-            fi
-          done
-        
+          buildDir="src/Kyuto.App/bin/Release/net10.0"
+          if [ -d "src/Kyuto.App/bin/Release/net10.0/linux-x64" ]; then
+            buildDir="src/Kyuto.App/bin/Release/net10.0/linux-x64"
+          fi
+
+          mkdir -p $out/lib/kyuto-app
+          
+          cp -r "$buildDir"/. $out/lib/kyuto-app/
+
           mkdir -p $out/share/kyuto
           cp -r sidecar $out/share/kyuto/
           
@@ -130,7 +132,9 @@
 
         postFixup = ''
           if [ -f "$out/bin/Kyuto.App" ]; then
-          mv "$out/bin/Kyuto.App" "$out/bin/kyuto"
+            mv "$out/bin/Kyuto.App" "$out/bin/kyuto"
+          elif [ -f "$out/lib/kyuto-app/Kyuto.App" ]; then
+            ln -s $out/lib/kyuto-app/Kyuto.App $out/bin/kyuto
           fi
         '';
         
