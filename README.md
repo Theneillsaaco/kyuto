@@ -123,7 +123,7 @@ I use YouTube Music every day, and existing Electron wrappers take forever to st
 
 This project started mainly as an excuse to dive deeper into **Qt**, test out **Qt Bridge for C#**, and build my first native desktop application from scratch. I wanted fast startup times, a proper **Material 3** interface, and complete freedom to customize every single feature the way I actually want it.
 
-I'm also a huge **.NET** enthusiast, and honestly, there are barely any active FOSS desktop projects built with it—let alone anything combining **F# and C#** like this, as the few out there stick to plain C# and are either abandoned or overly barebones. So I combined both worlds into a responsive player tailored to my exact needs.
+I'm also a huge **.NET** enthusiast, and honestly, there are barely any active FOSS desktop projects built with it-let alone anything combining **F# and C#** like this, as the few out there stick to plain C# and are either abandoned or overly barebones. So I combined both worlds into a responsive player tailored to my exact needs.
 
 ## License
 
