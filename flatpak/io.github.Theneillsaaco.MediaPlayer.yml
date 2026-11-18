@@ -44,9 +44,9 @@ finish-args:
 build-options:
   build-args:
     - --share=network
-  append-path: /app/lib/sdk/dotnet10/bin
-  append-ld-library-path: /app/lib/sdk/dotnet10/lib
-  append-pkg-config-path: /app/lib/sdk/dotnet10/lib/pkgconfig
+  append-path: /app/lib/sdk/dotnet10/bin:/usr/lib/sdk/dotnet10/bin
+  append-ld-library-path: /app/lib/sdk/dotnet10/lib:/usr/lib/sdk/dotnet10/lib
+  append-pkg-config-path: /app/lib/sdk/dotnet10/lib/pkgconfig:/usr/lib/sdk/dotnet10/lib/pkgconfig  
   
 cleanup:
   - /include
@@ -151,6 +151,7 @@ modules:
         CMAKE_PREFIX_PATH: /run/build/media-player/qt-sdk:/usr
         QT_NO_PRIVATE_MODULE_WARNING: 'ON'
     build-commands:
+      - ls -d /app/lib/sdk/dotnet10 /usr/lib/sdk/dotnet10 || true; which dotnet
       - mkdir -p /run/build/media-player/qt-sdk/lib
       - ln -s /usr/lib/x86_64-linux-gnu/cmake /run/build/media-player/qt-sdk/lib/cmake
       - ln -s /usr/include /run/build/media-player/qt-sdk/include
