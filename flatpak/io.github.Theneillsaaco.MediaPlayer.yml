@@ -44,10 +44,10 @@ finish-args:
 build-options:
   build-args:
     - --share=network
-  append-path: /usr/lib/sdk/dotnet10/bin
-  append-ld-library-path: /usr/lib/sdk/dotnet10/lib
-  append-pkg-config-path: /usr/lib/sdk/dotnet10/lib/pkgconfig
-
+  append-path: /app/lib/sdk/dotnet10/bin
+  append-ld-library-path: /app/lib/sdk/dotnet10/lib
+  append-pkg-config-path: /app/lib/sdk/dotnet10/lib/pkgconfig
+  
 cleanup:
   - /include
   - /lib/pkgconfig
@@ -69,7 +69,7 @@ modules:
     sources:
       - type: git
         url: https://git.ffmpeg.org/ffmpeg.git
-        tag: n9.0.1
+        tag: n9.0.2
     cleanup:
       - /share/ffmpeg
 
@@ -83,7 +83,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/haasn/libplacebo.git
-        tag: v7.360.1
+        tag: v7.387.0
 
   - name: libass
     buildsystem: autotools
@@ -107,7 +107,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/mpv-player/mpv.git
-        tag: v0.41.0
+        tag: v0.42.0
 
   - name: libsecret
     buildsystem: meson
