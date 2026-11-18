@@ -47,8 +47,8 @@ Or build the package: `nix build` (the binary is `result/bin/kyuto`).
 
 Add in your inputs
 ```nix
-media-player = {
-  url = "github:Theneillsaaco/media-player-m3";
+kyuto = {
+  url = "github:Theneillsaaco/kyuto";
   inputs.nixpkgs.follows = "nixpkgs";
 };
 ```
@@ -56,7 +56,7 @@ media-player = {
 Add in your sistem or home packages like that
 
 ```nix
-inputs.media-player.packages.${pkgs.stdenv.hostPlatform.system}.default
+inputs.kyuto.packages.${pkgs.stdenv.hostPlatform.system}.default
 ```
 
 ### Flatpak

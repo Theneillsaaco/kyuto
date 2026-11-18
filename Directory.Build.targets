@@ -21,7 +21,7 @@
   <Target Name="PlayerFixQtAppHost" BeforeTargets="QtBridgePrepareAppHost"
           Condition="'$(DesignTimeBuild)' != 'true'">
     <PropertyGroup>
-      <_PlayerQtHostFile>$(MSBuildProjectDirectory)/$(IntermediateOutputPath)qt/native/bin/player_app</_PlayerQtHostFile>
+      <_PlayerQtHostFile>$(MSBuildProjectDirectory)/$(IntermediateOutputPath)qt/native/bin/kyuto_app</_PlayerQtHostFile>
     </PropertyGroup>
     <PropertyGroup Condition="Exists('$(_PlayerQtHostFile)')">
       <AppHostSourcePath>$(_PlayerQtHostFile)</AppHostSourcePath>

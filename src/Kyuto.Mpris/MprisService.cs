@@ -12,7 +12,7 @@ namespace Kyuto.Mpris;
 /// </summary>
 public class MprisService : IDisposable
 {
-    /// <summary>Connects and claims org.mpris.MediaPlayer2.player (or a per-process name if that one is taken).</summary>
+    /// <summary>Connects and claims org.mpris.MediaPlayer2.kyuto (or a per-process name if that one is taken).</summary>
     public async Task StartAsync()
     {
         var address = DBusAddress.Session ?? throw new InvalidOperationException("no session bus");
@@ -21,7 +21,7 @@ public class MprisService : IDisposable
         var handler = new Handler(this, connection);
         connection.AddMethodHandler(handler);
         
-        const string Name = "org.mpris.MediaPlayer2.Player";
+        const string Name = "org.mpris.MediaPlayer2.kyuto";
         if (!await connection.TryRequestNameAsync(Name, RequestNameOptions.None))
             await connection.RequestNameAsync($"{Name}.instance{Environment.ProcessId}");
         

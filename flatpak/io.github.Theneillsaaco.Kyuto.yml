@@ -142,7 +142,12 @@ modules:
   - name: kyuto
     buildsystem: simple
     build-options:
+      build-args:
+        - --share=network
+      append-path: /app/lib/sdk/dotnet10/lib
+      append-ld-library-path: /app/lib/sdk/dotnet10/lib
       env:
+        DOTNET_ROOT: /app/lib/sdk/dotnet10/lib
         DOTNET_CLI_TELEMETRY_OPTOUT: '1'
         DOTNET_SKIP_FIRST_TIME_EXPERIENCE: '1'
         DOTNET_NOLOGO: '1'
@@ -163,14 +168,14 @@ modules:
         -o /app/lib/kyuto
 
       - |
-        root=$(dirname "$(readlink -f "$(which dotnet)")")
+        root=/app/lib/sdk/dotnet10/lib
         mkdir -p /app/lib/dotnet
         cp -r "$root/host" "$root/shared" "$root/dotnet" /app/lib/dotnet/
         ln -s ../lib/dotnet/dotnet /app/bin/dotnet
-
+        
       - |
         d=src/Kyuto.App/bin/Release/net10.0/linux-x64
-        for f in player_app Application qt_bridge_metadata.json qtdeploy.txt; do
+        for f in kyuto_app Application qt_bridge_metadata.json qtdeploy.txt; do
           if [ -e "$d/$f" ]; then cp -r "$d/$f" /app/lib/kyuto/; fi
         done
 
