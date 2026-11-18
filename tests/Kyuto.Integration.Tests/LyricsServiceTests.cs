@@ -1,9 +1,9 @@
-using Player.App.Services;
-using Player.Core.Contracts;
-using Player.Integration.Tests.Base;
-using Player.Storage.Database;
+using Kyuto.App.Services;
+using Kyuto.Core.Contracts;
+using Kyuto.Integration.Tests.Base;
+using Kyuto.Storage.Database;
 
-namespace Player.Integration.Tests;
+namespace Kyuto.Integration.Tests;
 
 public class LyricsServiceTests
 {
@@ -36,7 +36,7 @@ public class LyricsServiceTests
         var h = With(source);
 
         var original = Samples.Song("x");
-        var modifiedTrack = new Player.Core.Domain.Track(
+        var modifiedTrack = new Kyuto.Core.Domain.Track(
             id, 
             original.Title, 
             original.Artist, 

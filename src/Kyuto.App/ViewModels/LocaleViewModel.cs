@@ -1,7 +1,7 @@
-using Player.App.ViewModels.Base;
-using Player.Core.Localization;
+using Kyuto.App.ViewModels.Base;
+using Kyuto.Core.Localization;
 
-namespace Player.App.ViewModels;
+namespace Kyuto.App.ViewModels;
 
 /// <summary>
 /// The interface language for QML. Instantiated once from Main.qml as <c>LocaleViewModel { id: localeVm }</c>; the

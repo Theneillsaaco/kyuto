@@ -1,4 +1,4 @@
-namespace Player.Scrobble.LastFm
+namespace Kyuto.Scrobble.LastFm
 
 open System
 open System.Security.Cryptography

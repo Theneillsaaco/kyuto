@@ -1,6 +1,6 @@
-using Player.Storage.Cache;
+using Kyuto.Storage.Cache;
 
-namespace Player.Integration.Tests;
+namespace Kyuto.Integration.Tests;
 
 public class AudioCacheTests : IDisposable
 {

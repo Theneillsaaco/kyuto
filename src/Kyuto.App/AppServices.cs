@@ -1,18 +1,18 @@
-using Player.App.Services;
-using Player.Audio.Mpv;
-using Player.Core;
-using Player.Core.Contracts;
-using Player.Core.Localization;
-using Player.Mpris;
-using Player.Providers.Lyrics;
-using Player.Providers.YoutubeMusic;
-using Player.Scrobble.LastFm;
-using Player.Storage;
-using Player.Storage.Cache;
-using Player.Storage.Database;
-using Player.Storage.Secrets;
+using Kyuto.App.Services;
+using Kyuto.Audio.Mpv;
+using Kyuto.Core;
+using Kyuto.Core.Contracts;
+using Kyuto.Core.Localization;
+using Kyuto.Mpris;
+using Kyuto.Providers.Lyrics;
+using Kyuto.Providers.YoutubeMusic;
+using Kyuto.Scrobble.LastFm;
+using Kyuto.Storage;
+using Kyuto.Storage.Cache;
+using Kyuto.Storage.Database;
+using Kyuto.Storage.Secrets;
 
-namespace Player.App;
+namespace Kyuto.App;
 
 /// <summary>
 /// Composition root: owns the engine, the database and the services, and is what every view model
@@ -30,6 +30,7 @@ internal static class AppServices
 
             _started = true;
 
+            AppPaths.MigrateLegacy();
             MemProbe.StartIfAsked();
 
             Engine = new MpvEngine();

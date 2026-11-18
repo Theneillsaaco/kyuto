@@ -1,6 +1,6 @@
-using Player.Storage;
+using Kyuto.Storage;
 
-namespace Player.Integration.Tests;
+namespace Kyuto.Integration.Tests;
 
 [Collection("environment")]
 public class AppPathsTests
@@ -18,16 +18,16 @@ public class AppPathsTests
     public void Config_files_follow_XDG_CONFIG_HOME()
     {
         With("XDG_CONFIG_HOME", "/tmp/cfg", () =>
-            Assert.Equal(Path.Combine("/tmp/cfg", "player", "lastfm.json"), AppPaths.ConfigFile("lastfm.json")));
+            Assert.Equal(Path.Combine("/tmp/cfg", "kyuto", "lastfm.json"), AppPaths.ConfigFile("lastfm.json")));
     }
  
     [Fact]
     public void Data_and_cache_follow_their_variables()
     {
         With("XDG_DATA_HOME", "/tmp/data", () =>
-            Assert.Equal(Path.Combine("/tmp/data", "player", "player.db"), AppPaths.DataFile("player.db")));
+            Assert.Equal(Path.Combine("/tmp/data", "kyuto", "kyuto.db"), AppPaths.DataFile("kyuto.db")));
         With("XDG_CACHE_HOME", "/tmp/cache", () =>
-            Assert.Equal(Path.Combine("/tmp/cache", "player", "audio"), AppPaths.CacheDir("audio")));
+            Assert.Equal(Path.Combine("/tmp/cache", "kyuto", "audio"), AppPaths.CacheDir("audio")));
     }
  
     [Fact]
@@ -37,7 +37,7 @@ public class AppPathsTests
         {
             var path = AppPaths.ConfigFile("x");
  
-            Assert.EndsWith(Path.Combine(".config", "player", "x"), path);
+            Assert.EndsWith(Path.Combine(".config", "kyuto", "x"), path);
         });
     }
 }

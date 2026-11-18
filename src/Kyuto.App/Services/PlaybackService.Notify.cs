@@ -1,9 +1,9 @@
 using System.Security.Cryptography;
 using System.Text;
-using Player.Core.Domain;
-using Player.Storage;
+using Kyuto.Core.Domain;
+using Kyuto.Storage;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 // "Now playing" desktop notification, with the cover. PlaybackService is partial so this lives next to the feature.
 internal sealed partial class PlaybackService

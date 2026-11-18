@@ -1,9 +1,9 @@
-using Player.App.Services;
-using Player.App.ViewModels.Base;
-using Player.Core.Domain;
-using Player.Core.Playback;
+using Kyuto.App.Services;
+using Kyuto.App.ViewModels.Base;
+using Kyuto.Core.Domain;
+using Kyuto.Core.Playback;
 
-namespace Player.App.ViewModels;
+namespace Kyuto.App.ViewModels;
 
 /// <summary>
 /// The video of the current track, for the "Reproduciendo" panel and the MV button of the playback bar.
@@ -84,7 +84,7 @@ public class VideoViewModel : ViewModelBase
     public void Poll()
     {
         try { PollCore(); }
-        catch (Exception ex) { Player.Core.Log.Error("video", "poll", ex); }
+        catch (Exception ex) { Kyuto.Core.Log.Error("video", "poll", ex); }
     }
 
     private void PollCore()

@@ -3,7 +3,7 @@ module ThemeTests
 open System
 open System.IO
 open System.Text.Json
-open Player.Core.Theme
+open Kyuto.Core.Theme
 open Xunit
 
 // Sung's m3color.cpp (MIT) compiled against Qt is the oracle: Data/m3color-oracle.json holds what it produced for

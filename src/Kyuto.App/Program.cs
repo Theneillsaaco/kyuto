@@ -1,7 +1,7 @@
-using Player.Core;
+using Kyuto.Core;
 using Qt.Quick;
 
-// A crash that comes from managed code leaves its trace in ~/.local/state/player/player.log before the process ends.
+// A crash that comes from managed code leaves its trace in ~/.local/state/kyuto/kyuto.log before the process ends.
 AppDomain.CurrentDomain.UnhandledException += (_, e) => Log.Error("crash", "unhandled exception", e.ExceptionObject as Exception);
 TaskScheduler.UnobservedTaskException += (_, e) =>
 {

@@ -1,4 +1,4 @@
-namespace Player.Core.Theme
+namespace Kyuto.Core.Theme
 
 open System
 open System.Collections.Concurrent

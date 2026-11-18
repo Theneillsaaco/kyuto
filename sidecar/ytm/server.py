@@ -286,7 +286,7 @@ def song(params):
 
 # ---- streams ----
 
-YT_CLIENTS = [c.strip() for c in os.environ.get("PLAYER_YT_CLIENTS", "visionos").split(",") if c.strip()]
+YT_CLIENTS = [c.strip() for c in os.environ.get("KYUTO_YT_CLIENTS", "visionos").split(",") if c.strip()]
     
 def _ydl(fmt=AUDIO_FORMAT):
     """One YoutubeDL per worker thread and format, reused between calls."""

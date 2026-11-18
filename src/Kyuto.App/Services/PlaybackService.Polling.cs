@@ -1,7 +1,7 @@
-using Player.Core;
-using Player.Core.Playback;
+using Kyuto.Core;
+using Kyuto.Core.Playback;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 // What mpv did since the last look: errors, a track that ended, the position, and whatever background work finished.
 // PlaybackService is partial so this lives next to the feature and shares its state.

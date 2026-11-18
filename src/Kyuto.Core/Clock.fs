@@ -1,4 +1,4 @@
-namespace Player.Core
+namespace Kyuto.Core
 
 open System
 

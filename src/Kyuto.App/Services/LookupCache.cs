@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
-using Player.Core;
+using Kyuto.Core;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 /// <summary>
 /// A keyed value that is fetched in the background, kept in memory (oldest out first) and not asked again for

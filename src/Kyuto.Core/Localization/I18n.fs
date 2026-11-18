@@ -1,4 +1,4 @@
-namespace Player.Core.Localization
+namespace Kyuto.Core.Localization
 
 open System
 open System.Collections.Generic

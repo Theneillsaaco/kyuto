@@ -1,6 +1,6 @@
 using Qt.Bridge.Models;
 
-namespace Player.App.Models;
+namespace Kyuto.App.Models;
 
 /// <summary>One line in the lyrics panel. Start is in seconds, -1 for plain lyrics.</summary>
 public class LyricRow

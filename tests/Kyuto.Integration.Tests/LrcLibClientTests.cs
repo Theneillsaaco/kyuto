@@ -1,10 +1,10 @@
 using System.Net;
 using System.Text;
-using Player.Core.Domain;
-using Player.Integration.Tests.Base;
-using Player.Providers.Lyrics;
+using Kyuto.Core.Domain;
+using Kyuto.Integration.Tests.Base;
+using Kyuto.Providers.Lyrics;
 
-namespace Player.Integration.Tests;
+namespace Kyuto.Integration.Tests;
 
 public class LrcLibClientTests
 {

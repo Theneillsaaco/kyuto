@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
-using Player.Core;
+using Kyuto.Core;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 
 /// <summary>

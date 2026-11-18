@@ -1,6 +1,6 @@
-using Player.Core.Playback;
+using Kyuto.Core.Playback;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 // What plays when the queue runs out. PlaybackService is partial so this lives next to the feature and shares its state.
 internal sealed partial class PlaybackService

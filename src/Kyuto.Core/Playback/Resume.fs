@@ -1,4 +1,4 @@
-namespace Player.Core.Playback
+namespace Kyuto.Core.Playback
 
 /// What the player does with the saved session when it starts.
 type StartupMode =

@@ -83,7 +83,7 @@
         dontWrapQtApps = true;
 
         env = {
-          PLAYER_NIX = "1";
+          KYUTO_NIX = "1";
           QtDir = "${qtPrefix}";
           CMAKE_PREFIX_PATH = "${qtPrefix}";
           QT_NO_PRIVATE_MODULE_WARNING = "ON";
@@ -97,7 +97,7 @@
           "--set" "QT_PLUGIN_PATH" "${qtPrefix}/${qt.qtbase.qtPluginPrefix}"
           "--set" "QML_IMPORT_PATH" "${qtPrefix}/${qt.qtbase.qtQmlPrefix}"
           "--set" "QT_QUICK_CONTROLS_STYLE" "Basic"
-          "--set" "PLAYER_SIDECAR_DIR" "${placeholder "out"}/share/kyuto/sidecar"
+          "--set" "KYUTO_SIDECAR_DIR" "${placeholder "out"}/share/kyuto/sidecar"
           "--prefix" "PATH" ":" "${lib.makeBinPath runtimeBins}" 
         ];
 

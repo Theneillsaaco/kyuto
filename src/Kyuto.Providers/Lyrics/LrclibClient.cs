@@ -1,11 +1,11 @@
 using System.Net;
 using System.Text.Json;
-using Player.Core.Contracts;
-using Player.Core.Domain;
-using Player.Core.Lyrics;
-using static Player.Providers.JsonRead;
+using Kyuto.Core.Contracts;
+using Kyuto.Core.Domain;
+using Kyuto.Core.Lyrics;
+using static Kyuto.Providers.JsonRead;
 
-namespace Player.Providers.Lyrics;
+namespace Kyuto.Providers.Lyrics;
 
 /// <summary>
 /// Lyrics from LRCLIB (https://lrclib.net): free, no key, with timed lyrics for many songs. It asks for the exact
@@ -15,7 +15,7 @@ namespace Player.Providers.Lyrics;
 /// </summary>
 public sealed class LrclibClient : ILyricsSource, IDisposable
 {
-    public const string UserAgent = "Player/0.3 (https://github.com/Theneillsaaco)";
+    public const string UserAgent = "Kyuto/0.3 (https://github.com/Theneillsaaco)";
     private const string Api = "https://lrclib.net/api/";
     private const double DurationTolerance = 2.0;
 

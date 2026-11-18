@@ -1,9 +1,9 @@
-using Player.Core.Contracts;
-using Player.Core.Domain;
-using Player.Storage.Database;
-using Player.Storage.Secrets;
+using Kyuto.Core.Contracts;
+using Kyuto.Core.Domain;
+using Kyuto.Storage.Database;
+using Kyuto.Storage.Secrets;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 internal enum AccountStage { Unavailable, SignedOut, SignedIn, Expired }
 

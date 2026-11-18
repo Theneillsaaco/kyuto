@@ -1,9 +1,9 @@
-using Player.Core;
-using Player.Core.Domain;
-using Player.Core.Playback;
-using Player.Storage.Database;
+using Kyuto.Core;
+using Kyuto.Core.Domain;
+using Kyuto.Core.Playback;
+using Kyuto.Storage.Database;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 /// <summary>
 /// The last session as it comes back: the queue (empty when the startup mode says to restore nothing, but with its

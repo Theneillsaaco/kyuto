@@ -1,6 +1,6 @@
-using Player.App.ViewModels.Base;
+using Kyuto.App.ViewModels.Base;
 
-namespace Player.App.ViewModels;
+namespace Kyuto.App.ViewModels;
 
 /// <summary>
 /// Appearance for QML. Instantiated once from Main.qml as <c>ThemeViewModel { id: themeVm }</c>; the Theme

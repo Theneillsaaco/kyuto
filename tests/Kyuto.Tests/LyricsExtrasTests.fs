@@ -1,6 +1,6 @@
 module LyricsExtrasTests
 
-open Player.Core.Lyrics
+open Kyuto.Core.Lyrics
 open Xunit
 
 let private line (start: float) (text: string) : LyricLine = { Start = start; Text = text }

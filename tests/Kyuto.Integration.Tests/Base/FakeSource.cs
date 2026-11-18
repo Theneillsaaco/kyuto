@@ -1,7 +1,7 @@
-using Player.Core.Contracts;
-using Player.Core.Domain;
+using Kyuto.Core.Contracts;
+using Kyuto.Core.Domain;
 
-namespace Player.Integration.Tests.Base;
+namespace Kyuto.Integration.Tests.Base;
 
 internal sealed class FakeSource(string name, Func<Track, Task<LyricsResult>> find) : ILyricsSource
 {

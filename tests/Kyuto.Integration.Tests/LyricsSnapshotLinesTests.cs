@@ -1,8 +1,8 @@
-using Player.App.Services;
-using Player.Core.Contracts;
-using Player.Integration.Tests.Base;
+using Kyuto.App.Services;
+using Kyuto.Core.Contracts;
+using Kyuto.Integration.Tests.Base;
 
-namespace Player.Integration.Tests;
+namespace Kyuto.Integration.Tests;
 
 /// <summary>The snapshot carries the lyrics already parsed, so the view model never parses the text again.</summary>
 public class LyricsSnapshotLinesTests

@@ -1,8 +1,8 @@
-using Player.App.Services;
+using Kyuto.App.Services;
 
-using Player.Integration.Tests.Base;
+using Kyuto.Integration.Tests.Base;
 
-namespace Player.Integration.Tests;
+namespace Kyuto.Integration.Tests;
 
 public class LookupCacheTests
 {

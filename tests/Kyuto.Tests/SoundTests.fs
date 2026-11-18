@@ -1,6 +1,6 @@
 module SoundTests
 
-open Player.Core.Playback
+open Kyuto.Core.Playback
 open Xunit
 
 [<Fact>]

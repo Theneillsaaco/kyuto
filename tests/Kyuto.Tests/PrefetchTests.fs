@@ -1,8 +1,8 @@
 module PrefetchTests
 
-open Player.Core.Contracts
-open Player.Core.Domain
-open Player.Core.Playback
+open Kyuto.Core.Contracts
+open Kyuto.Core.Domain
+open Kyuto.Core.Playback
 open Xunit
 
 let track (id: string) : Track =

@@ -1,4 +1,4 @@
-namespace Player.Scrobble.LastFm
+namespace Kyuto.Scrobble.LastFm
 
 open System
 open System.Collections.Generic
@@ -6,9 +6,9 @@ open System.IO
 open System.Net.Http
 open System.Text.Json
 open System.Threading.Tasks
-open Player.Core.Contracts
-open Player.Core.Domain
-open Player.Core.Localization
+open Kyuto.Core.Contracts
+open Kyuto.Core.Domain
+open Kyuto.Core.Localization
 
 type LastFmException(code: int, message: string) =
     inherit Exception(message)
@@ -63,7 +63,7 @@ module private Wire =
 type LastFmClient(credentials: LastFmCredentials) =
     let http =
         let client = new HttpClient(Timeout = TimeSpan.FromSeconds 20.0)
-        client.DefaultRequestHeaders.UserAgent.ParseAdd "Player/0.2"
+        client.DefaultRequestHeaders.UserAgent.ParseAdd "Kyuto/0.2"
         client
 
     /// One signed POST. Returns the parsed reply, or raises LastFmException for an error reply.

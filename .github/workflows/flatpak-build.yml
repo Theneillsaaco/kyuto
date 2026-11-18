@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  APP: io.github.Theneillsaaco.MediaPlayer
+  APP: io.github.Theneillsaaco.Kyuto
 
 jobs:
   build:
@@ -56,5 +56,5 @@ jobs:
       - name: Check the installed app
         run: |
           flatpak info --user "$APP"
-          flatpak run --command=test "$APP" -x /app/lib/player/Player.App
-          flatpak run --command=sh "$APP" -c 'ls /app/lib/libmpv.so* /app/lib/dotnet/dotnet /app/share/player/sidecar/ytm/server.py'
+          flatpak run --command=test "$APP" -x /app/lib/kyuto/Kyuto.App
+          flatpak run --command=sh "$APP" -c 'ls /app/lib/libmpv.so* /app/lib/dotnet/dotnet /app/share/kyuto/sidecar/ytm/server.py'

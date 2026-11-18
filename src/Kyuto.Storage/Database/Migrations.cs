@@ -1,4 +1,4 @@
-namespace Player.Storage.Database;
+namespace Kyuto.Storage.Database;
 
 /// <summary>
 /// Schema history. Index + 1 is the version stored in PRAGMA user_version. Append, never edit.

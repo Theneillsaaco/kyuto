@@ -1,10 +1,10 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
-using Player.Core;
-using Player.Core.Playback;
+using Kyuto.Core;
+using Kyuto.Core.Playback;
 
-namespace Player.Storage.Cache;
+namespace Kyuto.Storage.Cache;
 
 /// <summary>
 /// Whole songs on disk. The app hands it the stream URL it already resolved and the song is downloaded in the

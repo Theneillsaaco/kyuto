@@ -1,12 +1,12 @@
-using Player.App.Services;
-using Player.Core.Domain;
-using Player.Integration.Tests.Base;
+using Kyuto.App.Services;
+using Kyuto.Core.Domain;
+using Kyuto.Integration.Tests.Base;
 
-namespace Player.Integration.Tests;
+namespace Kyuto.Integration.Tests;
 
 public class MprisMapperTests
 {
-    private static Player.Mpris.MprisState Build(
+    private static Kyuto.Mpris.MprisState Build(
         Track? track = null, bool loaded = false, bool paused = true, bool awaiting = false, double duration = 0,
         double position = 0, int volume = 100, double speed = 1.0, string repeat = "off", bool shuffle = false,
         bool canNext = false, bool canPrevious = false, int count = 0) =>

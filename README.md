@@ -22,15 +22,15 @@ A desktop YouTube Music player for Linux, built with **.NET 10**, **Qt Bridge fo
 
 | Project | What it holds |
 |---|---|
-| `Player.Core` (F#) | Domain, queue, listen tracking, scrobble rules, lyrics (LRC), Material color solver, i18n, logging |
-| `Player.Scrobble` (F#) | Last.fm client and request signing |
-| `Player.Providers` (C#) | YouTube Music through the Python sidecar, LRCLIB |
-| `Player.Audio` (C#) | libmpv engine (P/Invoke) |
-| `Player.Storage` (C#) | SQLite database, secrets (keyring or file with mode 600), XDG paths |
-| `Player.Mpris` (C#) | `org.mpris.MediaPlayer2` on the session bus |
-| `Player.App` (C#) | Services, view models and the QML interface |
+| `Kyuto.Core` (F#) | Domain, queue, listen tracking, scrobble rules, lyrics (LRC), Material color solver, i18n, logging |
+| `Kyuto.Scrobble` (F#) | Last.fm client and request signing |
+| `Kyuto.Providers` (C#) | YouTube Music through the Python sidecar, LRCLIB |
+| `Kyuto.Audio` (C#) | libmpv engine (P/Invoke) |
+| `Kyuto.Storage` (C#) | SQLite database, secrets (keyring or file with mode 600), XDG paths |
+| `Kyuto.Mpris` (C#) | `org.mpris.MediaPlayer2` on the session bus |
+| `Kyuto.App` (C#) | Services, view models and the QML interface |
 | `sidecar/ytm` (Python) | `ytmusicapi` + `yt-dlp` behind a JSON-lines protocol |
-| `tests/Player.Tests` (F#) | xUnit tests, including the color solver checked against a reference oracle |
+| `tests/Kyuto.Tests` (F#) | xUnit tests, including the color solver checked against a reference oracle |
 
 ## Run it
 
@@ -38,10 +38,10 @@ A desktop YouTube Music player for Linux, built with **.NET 10**, **Qt Bridge fo
 
 ```sh
 nix develop
-dotnet run --project src/Player.App
+dotnet run --project src/Kyuto.App
 ```
 
-Or build the package: `nix build` (the binary is `result/bin/media-player`).
+Or build the package: `nix build` (the binary is `result/bin/kyuto`).
 
 #### Install (flake)
 
@@ -63,7 +63,7 @@ inputs.media-player.packages.${pkgs.stdenv.hostPlatform.system}.default
 
 ```sh
 ./flatpak/build.sh
-flatpak run io.github.Theneillsaaco.MediaPlayer
+flatpak run io.github.Theneillsaaco.Kyuto
 ```
 
 `build.sh` installs the KDE 6.11 runtime and the .NET 10 extension, generates the offline NuGet and Python dependency lists the first time, then builds and installs the app for your user. The first build compiles ffmpeg, mpv and libplacebo, so it takes a while.
@@ -84,20 +84,20 @@ Environment variables:
 
 | Variable | Purpose |
 |---|---|
-| `PLAYER_LASTFM_KEY`, `PLAYER_LASTFM_SECRET` | Last.fm API key and shared secret (or enter them in Settings) |
-| `PLAYER_SIDECAR` | Path to `server.py` |
-| `PLAYER_SIDECAR_DIR` | Folder that holds `ytm/server.py` |
-| `PLAYER_PYTHON` | Python interpreter for the sidecar (default `python3`) |
-| `PLAYER_LOG` | `debug`, `warn` or `error` (default `info`) |
+| `KYUTO_LASTFM_KEY`, `KYUTO_LASTFM_SECRET` | Last.fm API key and shared secret (or enter them in Settings) |
+| `KYUTO_SIDECAR` | Path to `server.py` |
+| `KYUTO_SIDECAR_DIR` | Folder that holds `ytm/server.py` |
+| `KYUTO_PYTHON` | Python interpreter for the sidecar (default `python3`) |
+| `KYUTO_LOG` | `debug`, `warn` or `error` (default `info`) |
 
 Files (XDG):
 
 | Path | Content |
 |---|---|
-| `~/.config/player/lastfm.json` | Last.fm API key and secret (mode 600) |
-| `~/.config/player/secrets/` | Fallback for secrets when no keyring is available |
-| `~/.local/share/player/player.db` | Settings, history, saved queue, scrobble queue, caches |
-| `~/.local/state/player/player.log` | Rotating log (never contains cookies or tokens) |
+| `~/.config/kyuto/lastfm.json` | Last.fm API key and secret (mode 600) |
+| `~/.config/kyuto/secrets/` | Fallback for secrets when no keyring is available |
+| `~/.local/share/kyuto/kyuto.db` | Settings, history, saved queue, scrobble queue, caches |
+| `~/.local/state/kyuto/kyuto.log` | Rotating log (never contains cookies or tokens) |
 
 The YouTube cookie and the Last.fm session key are kept in the Secret Service keyring through `secret-tool`.
 

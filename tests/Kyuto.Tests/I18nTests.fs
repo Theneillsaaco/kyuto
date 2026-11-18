@@ -2,7 +2,7 @@ module I18nTests
 
 open System.Text.Json
 open System.Text.RegularExpressions
-open Player.Core.Localization
+open Kyuto.Core.Localization
 open Xunit
 
 [<Fact>]

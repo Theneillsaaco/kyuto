@@ -1,8 +1,8 @@
-using Player.Core;
-using Player.Core.Contracts;
-using Player.Core.Playback;
+using Kyuto.Core;
+using Kyuto.Core.Contracts;
+using Kyuto.Core.Playback;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 /// <summary>
 /// Resolves the direct stream of the tracks that play now and next, on the thread pool, and keeps the results in a

@@ -1,8 +1,8 @@
 using System.Text;
 using System.Text.Json;
-using Player.Core.Contracts;
+using Kyuto.Core.Contracts;
 
-namespace Player.Providers.Lyrics;
+namespace Kyuto.Providers.Lyrics;
 
 /// <summary>
 /// Machine translation of lyrics through the free Google Translate endpoint (unofficial: it can change or limit use).

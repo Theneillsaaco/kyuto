@@ -2,20 +2,30 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
 
-namespace Player.Storage.Secrets;
+namespace Kyuto.Storage.Secrets;
 
 /// <summary>
 /// Keeps small secrets (a session key). The Secret Service through secret-tool comes first;
 /// when it is missing or no keyring daemon answers, a file with mode 600 under the config folder.
 /// The secret always travels on stdin, never as an argument, so it never shows in a process list.
 /// </summary>
-public  sealed class SecretStore(string application = "player")
+public  sealed class SecretStore(string application = "kyuto")
 {
     private static readonly TimeSpan ToolTimeout = TimeSpan.FromSeconds(10);
     
     public async Task<string?> GetAsync(string name)
     {
         var (ok, output) = await RunTool(["lookup", "application", application, "account", name], null);
+
+        // Kyuto was called "player": bring an old keyring entry over once.
+        (ok, output) = await RunTool(["lookup", "application", "player", "account", name], null);
+    
+        if (ok && output.Trim() is { Length: > 0 } old)
+        {
+            await Set(name, old);
+            await RunTool(["clear", "application", "player", "account", name], null);
+            return old;
+        }
         
         if (ok && output.Trim() is { Length: > 0} secret)
             return secret;
@@ -27,7 +37,7 @@ public  sealed class SecretStore(string application = "player")
 
     public async Task Set(string name, string value)
     {
-        var (ok, _) = await RunTool(["store", $"--label=Player ({name})", "application", application, "account", name], value);
+        var (ok, _) = await RunTool(["store", $"--label=Kyuto ({name})", "application", application, "account", name], value);
 
         if (ok)
         {

@@ -1,7 +1,7 @@
-using Player.Core;
-using Player.Storage.Database;
+using Kyuto.Core;
+using Kyuto.Storage.Database;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 /// <summary>
 /// The settings table with every failure swallowed and logged. Reading gives null and writing does nothing when the

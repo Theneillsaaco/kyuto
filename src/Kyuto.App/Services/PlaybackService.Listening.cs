@@ -1,8 +1,8 @@
-using Player.Core;
-using Player.Core.Domain;
-using Player.Core.Playback;
+using Kyuto.Core;
+using Kyuto.Core.Domain;
+using Kyuto.Core.Playback;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 // What counts as a listen: the history and Last.fm. PlaybackService is partial so this lives next to the feature and
 // shares its state.

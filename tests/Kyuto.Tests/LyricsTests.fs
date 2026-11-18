@@ -1,6 +1,6 @@
 module LyricsTests
 
-open Player.Core.Lyrics
+open Kyuto.Core.Lyrics
 open Xunit
 
 let private starts (lines: LyricLine[]) = lines |> Array.map (fun l -> l.Start) |> Array.toList

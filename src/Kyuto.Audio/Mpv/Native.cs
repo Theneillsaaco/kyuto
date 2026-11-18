@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace Player.Audio.Mpv;
+namespace Kyuto.Audio.Mpv;
 
 /// <summary>libmpv P/Invoke declarations and the resolver that finds the shared library. Nothing else calls native code.</summary>
 internal static class Native

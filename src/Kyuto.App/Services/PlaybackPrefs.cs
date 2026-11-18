@@ -1,7 +1,7 @@
 using System.Globalization;
-using Player.Core.Playback;
+using Kyuto.Core.Playback;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 /// <summary>
 /// The small playback settings: keep playing when the queue ends, level the volume between songs, the speed and

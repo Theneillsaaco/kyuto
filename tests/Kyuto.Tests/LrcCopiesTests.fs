@@ -1,6 +1,6 @@
 module LrcCopiesTests
 
-open Player.Core.Lyrics
+open Kyuto.Core.Lyrics
 open Xunit
 
 let private texts (lines: LyricLine[]) = lines |> Array.map (fun l -> l.Text) |> Array.toList

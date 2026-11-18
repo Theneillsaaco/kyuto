@@ -1,9 +1,9 @@
 using System.Text.Json;
-using Player.Core.Contracts;
-using Player.Core.Domain;
-using static Player.Providers.YoutubeMusic.TrackMapper;
+using Kyuto.Core.Contracts;
+using Kyuto.Core.Domain;
+using static Kyuto.Providers.YoutubeMusic.TrackMapper;
 
-namespace Player.Providers.YoutubeMusic;
+namespace Kyuto.Providers.YoutubeMusic;
 
 // The browsing half of the provider (home, album, artist, typed search...). YtSidecarProvider is partial so this
 // lives next to the feature and shares its process and its saved cookie.

@@ -1,6 +1,6 @@
-using Player.Core.Playback;
+using Kyuto.Core.Playback;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 // Saving and bringing back the listening session. The database work is in SessionStore; this part decides when to
 // save and applies what comes back. PlaybackService is partial so this lives next to the feature and shares its state.

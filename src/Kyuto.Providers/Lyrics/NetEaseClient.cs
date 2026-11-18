@@ -1,11 +1,11 @@
 using System.Collections.Concurrent;
 using System.Text.Json;
-using Player.Core.Contracts;
-using Player.Core.Domain;
-using Player.Core.Lyrics;
-using static Player.Providers.JsonRead;
+using Kyuto.Core.Contracts;
+using Kyuto.Core.Domain;
+using Kyuto.Core.Lyrics;
+using static Kyuto.Providers.JsonRead;
 
-namespace Player.Providers.Lyrics;
+namespace Kyuto.Providers.Lyrics;
 
 /// <summary>
 /// NetEase Cloud Music: timed lyrics for a huge catalog and the romaji ("romalrc") of many Japanese songs. The song is

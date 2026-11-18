@@ -1,7 +1,7 @@
-using Player.Core.Domain;
-using Player.Mpris;
+using Kyuto.Core.Domain;
+using Kyuto.Mpris;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 /// <summary>What the player is doing, turned into what the desktop is told. No state, so it is tested alone.</summary>
 internal static class MprisMapper

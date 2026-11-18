@@ -1,7 +1,7 @@
 using System.Text.Json;
-using Player.Core.Domain;
+using Kyuto.Core.Domain;
 
-namespace Player.Providers.YoutubeMusic;
+namespace Kyuto.Providers.YoutubeMusic;
 
 /// <summary>Turns the sidecar's JSON objects into domain types.</summary>
 internal static class TrackMapper

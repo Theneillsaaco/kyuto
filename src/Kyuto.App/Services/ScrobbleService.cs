@@ -1,11 +1,11 @@
 using System.Diagnostics;
-using Player.Core.Contracts;
-using Player.Core.Domain;
-using Player.Scrobble.LastFm;
-using Player.Storage.Database;
-using Player.Storage.Secrets;
+using Kyuto.Core.Contracts;
+using Kyuto.Core.Domain;
+using Kyuto.Scrobble.LastFm;
+using Kyuto.Storage.Database;
+using Kyuto.Storage.Secrets;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 internal enum ScrobbleStage { Unavailable, SignedOut, Authorizing, SignedIn, Reconnect }
 

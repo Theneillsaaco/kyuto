@@ -1,6 +1,6 @@
 module ScrobbleTests
 
-open Player.Core.Scrobbling
+open Kyuto.Core.Scrobbling
 open Xunit
 
 [<Fact>]

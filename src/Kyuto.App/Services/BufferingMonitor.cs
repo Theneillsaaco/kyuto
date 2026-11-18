@@ -1,4 +1,4 @@
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 /// <summary>
 /// Tells whether the sound is supposed to be playing and is not (still opening the track, or mpv is paused for the

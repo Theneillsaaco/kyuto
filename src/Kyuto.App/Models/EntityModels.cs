@@ -1,6 +1,6 @@
 using Qt.Bridge.Models;
 
-namespace Player.App.Models;
+namespace Kyuto.App.Models;
 
 /// <summary>
 /// A row of a browse list. Kind is "album", "artist", "playlist" or "track" (a song in a shelf of Home), or

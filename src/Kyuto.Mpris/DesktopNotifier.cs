@@ -1,7 +1,7 @@
-using Player.Core;
+using Kyuto.Core;
 using Tmds.DBus.Protocol;
 
-namespace Player.Mpris;
+namespace Kyuto.Mpris;
 
 /// <summary>Desktop notifications over the session bus. Never throws: a missing daemon only means no notification.</summary>
 public sealed class DesktopNotifier : IDisposable
@@ -27,9 +27,9 @@ public sealed class DesktopNotifier : IDisposable
             using (var writer = _connection.GetMessageWriter())
             {
                 writer.WriteMethodCallHeader(Service, Path, Service, "Notify", "susssasa{sv}i");
-                writer.WriteString("Player");
+                writer.WriteString("Kyuto");
                 writer.WriteUInt32(_lastId); // replaces the previous one
-                writer.WriteString("io.github.Theneillsaaco.MediaPlayer");
+                writer.WriteString("io.github.Theneillsaaco.Kyuto");
                 writer.WriteString(summary);
                 writer.WriteString(body);
                 writer.WriteArray(Array.Empty<string>());

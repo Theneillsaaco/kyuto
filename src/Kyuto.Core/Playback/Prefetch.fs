@@ -1,7 +1,7 @@
-namespace Player.Core.Playback
+namespace Kyuto.Core.Playback
 
-open Player.Core.Contracts
-open Player.Core.Domain
+open Kyuto.Core.Contracts
+open Kyuto.Core.Domain
 
 /// Which tracks are worth resolving ahead of time, and whether a resolved URL can still be used.
 module Prefetch =

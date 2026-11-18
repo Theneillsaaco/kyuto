@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 
-namespace Player.Storage;
+namespace Kyuto.Storage;
 
 public readonly record struct ToolResult(int ExitCode, string Output);
 

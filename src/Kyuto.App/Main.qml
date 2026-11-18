@@ -14,7 +14,7 @@ ApplicationWindow {
     visible: true
     title: playback.currentTitle !== ""
         ? playback.currentTitle + (playback.currentArtist !== "" ? " · " + playback.currentArtist : "")
-        : "Player"
+        : "Kyuto"
     color: appTheme.surface
 
     // The Basic style's own pieces (scroll bars, text cursors, selections) read the palette, which is light

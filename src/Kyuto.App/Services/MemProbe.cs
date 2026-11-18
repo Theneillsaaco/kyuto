@@ -1,24 +1,24 @@
-using Player.Core;
+using Kyuto.Core;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 // cuesta nada si no está puesta:
-//     PLAYER_MEMPROBE=1  player      cada 30 s escribe una línea en el log (~/.local/state/player/player.log)
-//     PLAYER_MEMPROBE=gc player      igual, pero fuerza un GC antes de medir (el "managed live" es lo que de verdad vive)
+//     KYUTO_MEMPROBE=1  player      cada 30 s escribe una línea en el log (~/.local/state/kyuto/kyuto.log)
+//     KYUTO_MEMPROBE=gc player      igual, pero fuerza un GC antes de medir (el "managed live" es lo que de verdad vive)
 // La línea separa lo que ve el sistema (rss, y de él anon / file / shmem) de lo que ve .NET (managed, heap), y lista
 // los procesos hijos (el sidecar de Python, node...). Lectura:
 //   - rss sube y "managed live" no  -> es nativo: Qt (imágenes, texturas, shaders), mpv o QtMultimedia.
 //   - "managed live" sube           -> es .NET: algo que se guarda y no se suelta.
 //   - un hijo sube                  -> es el sidecar (yt-dlp), no la app.
 
-/// <summary>Writes a memory line to the log every 30 seconds while PLAYER_MEMPROBE is set.</summary>
+/// <summary>Writes a memory line to the log every 30 seconds while KYUTO_MEMPROBE is set.</summary>
 internal static class MemProbe
 {
     private const double MiB = 1024.0 * 1024.0;
 
     public static void StartIfAsked()
     {
-        var mode = Environment.GetEnvironmentVariable("PLAYER_MEMPROBE");
+        var mode = Environment.GetEnvironmentVariable("KYUTO_MEMPROBE");
         if (string.IsNullOrEmpty(mode) || !OperatingSystem.IsLinux())
             return;
 

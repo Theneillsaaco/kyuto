@@ -1,7 +1,7 @@
-using Player.App.Services;
-using Player.Integration.Tests.Base;
+using Kyuto.App.Services;
+using Kyuto.Integration.Tests.Base;
 
-namespace Player.Integration.Tests;
+namespace Kyuto.Integration.Tests;
 
 public class BackgroundWorkTests
 {

@@ -1,4 +1,4 @@
-namespace Player.Scrobble.LastFm
+namespace Kyuto.Scrobble.LastFm
 
 open System
 open System.Collections.Generic
@@ -12,11 +12,11 @@ type LastFmCredentials = {
 }
 
 // The API key and secret come from the environment or from a JSON file kept out of the repo:
-/// PLAYER_LASTFM_KEY / PLAYER_LASTFM_SECRET, or {"apiKey": "...", "secret": "..."} in the given file.
+/// KYUTO_LASTFM_KEY / KYUTO_LASTFM_SECRET, or {"apiKey": "...", "secret": "..."} in the given file.
 module LastFmConfig =
     let load (file: string) : LastFmCredentials voption =
         let env name = (Environment.GetEnvironmentVariable name |> Option.ofObj |> Option.defaultValue "").Trim()
-        let key, secret = env "PLAYER_LASTFM_KEY", env "PLAYER_LASTFM_SECRET"
+        let key, secret = env "KYUTO_LASTFM_KEY", env "KYUTO_LASTFM_SECRET"
 
         if key <> "" && secret <> "" then
             ValueSome { ApiKey = key; Secret = secret }

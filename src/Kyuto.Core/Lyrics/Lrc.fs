@@ -1,4 +1,4 @@
-namespace Player.Core.Lyrics
+namespace Kyuto.Core.Lyrics
 
 open System
 open System.Globalization

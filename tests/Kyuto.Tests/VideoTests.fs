@@ -1,7 +1,7 @@
 module VideoTests
 
-open Player.Core.Contracts
-open Player.Core.Playback
+open Kyuto.Core.Contracts
+open Kyuto.Core.Playback
 open Xunit
 
 let private info id typ counterpartId counterpartType : VideoInfo =

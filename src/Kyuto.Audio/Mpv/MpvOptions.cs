@@ -1,4 +1,4 @@
-namespace Player.Audio.Mpv;
+namespace Kyuto.Audio.Mpv;
 
 internal static class MpvOptions
 {
@@ -6,7 +6,7 @@ internal static class MpvOptions
     [
         ("config", "no"), ("terminal", "no"), ("idle", "yes"), ("vid", "no"),
         ("audio-display", "no"), ("input-default-bindings", "no"), ("input-vo-keyboard", "no"),
-        ("ytdl", "yes"), ("ytdl-format", "bestaudio/best"), ("audio-client-name", "Player"),
+        ("ytdl", "yes"), ("ytdl-format", "bestaudio/best"), ("audio-client-name", "Kyuto"),
         ("ytdl-raw-options", "extractor-args=youtube:player_client=default"),
         ("prefetch-playlist", "yes"), ("gapless-audio", "yes"),
         // The demuxer cache is capped: a song is a few MB, so the 150 MiB mpv allows by default is never needed for

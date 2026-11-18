@@ -2,7 +2,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-APP=io.github.Theneillsaaco.MediaPlayer
+APP=io.github.Theneillsaaco.Kyuto
 KDE=6.11
 FDO=26.08
 

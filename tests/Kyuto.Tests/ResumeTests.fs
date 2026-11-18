@@ -1,6 +1,6 @@
 module ResumeTests
 
-open Player.Core.Playback
+open Kyuto.Core.Playback
 open Xunit
 
 [<Fact>]

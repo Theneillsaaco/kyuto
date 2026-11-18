@@ -1,12 +1,12 @@
 using System.Globalization;
-using Player.App.Models;
-using Player.App.Services;
-using Player.App.ViewModels.Base;
-using Player.Core;
-using Player.Core.Domain;
-using Player.Storage.Database;
+using Kyuto.App.Models;
+using Kyuto.App.Services;
+using Kyuto.App.ViewModels.Base;
+using Kyuto.Core;
+using Kyuto.Core.Domain;
+using Kyuto.Storage.Database;
 
-namespace Player.App.ViewModels;
+namespace Kyuto.App.ViewModels;
 
 /// <summary>
 /// The history page: the songs that counted as a listen, newest first. Instantiated once from Main.qml as

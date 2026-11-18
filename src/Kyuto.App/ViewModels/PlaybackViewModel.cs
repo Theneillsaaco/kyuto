@@ -1,10 +1,10 @@
 using System.Globalization;
-using Player.App.Services;
-using Player.App.ViewModels.Base;
-using Player.Core.Contracts;
-using Player.Core.Playback;
+using Kyuto.App.Services;
+using Kyuto.App.ViewModels.Base;
+using Kyuto.Core.Contracts;
+using Kyuto.Core.Playback;
 
-namespace Player.App.ViewModels;
+namespace Kyuto.App.ViewModels;
 
 /// <summary>
 /// Transport and now-playing for QML. Instantiated from Main.qml as <c>PlaybackViewModel { id: playback }</c>.

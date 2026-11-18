@@ -1,4 +1,4 @@
-namespace Player.Core.Contracts
+namespace Kyuto.Core.Contracts
 
 open System
 

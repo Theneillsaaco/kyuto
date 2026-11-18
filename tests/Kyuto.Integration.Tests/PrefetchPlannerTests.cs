@@ -1,9 +1,9 @@
-using Player.App.Services;
-using Player.Core.Domain;
-using Player.Core.Playback;
-using Player.Integration.Tests.Base;
+using Kyuto.App.Services;
+using Kyuto.Core.Domain;
+using Kyuto.Core.Playback;
+using Kyuto.Integration.Tests.Base;
 
-namespace Player.Integration.Tests;
+namespace Kyuto.Integration.Tests;
 
 public class PrefetchPlannerTests
 {

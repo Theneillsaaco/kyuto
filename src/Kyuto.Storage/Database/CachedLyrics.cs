@@ -1,4 +1,4 @@
-namespace Player.Storage.Database;
+namespace Kyuto.Storage.Database;
 
 /// <summary>
 /// Lyrics saved for a track. Kind is "lrc" (timed), "plain", "instrumental" or "none" (looked for, nothing

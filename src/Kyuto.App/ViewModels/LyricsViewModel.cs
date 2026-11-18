@@ -1,11 +1,11 @@
 using System.Globalization;
-using Player.App.Models;
-using Player.App.Services;
-using Player.App.ViewModels.Base;
-using Player.Core.Localization;
-using Player.Core.Lyrics;
+using Kyuto.App.Models;
+using Kyuto.App.Services;
+using Kyuto.App.ViewModels.Base;
+using Kyuto.Core.Localization;
+using Kyuto.Core.Lyrics;
 
-namespace Player.App.ViewModels;
+namespace Kyuto.App.ViewModels;
 
 /// <summary>
 /// The lyrics panel. Instantiated once from Main.qml as <c>LyricsViewModel { id: lyricsVm }</c>. Nothing is
@@ -61,7 +61,7 @@ public class LyricsViewModel : ViewModelBase
     public void PanelShown(bool shown)
     {
         _shown = shown;
-        Player.Core.Log.Info("lyrics", shown ? "panel opened" : "panel closed");
+        Kyuto.Core.Log.Info("lyrics", shown ? "panel opened" : "panel closed");
         if (shown)
             Poll();
     }
@@ -70,7 +70,7 @@ public class LyricsViewModel : ViewModelBase
     public void Poll()
     {
         try { PollCore(); }
-        catch (Exception ex) { Player.Core.Log.Error("lyrics", "poll", ex); }
+        catch (Exception ex) { Kyuto.Core.Log.Error("lyrics", "poll", ex); }
     }
 
     private void PollCore()

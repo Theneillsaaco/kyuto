@@ -1,10 +1,10 @@
 using System.Globalization;
-using Player.App.Services;
-using Player.App.ViewModels.Base;
-using Player.Core;
-using Player.Core.Playback;
+using Kyuto.App.Services;
+using Kyuto.App.ViewModels.Base;
+using Kyuto.Core;
+using Kyuto.Core.Playback;
 
-namespace Player.App.ViewModels;
+namespace Kyuto.App.ViewModels;
 
 /// <summary>The settings dialog: startup behaviour, playback, audio cache, YouTube Music account and Last.fm connection (state, status, commands).</summary>
 public class SettingsViewModel : ViewModelBase

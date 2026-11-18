@@ -1,9 +1,9 @@
-namespace Player.Core.Contracts
+namespace Kyuto.Core.Contracts
 
 open System
 open System.Collections.Generic
 open System.Threading.Tasks
-open Player.Core.Domain
+open Kyuto.Core.Domain
 
 /// A playlist in the user's library. Id "LM" is Liked Music, the list YouTube Music keeps from likes.
 type PlaylistInfo = {

@@ -1,6 +1,6 @@
-using Player.Core.Contracts;
+using Kyuto.Core.Contracts;
 
-namespace Player.Integration.Tests.Base;
+namespace Kyuto.Integration.Tests.Base;
 
 internal sealed class FakeTranslator(Func<string[], string[]> translate) : ILineTranslator
 {

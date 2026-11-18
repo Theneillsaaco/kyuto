@@ -1,4 +1,4 @@
-namespace Player.Core.Playback
+namespace Kyuto.Core.Playback
 
 open System
 open System.Globalization

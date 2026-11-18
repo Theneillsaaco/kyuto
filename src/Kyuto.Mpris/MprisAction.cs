@@ -1,4 +1,4 @@
-namespace Player.Mpris;
+namespace Kyuto.Mpris;
 
 public enum MprisAction
 {

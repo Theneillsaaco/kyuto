@@ -1,8 +1,8 @@
-using Player.Core;
-using Player.Core.Domain;
-using Player.Core.Playback;
+using Kyuto.Core;
+using Kyuto.Core.Domain;
+using Kyuto.Core.Playback;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 // Streams resolved ahead of time, the disk cache, and the entry queued in mpv so the switch is gapless.
 // PlaybackService is partial so this lives next to the feature and shares its state.

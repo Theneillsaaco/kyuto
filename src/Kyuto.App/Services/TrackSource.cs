@@ -1,6 +1,6 @@
-using Player.Core.Domain;
+using Kyuto.Core.Domain;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 internal static class TrackSource
 {

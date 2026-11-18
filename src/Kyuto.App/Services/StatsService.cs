@@ -1,6 +1,6 @@
-using Player.Core.Contracts;
+using Kyuto.Core.Contracts;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 /// <summary>Views and likes of the tracks, looked up in the background and kept in memory. A failed lookup waits a minute.</summary>
 internal sealed class StatsService(IBrowseProvider? source)

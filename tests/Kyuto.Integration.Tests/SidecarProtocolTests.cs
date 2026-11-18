@@ -1,9 +1,9 @@
 using System.Collections.Concurrent;
 using System.Text.Json;
-using Player.Core.Contracts;
-using Player.Providers.YoutubeMusic;
+using Kyuto.Core.Contracts;
+using Kyuto.Providers.YoutubeMusic;
 
-namespace Player.Integration.Tests;
+namespace Kyuto.Integration.Tests;
 
 public class SidecarProtocolTests
 {

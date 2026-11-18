@@ -1,8 +1,8 @@
-using Player.Core;
-using Player.Core.Playback;
-using Player.Mpris;
+using Kyuto.Core;
+using Kyuto.Core.Playback;
+using Kyuto.Mpris;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 // The desktop's side of the player (playerctl, media keys, widgets). What is told to the desktop is built by
 // MprisMapper. PlaybackService is partial so this lives next to the feature and shares its state.

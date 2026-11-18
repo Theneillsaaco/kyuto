@@ -1,7 +1,7 @@
-using Player.Core.Contracts;
-using Player.Core.Domain;
+using Kyuto.Core.Contracts;
+using Kyuto.Core.Domain;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 /// <summary>
 /// What plays after the queue ends: the radio YouTube Music builds from the last track, asked for in the background

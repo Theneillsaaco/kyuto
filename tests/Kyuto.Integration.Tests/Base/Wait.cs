@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace Player.Integration.Tests.Base;
+namespace Kyuto.Integration.Tests.Base;
 
 internal static class Wait
 {

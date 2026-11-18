@@ -1,11 +1,11 @@
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
-using Player.Core;
-using Player.Core.Contracts;
-using static Player.Audio.Mpv.Native;
+using Kyuto.Core;
+using Kyuto.Core.Contracts;
+using static Kyuto.Audio.Mpv.Native;
 
-namespace Player.Audio.Mpv;
+namespace Kyuto.Audio.Mpv;
 
 /// <summary>
 /// libmpv through P/Invoke (see <see cref="Native"/>). Audio only, no window, no config files.

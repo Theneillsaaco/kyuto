@@ -1,9 +1,9 @@
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Text.Json;
-using Player.Core.Contracts;
+using Kyuto.Core.Contracts;
 
-namespace Player.Providers.YoutubeMusic;
+namespace Kyuto.Providers.YoutubeMusic;
 
 /// <summary>
 /// The line protocol of sidecar/ytm/server.py: one JSON object per line each way, replies
@@ -17,17 +17,17 @@ internal static class SidecarProtocol
     public static readonly TimeSpan ListTimeout = TimeSpan.FromMinutes(5);    // a big library paginates
 
     /// <summary>
-    /// PLAYER_SIDECAR (the script itself), then PLAYER_SIDECAR_DIR (the folder that holds ytm/server.py, which is
+    /// KYUTO_SIDECAR (the script itself), then KYUTO_SIDECAR_DIR (the folder that holds ytm/server.py, which is
     /// what the Nix package sets), then the sidecar folder of the repository found by walking up from the
     /// executable and from the working directory.
     /// </summary>
     public static string FindScript()
     {
-        var env = Environment.GetEnvironmentVariable("PLAYER_SIDECAR");
+        var env = Environment.GetEnvironmentVariable("KYUTO_SIDECAR");
         if (!string.IsNullOrEmpty(env) && File.Exists(env))
             return env;
 
-        var folder = Environment.GetEnvironmentVariable("PLAYER_SIDECAR_DIR");
+        var folder = Environment.GetEnvironmentVariable("KYUTO_SIDECAR_DIR");
         if (!string.IsNullOrEmpty(folder))
         {
             var inFolder = Path.Combine(folder, "ytm", "server.py");
@@ -43,7 +43,7 @@ internal static class SidecarProtocol
                     return candidate;
             }
         
-        throw new FileNotFoundException("sidecar/ytm/server.py not found; set PLAYER_SIDECAR to its path or PLAYER_SIDECAR_DIR to its folder");
+        throw new FileNotFoundException("sidecar/ytm/server.py not found; set KYUTO_SIDECAR to its path or KYUTO_SIDECAR_DIR to its folder");
     }
     
     public static string Request(long id, string method, object args) =>

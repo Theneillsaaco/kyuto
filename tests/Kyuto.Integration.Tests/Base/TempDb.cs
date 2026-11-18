@@ -1,12 +1,12 @@
-using Player.Storage.Database;
+using Kyuto.Storage.Database;
 
-namespace Player.Integration.Tests.Base;
+namespace Kyuto.Integration.Tests.Base;
 
 /// <summary>A PlayerDatabase in a throw-away folder.</summary>
 internal sealed class TempDb : IDisposable
 {
     public string Dir { get; } = Directory.CreateTempSubdirectory("player-db-").FullName;
-    public string Path => System.IO.Path.Combine(Dir, "player.db");
+    public string Path => System.IO.Path.Combine(Dir, "kyuto.db");
     public PlayerDatabase Db { get; }
     
     public TempDb() => Db = new PlayerDatabase(Path);

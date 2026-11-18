@@ -1,6 +1,6 @@
-using Player.Core.Domain;
+using Kyuto.Core.Domain;
 
-namespace Player.Integration.Tests.Base;
+namespace Kyuto.Integration.Tests.Base;
 
 internal static class Samples
 {

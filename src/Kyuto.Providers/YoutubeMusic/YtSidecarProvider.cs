@@ -1,11 +1,11 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using Player.Core;
-using Player.Core.Contracts;
-using Player.Core.Domain;
-using static Player.Providers.YoutubeMusic.TrackMapper;
+using Kyuto.Core;
+using Kyuto.Core.Contracts;
+using Kyuto.Core.Domain;
+using static Kyuto.Providers.YoutubeMusic.TrackMapper;
 
-namespace Player.Providers.YoutubeMusic;
+namespace Kyuto.Providers.YoutubeMusic;
 
 /// <summary>
 /// YouTube Music through sidecar/ytm/server.py (see <see cref="SidecarProcess"/> for the process and
@@ -179,7 +179,7 @@ public partial class YtSidecarProvider : IMusicProvider, IAccountProvider, ILyri
 
     public YtSidecarProvider(string? script = null, string? python = null) =>
         _process = new SidecarProcess(
-            python ?? Environment.GetEnvironmentVariable("PLAYER_PYTHON") ?? "python3",
+            python ?? Environment.GetEnvironmentVariable("KYUTO_PYTHON") ?? "python3",
             script ?? SidecarProtocol.FindScript());
 
     #endregion

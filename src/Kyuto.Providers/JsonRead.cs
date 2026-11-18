@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Player.Providers;
+namespace Kyuto.Providers;
 
 /// <summary>Forgiving readers for the JSON of services we do not control: a missing or odd field is an empty value.</summary>
 internal static class JsonRead

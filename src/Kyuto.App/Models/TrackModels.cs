@@ -1,4 +1,4 @@
-namespace Player.App.Models;
+namespace Kyuto.App.Models;
 
 public class TrackRow
 {

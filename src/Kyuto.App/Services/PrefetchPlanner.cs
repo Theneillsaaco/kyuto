@@ -1,6 +1,6 @@
-using Player.Core.Playback;
+using Kyuto.Core.Playback;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 internal static class PrefetchPlanner
 {

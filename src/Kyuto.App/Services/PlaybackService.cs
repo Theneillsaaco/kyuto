@@ -1,12 +1,12 @@
 using System.Diagnostics;
-using Player.Core.Contracts;
-using Player.Core.Domain;
-using Player.Core.Playback;
-using Player.Mpris;
-using Player.Storage.Cache;
-using Player.Storage.Database;
+using Kyuto.Core.Contracts;
+using Kyuto.Core.Domain;
+using Kyuto.Core.Playback;
+using Kyuto.Mpris;
+using Kyuto.Storage.Cache;
+using Kyuto.Storage.Database;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 /// <summary>
 /// The playback engine room: queue, mpv, listen tracking, session save/restore and MPRIS. Plain C#,

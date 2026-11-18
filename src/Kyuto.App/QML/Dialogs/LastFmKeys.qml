@@ -4,7 +4,7 @@ import QtQuick.Controls.Basic
 import "../Components"
 
 // Asks for the Last.fm API key and shared secret while none is configured (Settings > Last.fm). They are saved
-// to ~/.config/player/lastfm.json and used at once. vm is the SettingsViewModel; theme the window's Theme.
+// to ~/.config/kyuto/lastfm.json and used at once. vm is the SettingsViewModel; theme the window's Theme.
 ColumnLayout {
     id: root
 

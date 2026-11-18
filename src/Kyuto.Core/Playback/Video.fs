@@ -1,6 +1,6 @@
-namespace Player.Core.Playback
+namespace Kyuto.Core.Playback
 
-open Player.Core.Contracts
+open Kyuto.Core.Contracts
 
 /// What a track's video side offers.
 type VideoPlan = {

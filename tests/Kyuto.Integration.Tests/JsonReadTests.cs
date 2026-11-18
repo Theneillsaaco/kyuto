@@ -1,7 +1,7 @@
 using System.Text.Json;
-using Player.Providers;
+using Kyuto.Providers;
 
-namespace Player.Integration.Tests;
+namespace Kyuto.Integration.Tests;
 
 public class JsonReadTests
 {

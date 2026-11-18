@@ -1,7 +1,7 @@
 module ClockTests
 
 open System
-open Player.Core
+open Kyuto.Core
 open Xunit
 
 [<Fact>]

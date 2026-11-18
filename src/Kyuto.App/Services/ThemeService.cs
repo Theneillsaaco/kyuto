@@ -1,6 +1,6 @@
-using Player.Core.Theme;
+using Kyuto.Core.Theme;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 /// <summary>What the UI needs to paint: the choices, whether it is dark and every color role as a JSON object.</summary>
 internal readonly record struct ThemeSnapshot(
@@ -8,7 +8,7 @@ internal readonly record struct ThemeSnapshot(
 
 /// <summary>
 /// Appearance: mode (light, dark or follow the desktop), accent color, scheme variant and contrast. Keeps the
-/// choices in the settings table and turns them into color tokens with the Material solver in Player.Core.
+/// choices in the settings table and turns them into color tokens with the Material solver in Kyuto.Core.
 /// With the dynamic option on, the source color is the one of the cover that plays (sent by QML) instead of
 /// the accent. Used on the Qt thread only; the desktop watcher is the one piece that works in the background.
 /// </summary>

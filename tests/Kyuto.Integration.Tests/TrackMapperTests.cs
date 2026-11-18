@@ -1,7 +1,7 @@
 using System.Text.Json;
-using Player.Providers.YoutubeMusic;
+using Kyuto.Providers.YoutubeMusic;
 
-namespace Player.Integration.Tests;
+namespace Kyuto.Integration.Tests;
 
 public class TrackMapperTests
 {

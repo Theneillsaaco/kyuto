@@ -9,9 +9,9 @@
       WorkingDirectory="$(QtNativeBuildDir)" IgnoreExitCode="true">
       <Output TaskParameter="ExitCode" PropertyName="DeployResult" />
     </Exec>
-    <Warning Condition="'$(DeployResult)' != '0' AND '$(PLAYER_NIX)' == '1'"
+    <Warning Condition="'$(DeployResult)' != '0' AND '$(KYUTO_NIX)' == '1'"
       Text="Qt deploy fallo (ignorado en Nix, se usa el Qt del store)." />
-    <Error Condition="'$(DeployResult)' != '0' AND '$(PLAYER_NIX)' != '1'"
+    <Error Condition="'$(DeployResult)' != '0' AND '$(KYUTO_NIX)' != '1'"
       Text="Error deploying Qt binaries with CMake install!" />
     <Exec Condition="Exists('$(QtNativeBuildDir)/install_manifest.txt')"
         Command="sed -e &quot;s#^$(TargetDir.Replace('\', '/').TrimEnd('/'))/##&quot; &quot;$(QtNativeBuildDir)/install_manifest.txt&quot; &gt;&gt; &quot;$(TargetDir)qtdeploy.txt&quot;"

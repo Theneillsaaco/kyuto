@@ -1,6 +1,6 @@
-using Player.App.Services;
+using Kyuto.App.Services;
 
-namespace Player.Integration.Tests;
+namespace Kyuto.Integration.Tests;
 
 public class BufferingMonitorTests
 {

@@ -1,8 +1,8 @@
-using Player.Core.Contracts;
-using Player.Scrobble.LastFm;
-using Player.Storage;
+using Kyuto.Core.Contracts;
+using Kyuto.Scrobble.LastFm;
+using Kyuto.Storage;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 // The API key of Last.fm, asked for in Settings instead of by environment variable. ScrobbleService is partial so
 // this lives next to the feature and shares its lock and its notes.

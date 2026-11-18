@@ -1,4 +1,4 @@
-namespace Player.Storage.Database;
+namespace Kyuto.Storage.Database;
 
 // The listening history. PlayerDatabase is partial so this lives next to the feature and shares its connection and lock.
 public partial class PlayerDatabase

@@ -1,7 +1,7 @@
-namespace Player.Core.Playback
+namespace Kyuto.Core.Playback
 
 open System.Collections.Generic
-open Player.Core.Domain
+open Kyuto.Core.Domain
 
 /// When the queue runs out, what to add so the music goes on.
 module Autoplay =

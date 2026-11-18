@@ -2,10 +2,10 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
-using Player.Core;
-using Player.Core.Contracts;
+using Kyuto.Core;
+using Kyuto.Core.Contracts;
 
-namespace Player.Providers.YoutubeMusic;
+namespace Kyuto.Providers.YoutubeMusic;
 
 /// <summary>
 /// The persistent Python process behind the sidecar. If it dies or stalls, the next call starts a

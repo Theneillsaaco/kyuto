@@ -1,8 +1,8 @@
-namespace Player.Core.Playback
+namespace Kyuto.Core.Playback
 
 open System
-open Player.Core.Domain
-open Player.Core.Scrobbling
+open Kyuto.Core.Domain
+open Kyuto.Core.Scrobbling
 
 /// One reading of the player: wall-clock seconds, track position and whether it was paused.
 type ListenSample = {

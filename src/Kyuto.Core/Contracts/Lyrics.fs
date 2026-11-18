@@ -1,7 +1,7 @@
-namespace Player.Core.Contracts
+namespace Kyuto.Core.Contracts
 
 open System.Threading.Tasks
-open Player.Core.Domain
+open Kyuto.Core.Domain
 
 /// What a lyrics source found for a track. Text is LRC (with [mm:ss.xx] marks) when Synced, plain lines otherwise.
 type LyricsResult = {

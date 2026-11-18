@@ -1,11 +1,11 @@
 using System.Text;
 using System.Text.Json;
-using Player.Core.Contracts;
-using Player.Core.Domain;
-using Player.Core.Lyrics;
-using static Player.Providers.JsonRead;
+using Kyuto.Core.Contracts;
+using Kyuto.Core.Domain;
+using Kyuto.Core.Lyrics;
+using static Kyuto.Providers.JsonRead;
 
-namespace Player.Providers.Lyrics;
+namespace Kyuto.Providers.Lyrics;
 
 /// <summary>Timed lyrics from Kugou (no key). The first candidate whose duration is within three seconds is used.</summary>
 public sealed class KugouClient : ILyricsSource, IDisposable

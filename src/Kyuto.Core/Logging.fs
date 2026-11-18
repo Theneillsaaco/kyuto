@@ -1,4 +1,4 @@
-namespace Player.Core
+namespace Kyuto.Core
 
 open System
 open System.IO
@@ -19,14 +19,14 @@ module internal LogFile =
     let mutable private size = 0L
     
     let minLevel =
-        match Environment.GetEnvironmentVariable "PLAYER_LOG" with
+        match Environment.GetEnvironmentVariable "KYUTO_LOG" with
         | null -> LogLevel.Info
         | s when s.Equals("debug", StringComparison.OrdinalIgnoreCase) -> LogLevel.Debug
         | s when s.Equals("warn", StringComparison.OrdinalIgnoreCase) -> LogLevel.Warn
         | s when s.Equals("error", StringComparison.OrdinalIgnoreCase) -> LogLevel.Error
         | _ -> LogLevel.Info
         
-    /// $XDG_STATE_HOME/player/player.log, falling back to ~/.local/state.
+    /// $XDG_STATE_HOME/player/kyuto.log, falling back to ~/.local/state.
     let path =
         lazy
             (let state =
@@ -35,7 +35,7 @@ module internal LogFile =
                 | "" -> Path.Combine(Environment.GetFolderPath Environment.SpecialFolder.UserProfile, ".local", "state")
                 | dir -> dir
                 
-            Path.Combine(state, "player", "player.log"))
+            Path.Combine(state, "kyuto", "kyuto.log"))
             
     let private rotate (file: string) =
         for i in keep - 1 .. -1 .. 1 do
@@ -84,7 +84,7 @@ module internal LogFile =
             with _ -> ())
       
 /// Application log: stderr plus a rotating file. Never pass cookies, tokens or session keys.
-/// Set PLAYER_LOG=debug|warn|error to change the level (default info).
+/// Set KYUTO_LOG=debug|warn|error to change the level (default info).
 [<AbstractClass; Sealed>]
 type Log() =
     static member private Write(level: LogLevel, source: string, message: string, ex: exn) =

@@ -1,4 +1,4 @@
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 /// <summary>The one-line message under the search box ("Buscando…", "Reproduciendo", errors). Written on the Qt thread only.</summary>
 internal sealed class StatusLine

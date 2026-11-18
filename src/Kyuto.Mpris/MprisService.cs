@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using Mpris.DBus;
 using Tmds.DBus.Protocol;
 
-namespace Player.Mpris;
+namespace Kyuto.Mpris;
 
 /// <summary>
 /// org.mpris.MediaPlayer2 on the session bus, so playerctl, media keys and desktop widgets can see and
@@ -212,7 +212,7 @@ public class MprisService : IDisposable
     private Handler? _handler;
     private DBusConnection? _connection;
 
-    public MprisService(string identity = "Player") => _identity = identity;
+    public MprisService(string identity = "Kyuto") => _identity = identity;
     
     #endregion
 }

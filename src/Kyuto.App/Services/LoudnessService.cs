@@ -1,6 +1,6 @@
-using Player.Core.Contracts;
+using Kyuto.Core.Contracts;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 /// <summary>
 /// How loud YouTube measured the tracks (only a signed-in session gets it), looked up in the background for the

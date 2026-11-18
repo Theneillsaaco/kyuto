@@ -1,10 +1,10 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using Player.Core;
-using Player.Storage;
+using Kyuto.Core;
+using Kyuto.Storage;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 /// <summary>
 /// Whether the desktop is in dark mode, read from the XDG settings portal (org.freedesktop.appearance /

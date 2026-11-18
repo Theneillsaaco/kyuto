@@ -1,12 +1,12 @@
 using System.Globalization;
-using Player.Core;
-using Player.Core.Contracts;
-using Player.Core.Domain;
-using Player.Core.Localization;
-using Player.Core.Lyrics;
-using Player.Storage.Database;
+using Kyuto.Core;
+using Kyuto.Core.Contracts;
+using Kyuto.Core.Domain;
+using Kyuto.Core.Localization;
+using Kyuto.Core.Lyrics;
+using Kyuto.Storage.Database;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 internal enum LyricsStage { Idle, Loading, Synced, Plain, Instrumental, None, Error, Unavailable }
 

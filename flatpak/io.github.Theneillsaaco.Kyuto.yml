@@ -1,9 +1,9 @@
-app-id: io.github.Theneillsaaco.MediaPlayer
+app-id: io.github.Theneillsaaco.Kyuto
 runtime: org.kde.Platform
 runtime-version: '6.11'
 sdk: org.kde.Sdk
 appstream-compose: false
-command: media-player
+command: kyuto
 
 add-build-extensions:
   org.freedesktop.Sdk.Extension.dotnet10:
@@ -25,12 +25,12 @@ finish-args:
   - --filesystem=~/.config/dconf:ro
   - --talk-name=ca.desktop.dconf
   - --env=DCONF_USER_CONFIG_DIR=.config/dconf
-  - --env=PLAYER_SIDECAR_DIR=/app/share/player/sidecar
+  - --env=KYUTO_SIDECAR_DIR=/app/share/kyuto/sidecar
   - --env=QT_QUICK_CONTROLS_STYLE=Basic
   - --env=QtDir=/usr
   - --env=DOTNET_ROOT=/app/lib/dotnet
   # "Importar sesión del navegador" (solo lectura). Quita lo que no uses:
-  #   flatpak override --user --nofilesystem=~/.mozilla io.github.Theneillsaaco.MediaPlayer
+  #   flatpak override --user --nofilesystem=~/.mozilla io.github.Theneillsaaco.Kyuto
   - --filesystem=~/.mozilla:ro
   - --filesystem=~/.config/mozilla:ro
   - --filesystem=~/.var/app/org.mozilla.firefox:ro
@@ -139,28 +139,28 @@ modules:
     build-commands:
       - pip3 install --no-cache-dir --prefix=/app --upgrade ytmusicapi "yt-dlp[default]" secretstorage
 
-  - name: media-player
+  - name: kyuto
     buildsystem: simple
     build-options:
       env:
         DOTNET_CLI_TELEMETRY_OPTOUT: '1'
         DOTNET_SKIP_FIRST_TIME_EXPERIENCE: '1'
         DOTNET_NOLOGO: '1'
-        PLAYER_NIX: '1'
-        QtDir: /run/build/media-player/qt-sdk
-        CMAKE_PREFIX_PATH: /run/build/media-player/qt-sdk:/usr
+        KYUTO_NIX: '1'
+        QtDir: /run/build/kyuto/qt-sdk
+        CMAKE_PREFIX_PATH: /run/build/kyuto/qt-sdk:/usr
         QT_NO_PRIVATE_MODULE_WARNING: 'ON'
     build-commands:
-      - mkdir -p /run/build/media-player/qt-sdk/lib
-      - ln -s /usr/lib/x86_64-linux-gnu/cmake /run/build/media-player/qt-sdk/lib/cmake
-      - ln -s /usr/include /run/build/media-player/qt-sdk/include
-      - ln -s /usr/lib/x86_64-linux-gnu /run/build/media-player/qt-sdk/lib/x86_64-linux-gnu
+      - mkdir -p /run/build/kyuto/qt-sdk/lib
+      - ln -s /usr/lib/x86_64-linux-gnu/cmake /run/build/kyuto/qt-sdk/lib/cmake
+      - ln -s /usr/include /run/build/kyuto/qt-sdk/include
+      - ln -s /usr/lib/x86_64-linux-gnu /run/build/kyuto/qt-sdk/lib/x86_64-linux-gnu
 
       - >-
-        dotnet publish src/Player.App/Player.App.csproj --nologo
+        dotnet publish src/Kyuto.App/Kyuto.App.csproj --nologo
         -c Release -r linux-x64 --self-contained false
         -p:PublishReadyToRun=false -p:UseAppHost=true -p:DebugType=None
-        -o /app/lib/player
+        -o /app/lib/kyuto
 
       - |
         root=$(dirname "$(readlink -f "$(which dotnet)")")
@@ -169,24 +169,24 @@ modules:
         ln -s ../lib/dotnet/dotnet /app/bin/dotnet
 
       - |
-        d=src/Player.App/bin/Release/net10.0/linux-x64
+        d=src/Kyuto.App/bin/Release/net10.0/linux-x64
         for f in player_app Application qt_bridge_metadata.json qtdeploy.txt; do
-          if [ -e "$d/$f" ]; then cp -r "$d/$f" /app/lib/player/; fi
+          if [ -e "$d/$f" ]; then cp -r "$d/$f" /app/lib/kyuto/; fi
         done
 
-      - install -Dm755 media-player.sh /app/bin/media-player
-      - mkdir -p /app/share/player
-      - cp -r sidecar /app/share/player/
-      - python3 -m compileall -o 1 /app/share/player/sidecar
-      - install -Dm644 flatpak/io.github.Theneillsaaco.MediaPlayer.desktop /app/share/applications/io.github.Theneillsaaco.MediaPlayer.desktop
-      - install -Dm644 flatpak/io.github.Theneillsaaco.MediaPlayer.metainfo.xml /app/share/metainfo/io.github.Theneillsaaco.MediaPlayer.metainfo.xml
-      - install -Dm644 flatpak/io.github.Theneillsaaco.MediaPlayer.svg /app/share/icons/hicolor/scalable/apps/io.github.Theneillsaaco.MediaPlayer.svg
+      - install -Dm755 kyuto.sh /app/bin/kyuto
+      - mkdir -p /app/share/kyuto
+      - cp -r sidecar /app/share/kyuto/
+      - python3 -m compileall -o 1 /app/share/kyuto/sidecar
+      - install -Dm644 flatpak/io.github.Theneillsaaco.Kyuto.desktop /app/share/applications/io.github.Theneillsaaco.Kyuto.desktop
+      - install -Dm644 flatpak/io.github.Theneillsaaco.Kyuto.metainfo.xml /app/share/metainfo/io.github.Theneillsaaco.Kyuto.metainfo.xml
+      - install -Dm644 flatpak/io.github.Theneillsaaco.Kyuto.svg /app/share/icons/hicolor/scalable/apps/io.github.Theneillsaaco.Kyuto.svg
     sources:
       - type: dir
         path: ..
         skip: [.git, .github, .direnv, .idea, bin, obj, result, tests, docs, flatpak/.flatpak-builder, flatpak/build-dir]
       - type: script
-        dest-filename: media-player.sh
+        dest-filename: kyuto.sh
         commands:
-          - exec /app/lib/player/Player.App "$@"
+          - exec /app/lib/kyuto/Kyuto.App "$@"
     

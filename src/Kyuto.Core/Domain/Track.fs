@@ -1,4 +1,4 @@
-namespace Player.Core.Domain
+namespace Kyuto.Core.Domain
 
 type TrackKind =
     | Song

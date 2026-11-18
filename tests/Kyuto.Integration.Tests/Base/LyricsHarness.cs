@@ -1,10 +1,10 @@
 using System.Collections.Concurrent;
-using Player.App.Services;
-using Player.Core.Contracts;
-using Player.Core.Domain;
-using Player.Storage.Database;
+using Kyuto.App.Services;
+using Kyuto.Core.Contracts;
+using Kyuto.Core.Domain;
+using Kyuto.Storage.Database;
 
-namespace Player.Integration.Tests.Base;
+namespace Kyuto.Integration.Tests.Base;
 
 internal sealed class LyricsHarness
 {

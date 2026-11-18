@@ -1,7 +1,7 @@
-using Player.App.Models;
-using Player.App.ViewModels.Base;
+using Kyuto.App.Models;
+using Kyuto.App.ViewModels.Base;
 
-namespace Player.App.ViewModels;
+namespace Kyuto.App.ViewModels;
 
 /// <summary>The queue panel: rows in play order, how many there are and which one is playing.</summary>
 public class QueueViewModel : ViewModelBase

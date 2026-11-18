@@ -1,4 +1,4 @@
-namespace Player.Core.Localization
+namespace Kyuto.Core.Localization
 
 /// Every text the interface shows, once per language: key, Spanish, English. {0}, {1}... are filled in by I18n.tf.
 /// One list for both languages, so a text can never exist in only one of them.
@@ -170,7 +170,7 @@ module Translations =
 
         // audio cache
         "settings.cache", "Caché de audio", "Audio cache"
-        "settings.cacheNote", "Guarda en ~/.cache/player las canciones que suenan y las que vienen después, para que arranquen al instante y no se vuelvan a descargar al repetirlas.", "Keeps the songs that play, and the ones that come next, in ~/.cache/player, so they start at once and are not downloaded again when repeated."
+        "settings.cacheNote", "Guarda en ~/.cache/kyuto las canciones que suenan y las que vienen después, para que arranquen al instante y no se vuelvan a descargar al repetirlas.", "Keeps the songs that play, and the ones that come next, in ~/.cache/kyuto, so they start at once and are not downloaded again when repeated."
         "cache.off", "Desactivada", "Off"
         "cache.songs", "{0} canciones", "{0} songs"
         "cache.used", "{0} canciones guardadas · {1}", "{0} songs saved · {1}"
@@ -206,7 +206,7 @@ module Translations =
         "ytm.help", "Inicia sesión en music.youtube.com con ese navegador y elígelo aquí. La cookie equivale a tu contraseña: se guarda en el llavero (o en un archivo con permisos 600) y solo se envía a YouTube.", "Sign in to music.youtube.com with that browser and pick it here. The cookie is as secret as your password: it is kept in the keyring (or in a file with 600 permissions) and only sent to YouTube."
         "ytm.cookiePlaceholder", "Pega aquí la cabecera cookie de music.youtube.com…", "Paste the cookie header of music.youtube.com here…"
         "lastfm.send", "Enviar scrobbles", "Send scrobbles"
-        "lastfm.keysHelp", "Crea una app en last.fm/api/account/create y pega aquí su clave de API y su secreto compartido. Se guardan en ~/.config/player/lastfm.json, que solo tú puedes leer.", "Create an app at last.fm/api/account/create and paste its API key and shared secret here. They are saved in ~/.config/player/lastfm.json, which only you can read."
+        "lastfm.keysHelp", "Crea una app en last.fm/api/account/create y pega aquí su clave de API y su secreto compartido. Se guardan en ~/.config/kyuto/lastfm.json, que solo tú puedes leer.", "Create an app at last.fm/api/account/create and paste its API key and shared secret here. They are saved in ~/.config/kyuto/lastfm.json, which only you can read."
         "lastfm.apiKey", "Clave de API", "API key"
         "lastfm.secret", "Secreto compartido", "Shared secret"
 
@@ -245,10 +245,10 @@ module Translations =
 
         // Last.fm
         "scrobble.asking", "Pidiendo autorización a Last.fm…", "Asking Last.fm for authorization…"
-        "scrobble.authorize", "Autoriza a Player en Last.fm y vuelve aquí para continuar.", "Authorize Player on Last.fm and come back here to continue."
+        "scrobble.authorize", "Autoriza a Kyuto en Last.fm y vuelve aquí para continuar.", "Authorize Kyuto on Last.fm and come back here to continue."
         "scrobble.contactFailed", "No se pudo contactar con Last.fm", "Could not contact Last.fm"
         "scrobble.checking", "Comprobando la autorización…", "Checking the authorization…"
-        "scrobble.notAuthorized", "Todavía no has autorizado a Player en Last.fm. Abre el enlace y vuelve a pulsar Continuar.", "You have not authorized Player on Last.fm yet. Open the link and press Continue again."
+        "scrobble.notAuthorized", "Todavía no has autorizado a Kyuto en Last.fm. Abre el enlace y vuelve a pulsar Continuar.", "You have not authorized Kyuto on Last.fm yet. Open the link and press Continue again."
         "scrobble.authExpired", "La autorización caducó. Pulsa Conectar para empezar de nuevo.", "The authorization expired. Press Connect to start over."
         "scrobble.completeFailed", "No se pudo completar la conexión", "Could not complete the connection"
         "scrobble.sessionLost", "La sesión de Last.fm ya no es válida. Vuelve a conectar; lo pendiente se enviará entonces.", "The Last.fm session is no longer valid. Reconnect; what is pending will be sent then."

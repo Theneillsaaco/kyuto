@@ -1,8 +1,8 @@
-using Player.App.Services;
-using Player.Core.Contracts;
-using Player.Core.Domain;
+using Kyuto.App.Services;
+using Kyuto.Core.Contracts;
+using Kyuto.Core.Domain;
 
-namespace Player.App.Models;
+namespace Kyuto.App.Models;
 
 /// <summary>Domain objects to the rows QML list models show.</summary>
 internal static class Rows

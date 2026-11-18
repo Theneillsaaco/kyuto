@@ -1,4 +1,4 @@
-namespace Player.Mpris;
+namespace Kyuto.Mpris;
 
 /// <summary>What the desktop is told about the player. The app builds a new one whenever something changes.</summary>
 public sealed record MprisState(

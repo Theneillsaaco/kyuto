@@ -1,9 +1,9 @@
 [Desktop Entry]
 Type=Application
-Name=YouTube Music Player
+Name=Kyuto
 Comment=YouTube Music player (.NET + Qt Bridge + libmpv)
-Exec=media-player
-Icon=io.github.Theneillsaaco.MediaPlayer
+Exec=kyuto
+Icon=io.github.Theneillsaaco.Kyuto
 Categories=AudioVideo;Audio;Player;Music;
 Keywords=Music;YouTube;Player;Audio;
 Terminal=false

@@ -1,6 +1,6 @@
 module CachePolicyTests
 
-open Player.Core.Playback
+open Kyuto.Core.Playback
 open Xunit
 
 let private files (used: (string * int64) list) = used |> List.map (fun (id, at) -> struct (id, at))

@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Player.App.ViewModels.Base;
+namespace Kyuto.App.ViewModels.Base;
 
 /// <summary>
 /// The INotifyPropertyChanged plumbing every view model repeated. Properties are still written as

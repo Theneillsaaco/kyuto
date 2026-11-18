@@ -1,7 +1,7 @@
-namespace Player.Core.Playback
+namespace Kyuto.Core.Playback
 
 open System
-open Player.Core.Domain
+open Kyuto.Core.Domain
 
 /// Items are kept in insertion order. Order is the play order (a permutation of item
 /// indices; the identity unless shuffled) and Position is an index into Order, -1 = none.

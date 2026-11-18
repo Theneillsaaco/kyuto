@@ -1,4 +1,4 @@
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 /// <summary>Names the states for QML (strings are what the bridge handles best).</summary>
 internal static class AccountView

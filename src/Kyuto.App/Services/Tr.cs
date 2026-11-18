@@ -1,6 +1,6 @@
-using Player.Core.Localization;
+using Kyuto.Core.Localization;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 /// <summary>Texts of the interface in the current language (see Translations.fs).</summary>
 internal static class Tr

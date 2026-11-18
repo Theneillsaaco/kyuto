@@ -1,10 +1,10 @@
 using System.Globalization;
-using Player.Core;
-using Player.Core.Contracts;
-using Player.Core.Domain;
-using Player.Core.Playback;
+using Kyuto.Core;
+using Kyuto.Core.Contracts;
+using Kyuto.Core.Domain;
+using Kyuto.Core.Playback;
 
-namespace Player.App.Services;
+namespace Kyuto.App.Services;
 
 /// <summary>What is known about the video of the current track. Version goes up with every change.</summary>
 internal sealed record VideoSnapshot(string TrackId, bool Checked, VideoPlan Plan, VideoStream? Stream, string Error, int Version);

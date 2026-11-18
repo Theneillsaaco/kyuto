@@ -1,8 +1,8 @@
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
-using Player.Core.Domain;
+using Kyuto.Core.Domain;
 
-namespace Player.Storage.Database;
+namespace Kyuto.Storage.Database;
 
 /// <summary>
 /// The player's SQLite file: settings, scrobbles waiting to be sent, play history and the saved
@@ -293,7 +293,7 @@ public partial class PlayerDatabase : IDisposable
     private readonly Lock _gate = new();
     private readonly SqliteConnection _db;
     
-    public static string DefaultPath => AppPaths.DataFile("player.db");
+    public static string DefaultPath => AppPaths.DataFile("kyuto.db");
 
     public PlayerDatabase(string path)
     {
