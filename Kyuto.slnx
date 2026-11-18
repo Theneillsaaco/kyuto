@@ -1,0 +1,20 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/src/">
+    <Project Path="src/Kyuto.App/Kyuto.App.csproj" />
+    <Project Path="src/Kyuto.Audio/Kyuto.Audio.csproj" />
+    <Project Path="src/Kyuto.Core/Kyuto.Core.fsproj" />
+    <Project Path="src/Kyuto.Mpris/Kyuto.Mpris.csproj" />
+    <Project Path="src/Kyuto.Providers/Kyuto.Providers.csproj" />
+    <Project Path="src/Kyuto.Scrobble/Kyuto.Scrobble.fsproj" />
+    <Project Path="src/Kyuto.Storage/Kyuto.Storage.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Kyuto.Integration.Tests/Kyuto.Integration.Tests.csproj" />
+    <Project Path="tests/Kyuto.Tests/Kyuto.Tests.fsproj" />
+  </Folder>
+</Solution>

@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Player.Core\Player.Core.fsproj" />
+      <ProjectReference Include="..\Kyuto.Core\Kyuto.Core.fsproj" />
     </ItemGroup>
 
 </Project>

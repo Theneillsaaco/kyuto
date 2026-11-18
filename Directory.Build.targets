@@ -1,6 +1,4 @@
 <Project>
-  <!-- Mismo target que el de Qt Bridge, pero tolerante al fallo del deploy de Qt en Nix.
-       Fuera de Nix se comporta igual que el original. -->
   <Target Name="QtBridgeDeploy_SourceCode_Linux_MacOS"
     AfterTargets="CopyFilesToOutputDirectory" DependsOnTargets="QtBridgeBuild"
     Condition="'$(DesignTimeBuild)' != 'true' AND '$(QtGenSourceCode)' == 'true'

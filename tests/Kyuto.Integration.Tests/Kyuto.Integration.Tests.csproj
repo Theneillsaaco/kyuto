@@ -25,10 +25,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\Player.App\Player.App.csproj" />
-      <ProjectReference Include="..\..\src\Player.Core\Player.Core.fsproj" />
-      <ProjectReference Include="..\..\src\Player.Providers\Player.Providers.csproj" />
-      <ProjectReference Include="..\..\src\Player.Storage\Player.Storage.csproj" />
+      <ProjectReference Include="..\..\src\Kyuto.App\Kyuto.App.csproj" />
+      <ProjectReference Include="..\..\src\Kyuto.Core\Kyuto.Core.fsproj" />
+      <ProjectReference Include="..\..\src\Kyuto.Providers\Kyuto.Providers.csproj" />
+      <ProjectReference Include="..\..\src\Kyuto.Storage\Kyuto.Storage.csproj" />
     </ItemGroup>
 
 </Project>

@@ -36,13 +36,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Player.Audio\Player.Audio.csproj" />
-    <ProjectReference Include="..\Player.Core\Player.Core.fsproj" />
-    <ProjectReference Include="..\Player.Mpris\Player.Mpris.csproj" />
-    <ProjectReference Include="..\Player.Providers\Player.Providers.csproj" />
-    <ProjectReference Include="..\Player.Scrobble\Player.Scrobble.fsproj" />
-    <ProjectReference Include="..\Player.Storage\Player.Storage.csproj" />
-    <InternalsVisibleTo Include="Player.Integration.Tests" />
+    <ProjectReference Include="..\Kyuto.Audio\Kyuto.Audio.csproj" />
+    <ProjectReference Include="..\Kyuto.Core\Kyuto.Core.fsproj" />
+    <ProjectReference Include="..\Kyuto.Mpris\Kyuto.Mpris.csproj" />
+    <ProjectReference Include="..\Kyuto.Providers\Kyuto.Providers.csproj" />
+    <ProjectReference Include="..\Kyuto.Scrobble\Kyuto.Scrobble.fsproj" />
+    <ProjectReference Include="..\Kyuto.Storage\Kyuto.Storage.csproj" />
+    <InternalsVisibleTo Include="Kyuto.Integration.Tests" />
   </ItemGroup>
 
   <ItemGroup>

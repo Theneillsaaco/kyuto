@@ -1,5 +1,5 @@
 {
-  description = "Player: YouTube Music player (.NET + Qt Bridge for C# + libmpv)";
+  description = "Kyuto: YouTube Music player (.NET + Qt Bridge for C# + libmpv)";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
@@ -64,11 +64,11 @@
       };
 
       packages.${system}.default = pkgs.buildDotnetModule {
-        pname = "player-app";
+        pname = "kyuto";
         version = "0.1.0";
         src = ./.;
 
-        projectFile = "src/Player.App/Player.App.csproj";
+        projectFile = "src/Kyuto.App/Kyuto.App.csproj";
         nugetDeps = ./deps.json;
         dotnet-sdk = pkgs.dotnet-sdk_10;
         dotnet-runtime = pkgs.dotnet-runtime_10;
@@ -97,29 +97,29 @@
           "--set" "QT_PLUGIN_PATH" "${qtPrefix}/${qt.qtbase.qtPluginPrefix}"
           "--set" "QML_IMPORT_PATH" "${qtPrefix}/${qt.qtbase.qtQmlPrefix}"
           "--set" "QT_QUICK_CONTROLS_STYLE" "Basic"
-          "--set" "PLAYER_SIDECAR_DIR" "${placeholder "out"}/share/player/sidecar"
+          "--set" "PLAYER_SIDECAR_DIR" "${placeholder "out"}/share/kyuto/sidecar"
           "--prefix" "PATH" ":" "${lib.makeBinPath runtimeBins}" 
         ];
 
         postInstall = ''
-          d=src/Player.App/bin/Release/net10.0/linux-x64
-          for f in player_app Application qt_bridge_metadata.json qtdeploy.txt; do
+          d=src/Kyuto.App/bin/Release/net10.0/linux-x64
+          for f in kyuto Application qt_bridge_metadata.json qtdeploy.txt; do
             if [ -e "$d/$f" ]; then
-              cp -r "$d/$f" "$out/lib/player-app/"
+              cp -r "$d/$f" "$out/lib/kyuto-app/"
             fi
           done
         
-          mkdir -p $out/share/player
-          cp -r sidecar $out/share/player/
+          mkdir -p $out/share/kyuto
+          cp -r sidecar $out/share/kyuto/
           
-          ${pythonEnv.interpreter} -m compileall -o 1 $out/share/player/sidecar
+          ${pythonEnv.interpreter} -m compileall -o 1 $out/share/kyuto/sidecar
 
           mkdir -p $out/share/applications
-          cat <<'EOF' > $out/share/applications/media-player.desktop
+          cat <<'EOF' > $out/share/applications/kyuto.desktop
           [Desktop Entry]
           Type=Application
-          Name=YouTube Music Player
-          Exec=media-player
+          Name=Kyuto
+          Exec=kyuto
           Comment=YouTube Music player (.NET + Qt Bridge + libmpv)
           Categories=AudioVideo;Player;Music;
           Terminal=false
@@ -129,12 +129,12 @@
         '';
 
         postFixup = ''
-          if [ -f "$out/bin/Player.App" ]; then
-          mv "$out/bin/Player.App" "$out/bin/media-player"
+          if [ -f "$out/bin/Kyuto.App" ]; then
+          mv "$out/bin/Kyuto.App" "$out/bin/kyuto"
           fi
         '';
         
-        meta.mainProgram = "media-player";
+        meta.mainProgram = "kyuto";
       };
     };
 }

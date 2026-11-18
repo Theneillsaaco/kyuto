@@ -42,8 +42,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\Player.Core\Player.Core.fsproj" />
-      <ProjectReference Include="..\..\src\Player.Scrobble\Player.Scrobble.fsproj" />
+      <ProjectReference Include="..\..\src\Kyuto.Core\Kyuto.Core.fsproj" />
+      <ProjectReference Include="..\..\src\Kyuto.Scrobble\Kyuto.Scrobble.fsproj" />
     </ItemGroup>
 
     <ItemGroup>

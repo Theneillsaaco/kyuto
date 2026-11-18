@@ -151,7 +151,6 @@ modules:
         CMAKE_PREFIX_PATH: /run/build/media-player/qt-sdk:/usr
         QT_NO_PRIVATE_MODULE_WARNING: 'ON'
     build-commands:
-      - ls -d /app/lib/sdk/dotnet10 /usr/lib/sdk/dotnet10 || true; which dotnet
       - mkdir -p /run/build/media-player/qt-sdk/lib
       - ln -s /usr/lib/x86_64-linux-gnu/cmake /run/build/media-player/qt-sdk/lib/cmake
       - ln -s /usr/include /run/build/media-player/qt-sdk/include
