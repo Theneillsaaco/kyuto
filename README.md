@@ -103,7 +103,7 @@ The YouTube cookie and the Last.fm session key are kept in the Secret Service ke
 
 ## Requirements
 
-`libmpv`, `python3` with `ytmusicapi` and `yt-dlp`, a JS runtime for yt-dlp (`deno`), `xdg-utils`, `libsecret` (for `secret-tool`) and Qt 6 with QtQuick, QtQuick Controls, QtQuick Shapes and QtMultimedia (video only). The Nix shell and the Flatpak bring all of it.
+`libmpv`, `python3` with `ytmusicapi` and `yt-dlp`, a JS runtime for yt-dlp (`node`), `xdg-utils`, `libsecret` (for `secret-tool`) and Qt 6 with QtQuick, QtQuick Controls, QtQuick Shapes and QtMultimedia (video only). The Nix shell and the Flatpak bring all of it.
 
 ## Shortcuts
 
@@ -117,11 +117,20 @@ The YouTube cookie and the Last.fm session key are kept in the Secret Service ke
 | `Alt+Left` | Back |
 | `Esc` | Leave the maximized player |
 
+## About
+
+I use YouTube Music every day, and existing Electron wrappers take forever to start up. On top of that, both YouTube Music and Pear Desktop are still stuck on Material Design 1 or 2. Since Google doesn't seem to be in any rush to modernize it, I decided to do what any developer looking for a side project would do: **build it myself**.
+
+This project started mainly as an excuse to dive deeper into **Qt**, test out **Qt Bridge for C#**, and build my first native desktop application from scratch. I wanted fast startup times, a proper **Material 3** interface, and complete freedom to customize every single feature the way I actually want it.
+
+I'm also a huge **.NET** enthusiast, and honestly, there are barely any active FOSS desktop projects built with it—let alone anything combining **F# and C#** like this, as the few out there stick to plain C# and are either abandoned or overly barebones. So I combined both worlds into a responsive player tailored to my exact needs.
+
 ## License
 
 MIT, see [LICENSE](LICENSE).
 
 ## Credits
 
-- Color solver ported from Sung's `m3color.cpp` (MIT); item normalization in the sidecar follows Sung's `helper/catalog.py` (MIT)
-- [mpv](https://mpv.io), [ytmusicapi](https://github.com/sigma67/ytmusicapi), [yt-dlp](https://github.com/yt-dlp/yt-dlp), [LRCLIB](https://lrclib.net), Qt Bridge for C#
+- Color solver ported from [Sung](https://github.com/yappologistic/Sung)'s `m3color.cpp` (MIT); item normalization in the sidecar follows Sung's `helper/catalog.py` (MIT)
+- Thanks to [Meiro](https://github.com/elianiva/meiro?tab=contributing-ov-file), which I used as the basis for several functions and the UI
+- [mpv](https://mpv.io), [ytmusicapi](https://github.com/sigma67/ytmusicapi), [yt-dlp](https://github.com/yt-dlp/yt-dlp), [LRCLIB](https://lrclib.net), [Qt Bridge for C#](https://github.com/qt/qtbridge-csharp)
