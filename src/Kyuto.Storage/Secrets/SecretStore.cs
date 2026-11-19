@@ -16,7 +16,10 @@ public  sealed class SecretStore(string application = "kyuto")
     public async Task<string?> GetAsync(string name)
     {
         var (ok, output) = await RunTool(["lookup", "application", application, "account", name], null);
-
+    
+        if (ok && output.Trim() is { Length: > 0 } secret)
+            return secret;
+    
         // Kyuto was called "player": bring an old keyring entry over once.
         (ok, output) = await RunTool(["lookup", "application", "player", "account", name], null);
     
@@ -26,12 +29,9 @@ public  sealed class SecretStore(string application = "kyuto")
             await RunTool(["clear", "application", "player", "account", name], null);
             return old;
         }
-        
-        if (ok && output.Trim() is { Length: > 0} secret)
-            return secret;
-        
+    
         var path = FilePath(name);
-        
+    
         return File.Exists(path) ? (await File.ReadAllTextAsync(path)).Trim() : null;
     }
 
