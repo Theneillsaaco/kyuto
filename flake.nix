@@ -102,20 +102,33 @@
         ];
 
         postInstall = ''
-          buildDir="src/Kyuto.App/bin/Release/net10.0"
-          if [ -d "src/Kyuto.App/bin/Release/net10.0/linux-x64" ]; then
-            buildDir="src/Kyuto.App/bin/Release/net10.0/linux-x64"
+          app=$out/lib/kyuto
+          qt=src/Kyuto.App/obj/Release/net10.0/qt/native
+        
+          # Lo que Qt Bridge necesita junto a Kyuto.App
+          for d in src/Kyuto.App/bin/Release/net10.0/linux-x64 src/Kyuto.App/bin/Release/net10.0; do
+            for f in Application kyuto_app qt_bridge_metadata.json qtdeploy.txt; do
+              if [ -e "$d/$f" ] && [ ! -e "$app/$f" ]; then
+                cp -r --no-preserve=mode "$d/$f" "$app/"
+              fi
+            done
+          done
+        
+          # Respaldo: el árbol de build de Qt (el deploy con cmake --install falla en Nix y se ignora)
+          [ -e "$app/Application" ] || cp -r --no-preserve=mode "$qt/build/Application" "$app/"
+          [ -e "$app/kyuto_app" ] || cp --no-preserve=mode "$qt/bin/kyuto_app" "$app/"
+          if [ ! -e "$app/qt_bridge_metadata.json" ]; then
+            meta=$(find src/Kyuto.App -name qt_bridge_metadata.json | head -n1)
+            [ -z "$meta" ] || cp --no-preserve=mode "$meta" "$app/"
           fi
-
-          mkdir -p $out/lib/kyuto-app
-          
-          cp -r "$buildDir"/. $out/lib/kyuto-app/
-
+        
+          test -e "$app/Application" || { echo "Falta el módulo Application de Qt"; exit 1; }
+        
           mkdir -p $out/share/kyuto
           cp -r sidecar $out/share/kyuto/
-          
+        
           ${pythonEnv.interpreter} -m compileall -o 1 $out/share/kyuto/sidecar
-
+        
           mkdir -p $out/share/applications
           cat <<'EOF' > $out/share/applications/kyuto.desktop
           [Desktop Entry]
@@ -133,8 +146,6 @@
         postFixup = ''
           if [ -f "$out/bin/Kyuto.App" ]; then
             mv "$out/bin/Kyuto.App" "$out/bin/kyuto"
-          elif [ -f "$out/lib/kyuto-app/Kyuto.App" ]; then
-            ln -s $out/lib/kyuto-app/Kyuto.App $out/bin/kyuto
           fi
         '';
         
