@@ -15,8 +15,8 @@ Item {
     readonly property var i18n: Window.window ? Window.window.i18n : null
 
     readonly property bool hasHeader: root.nav.collectionTitle !== ""
-    readonly property color base: theme ? theme.surfaceContainer : "#F2ECF4"
-    readonly property color wash: theme ? Qt.tint(theme.surfaceContainer, Qt.alpha(theme.primaryContainer, 0.6)) : "#E8DEF8"
+    readonly property color base: theme ? theme.surface : "#FDF7FF"
+    readonly property color wash: theme ? Qt.tint(theme.surface, Qt.alpha(theme.primaryContainer, 0.6)) : "#E8DEF8"
 
     // 0 while the header is in view, 1 once it has scrolled away. The compact bar's parts follow it in turn.
     readonly property real scrolled: list.contentY - list.originY
@@ -99,7 +99,7 @@ Item {
                     Layout.alignment: Qt.AlignVCenter
                     spacing: 6
 
-                    Text {
+                    Label {
                         text: root.tr(root.nav.page === "album" ? "hero.album" : "hero.playlist").toUpperCase()
                         color: root.theme ? root.theme.primary : "#6750A4"
                         font.pixelSize: 12
@@ -107,7 +107,7 @@ Item {
                         font.letterSpacing: 1.4
                     }
 
-                    Text {
+                    Label {
                         Layout.fillWidth: true
                         text: root.nav.collectionTitle
                         color: root.theme ? root.theme.inkSurface : "#1D1B20"
@@ -118,7 +118,7 @@ Item {
                         elide: Text.ElideRight
                     }
 
-                    Text {
+                    Label {
                         Layout.alignment: Qt.AlignLeft
                         Layout.maximumWidth: details.width
                         text: root.nav.collectionSubtitle
@@ -211,7 +211,7 @@ Item {
                 scale: 0.8 + 0.2 * root.artIn
             }
 
-            Text {
+            Label {
                 Layout.fillWidth: true
                 text: root.nav.collectionTitle
                 color: root.theme ? root.theme.inkSurface : "#1D1B20"
@@ -255,7 +255,7 @@ Item {
             visible: root.nav.working && !root.nav.failed
         }
 
-        Text {
+        Label {
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.Wrap

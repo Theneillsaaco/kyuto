@@ -28,7 +28,7 @@ MenuItem {
             size: 20
             tint: item.cOnSurfaceVariant
         }
-        Text {
+        Label {
             Layout.fillWidth: true
             text: item.text
             color: item.cOnSurface

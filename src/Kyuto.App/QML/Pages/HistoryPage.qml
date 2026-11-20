@@ -24,7 +24,7 @@ Item {
             Layout.rightMargin: 12
             spacing: 8
 
-            Text {
+            Label {
                 Layout.fillWidth: true
                 text: root.tr("history.title") + (root.vm.count > 0 ? " · " + root.vm.count : "")
                 color: root.theme ? root.theme.inkSurface : "#1D1B20"
@@ -68,15 +68,13 @@ Item {
                 onPlayNextRequested: root.vm.playNextItem(index)
             }
 
-            Text {
+            EmptyState {
                 anchors.centerIn: parent
                 width: parent.width - 48
-                horizontalAlignment: Text.AlignHCenter
-                wrapMode: Text.Wrap
                 visible: view.count === 0
-                text: root.tr("history.empty")
-                color: root.theme ? root.theme.inkSurfaceVariant : "#49454F"
-                font.pixelSize: 14
+                glyph: "history"
+                title: root.tr("empty.history")
+                body: root.tr("history.empty")
             }
         }
     }

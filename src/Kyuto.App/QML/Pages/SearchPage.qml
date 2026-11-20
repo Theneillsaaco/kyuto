@@ -91,22 +91,13 @@ Item {
                 }
             }
 
-            LoadingIndicator {
+            EmptyState {
                 anchors.centerIn: parent
-                anchors.verticalCenterOffset: -44
-                visible: root.vm.searching && (root.vm.entityMode ? entitiesView.count : tracksView.count) === 0
-            }
-
-            Text {
-                anchors.centerIn: parent
-                anchors.verticalCenterOffset: root.vm.searching ? 44 : 0
                 width: parent.width - 48
-                horizontalAlignment: Text.AlignHCenter
-                wrapMode: Text.Wrap
                 visible: (root.vm.entityMode ? entitiesView.count : tracksView.count) === 0
-                text: root.vm.status
-                color: root.theme ? root.theme.inkSurfaceVariant : "#49454F"
-                font.pixelSize: 14
+                glyph: "search"
+                busy: root.vm.searching
+                title: root.vm.status
             }
         }
     }

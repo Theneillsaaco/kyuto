@@ -92,7 +92,7 @@ Item {
                         }
                     }
 
-                    Text {
+                    Label {
                         Layout.alignment: Qt.AlignHCenter
                         text: rail.tr(dest.modelData.label)
                         font.pixelSize: 12

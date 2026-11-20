@@ -16,7 +16,7 @@ Item {
 
     function tr(key) { return i18n ? i18n.t(key) : key }
 
-    component SectionTitle: Text {
+    component SectionTitle: Label {
         Layout.leftMargin: 20
         Layout.topMargin: 12
         color: root.theme ? root.theme.inkSurface : "#1D1B20"
@@ -72,6 +72,17 @@ Item {
         boundsBehavior: Flickable.StopAtBounds
         ScrollBar.vertical: MScrollBar {}
 
+        Rectangle { // the wash: the primary container fading into the page
+            width: flick.width
+            height: 240
+            z: -1
+            visible: root.nav.artistName !== ""
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: root.theme ? Qt.tint(root.theme.surface, Qt.alpha(root.theme.primaryContainer, 0.6)) : "#E8DEF8" }
+                GradientStop { position: 1.0; color: root.theme ? root.theme.surface : "#FDF7FF" }
+            }
+        }
+
         ColumnLayout {
             id: column
             width: flick.width
@@ -98,7 +109,7 @@ Item {
                     Layout.alignment: Qt.AlignVCenter
                     spacing: 8
 
-                    Text {
+                    Label {
                         Layout.fillWidth: true
                         text: root.nav.artistName
                         color: root.theme ? root.theme.inkSurface : "#1D1B20"
@@ -130,7 +141,7 @@ Item {
                 }
             }
 
-            Text {
+            Label {
                 Layout.fillWidth: true
                 Layout.leftMargin: 20
                 Layout.rightMargin: 20
@@ -196,7 +207,7 @@ Item {
             visible: root.nav.working && !root.nav.failed
         }
 
-        Text {
+        Label {
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.Wrap

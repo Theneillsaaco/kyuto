@@ -72,7 +72,7 @@ Rectangle {
             Layout.rightMargin: 12
             spacing: 8
 
-            Text {
+            Label {
                 Layout.fillWidth: true
                 text: root.tr("queue.title") + (root.vm.count > 0 ? " · " + root.vm.count : "")
                 color: root.theme ? root.theme.inkSurface : "#1D1B20"
@@ -135,12 +135,12 @@ Rectangle {
                     onGripReleased: (dropped) => root.finishDrag(dropped)
                 }
 
-                Text {
+                EmptyState {
                     anchors.centerIn: parent
+                    width: parent.width - 32
                     visible: queueView.count === 0
-                    text: root.tr("queue.empty")
-                    color: root.theme ? root.theme.inkSurfaceVariant : "#49454F"
-                    font.pixelSize: 14
+                    glyph: "queue"
+                    title: root.tr("queue.empty")
                 }
             }
 
@@ -172,7 +172,7 @@ Rectangle {
                 color: root.theme ? root.theme.secondaryContainer : "#E8DEF8"
                 y: Math.max(0, Math.min(parent.height - height, root.dragLocalY - height / 2))
 
-                Text {
+                Label {
                     anchors.fill: parent
                     anchors.leftMargin: 16
                     anchors.rightMargin: 16
@@ -211,6 +211,6 @@ Rectangle {
         anchors.fill: parent
         z: 20
         radius: root.radius
-        color: root.theme ? root.theme.surface : "#FDF7FF"
+        color: root.theme ? root.theme.surfaceContainerLow : "#F8F2FA"
     }
 }

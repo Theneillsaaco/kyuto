@@ -76,7 +76,7 @@ Item {
                 height: 64
                 spacing: 4
 
-                Text {
+                Label {
                     Layout.fillWidth: true
                     text: shelf.modelData.title
                     color: root.theme ? root.theme.inkSurface : "#1D1B20"
@@ -187,7 +187,7 @@ Item {
             visible: root.nav.working && !root.nav.failed
         }
 
-        Text {
+        Label {
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.Wrap

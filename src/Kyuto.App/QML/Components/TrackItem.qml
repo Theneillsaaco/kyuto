@@ -169,7 +169,7 @@ Item {
             Layout.fillWidth: true
             spacing: 2
 
-            Text {
+            Label {
                 Layout.fillWidth: true
                 text: row.heading
                 color: row.current ? row.cOnSecondaryContainer : row.cOnSurface
@@ -178,7 +178,7 @@ Item {
                 elide: Text.ElideRight
             }
 
-            Text {
+            Label {
                 id: sub
                 Layout.fillWidth: true
                 text: row.supporting
@@ -203,7 +203,7 @@ Item {
             }
         }
 
-        Text {
+        Label {
             visible: row.trailing !== ""
             Layout.preferredWidth: 44
             horizontalAlignment: Text.AlignRight

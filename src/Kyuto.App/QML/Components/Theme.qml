@@ -12,6 +12,8 @@ import QtQuick
 // Motion and type tokens are at the end. Do not name a token on<Uppercase> either.
 QtObject {
     property string tokensJson: ""
+    // Google Sans ships in Fonts/ (Main.qml loads it); the window hands it down to every Label and control.
+    readonly property string fontFamily: "Google Sans"
     readonly property var tokens: parse(tokensJson)
 
     function parse(json) {

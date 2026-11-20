@@ -189,7 +189,7 @@ Slider {
         y: -height - 12
         padding: 8
 
-        contentItem: Text {
+        contentItem: Label {
             text: slider.valueLabel
             color: slider.cOnInverse
             font.pixelSize: 12

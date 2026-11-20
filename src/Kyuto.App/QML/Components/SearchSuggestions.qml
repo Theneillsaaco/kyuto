@@ -126,7 +126,7 @@ Popup {
                     size: 20
                     tint: root.theme ? root.theme.inkSurfaceVariant : "#49454F"
                 }
-                Text {
+                Label {
                     Layout.fillWidth: true
                     text: entry.modelData
                     color: root.theme ? root.theme.inkSurface : "#1D1B20"

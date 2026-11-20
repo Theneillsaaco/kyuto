@@ -105,13 +105,13 @@ Rectangle {
         }
     }
 
-    component Heading: Text {
+    component Heading: Label {
         color: root.theme.primary
         font.pixelSize: 14
         font.weight: Font.Medium
     }
 
-    component Note: Text {
+    component Note: Label {
         Layout.fillWidth: true
         color: root.theme.inkSurfaceVariant
         font.pixelSize: 12
@@ -144,7 +144,7 @@ Rectangle {
                         tip: root.tr("action.close")
                         onClicked: root.close()
                     }
-                    Text {
+                    Label {
                         visible: !root.narrow
                         Layout.fillWidth: true
                         text: root.tr("settings.title")
@@ -190,7 +190,7 @@ Rectangle {
                                 size: 24
                                 tint: item.active ? root.theme.inkSecondaryContainer : root.theme.inkSurfaceVariant
                             }
-                            Text {
+                            Label {
                                 visible: !root.narrow
                                 Layout.fillWidth: true
                                 text: root.tr(item.modelData.label)
@@ -212,7 +212,7 @@ Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            Text {
+            Label {
                 id: pageTitle
                 x: 32
                 y: 24
@@ -331,7 +331,7 @@ Rectangle {
                             Layout.fillWidth: true
                             spacing: 8
                             visible: root.vm.cacheLimit > 0
-                            Text {
+                            Label {
                                 Layout.fillWidth: true
                                 text: root.vm.cacheSummary
                                 color: root.theme.inkSurfaceVariant
@@ -382,7 +382,7 @@ Rectangle {
                 Pane {
                     Card {
                         Heading { text: "YouTube Music" }
-                        Text {
+                        Label {
                             Layout.fillWidth: true
                             text: root.vm.accountStatus
                             color: root.theme.inkSurfaceVariant
@@ -474,7 +474,7 @@ Rectangle {
 
                     Card {
                         Heading { text: "Last.fm" }
-                        Text {
+                        Label {
                             Layout.fillWidth: true
                             text: root.vm.scrobbleStatus
                             color: root.theme.inkSurfaceVariant

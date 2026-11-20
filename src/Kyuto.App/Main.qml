@@ -15,7 +15,13 @@ ApplicationWindow {
     title: playback.currentTitle !== ""
         ? playback.currentTitle + (playback.currentArtist !== "" ? " · " + playback.currentArtist : "")
         : "Kyuto"
-    color: appTheme.surface
+
+    // Meiro's frame: the window is a tinted surface and the pages are a rounded sheet laid on it.
+    color: appTheme.surfaceContainerLow
+
+    // Google Sans is the font of the whole interface. Labels and controls inherit it from the window.
+    font.family: appTheme.fontFamily
+    font.pixelSize: 14
 
     // The Basic style's own pieces (scroll bars, text cursors, selections) read the palette, which is light
     // unless told otherwise: that is what made the dark mode look wrong.
@@ -32,6 +38,12 @@ ApplicationWindow {
     palette.dark: appTheme.outline
     palette.placeholderText: appTheme.inkSurfaceVariant
 
+    // The four weights of Google Sans that ship in Fonts/ (Regular, Medium, SemiBold, Bold).
+    FontLoader { source: themeVm.fontDir !== "" ? themeVm.fontDir + "/GoogleSans-Regular.ttf" : "" }
+    FontLoader { source: themeVm.fontDir !== "" ? themeVm.fontDir + "/GoogleSans-Medium.ttf" : "" }
+    FontLoader { source: themeVm.fontDir !== "" ? themeVm.fontDir + "/GoogleSans-SemiBold.ttf" : "" }
+    FontLoader { source: themeVm.fontDir !== "" ? themeVm.fontDir + "/GoogleSans-Bold.ttf" : "" }
+
     // Leaf components find the theme and the texts through the window: Window.window.theme, Window.window.i18n.
     readonly property var theme: appTheme
     readonly property var i18n: appTr
@@ -40,6 +52,18 @@ ApplicationWindow {
 
     // A short note in the snackbar.
     function toast(text) { navVm.notify(text) }
+
+    // The heading of the top bar: where the user is.
+    function pageTitle() {
+        if (playerOpen) return tr("tip.player")
+        switch (navVm.page) {
+        case "home": return tr("nav.home")
+        case "search": return tr("nav.search")
+        case "library": return tr("nav.library")
+        case "history": return tr("nav.history")
+        default: return navVm.title
+        }
+    }
 
     // Likes from the lists (the ⋮ menu and the right click of a song). The ids come as a JSON array.
     readonly property var likedIds: {
@@ -102,7 +126,7 @@ ApplicationWindow {
         parent: win.compact ? compactHost : wideQueueHost
         anchors.fill: parent
         radius: 28
-        color: appTheme.surfaceContainer
+        color: appTheme.surface
         clip: true
         vm: queueVm
         opacity: win.queueOpen ? 1 : 0
@@ -115,7 +139,7 @@ ApplicationWindow {
         parent: win.compact ? compactHost : wideLyricsHost
         anchors.fill: parent
         radius: 28
-        color: appTheme.surfaceContainer
+        color: appTheme.surface
         clip: true
         vm: lyricsVm
         opacity: win.lyricsOpen ? 1 : 0
@@ -156,7 +180,7 @@ ApplicationWindow {
     }
 
     SettingsPage { id: settings; anchors.fill: parent; z: 90; vm: settingsVm; appearanceVm: themeVm; videoVm: videoVm; localeVm: localeVm; lyricsVm: lyricsVm; theme: appTheme }
-    
+
     PlaylistPicker { id: playlistPicker; vm: libraryVm; theme: appTheme }
 
     // Called by the lists and the playback bar: a name opens its page, from wherever the user is.
@@ -274,7 +298,11 @@ ApplicationWindow {
         sequence: "Ctrl+Shift+L"
         onActivated: win.lyricsOpen = !win.lyricsOpen
     }
-    
+    Shortcut {
+        sequence: "Ctrl+,"
+        onActivated: settings.open()
+    }
+
     Shortcut {
         sequence: "Left"
         enabled: !win.typing && !settings.visible && playback.isLoaded
@@ -308,7 +336,7 @@ ApplicationWindow {
         anchors.fill: parent
         spacing: 0
 
-        // Top bar: back, search and the panels
+        // Top bar: back and where you are on the left, search on the right, then the panels.
         RowLayout {
             Layout.fillWidth: true
             Layout.leftMargin: 12
@@ -326,9 +354,31 @@ ApplicationWindow {
                     else navVm.goBack()
                 }
             }
+
+            Label {
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
+                Layout.leftMargin: 8
+                visible: win.width >= 900
+                text: win.pageTitle()
+                elide: Text.ElideRight
+                maximumLineCount: 1
+                color: appTheme.inkSurface
+                font.pixelSize: 24
+                font.weight: Font.DemiBold
+            }
+
+            Item {
+                Layout.fillWidth: true
+                visible: win.width < 900
+            }
+
             MSearchField {
                 id: input
-                Layout.fillWidth: true
+                Layout.fillWidth: win.width < 900
+                Layout.preferredWidth: 520
+                Layout.maximumWidth: 560
+                Layout.minimumWidth: 160
                 placeholderText: win.tr("search.placeholder")
                 clearTip: win.tr("tip.clearSearch")
                 onTextEdited: suggestTimer.restart()
@@ -392,14 +442,14 @@ ApplicationWindow {
                 Layout.fillHeight: true
                 spacing: 8
 
-                // The pages and the player share one rounded card.
+                // The pages and the player share one rounded sheet.
                 Rectangle {
                     id: stageCard
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     radius: win.playerMode === "full" ? 0 : 28
                     clip: true
-                    color: win.playerMode === "full" ? "#000000" : appTheme.surfaceContainer
+                    color: win.playerMode === "full" ? "#000000" : appTheme.surface
 
                     // Pages cross-fade (Material "fade through": the old one out, then the new one in).
                     FadePage {
@@ -474,7 +524,7 @@ ApplicationWindow {
                         anchors.fill: parent
                         z: 50
                         radius: stageCard.radius
-                        color: appTheme.surface
+                        color: appTheme.surfaceContainerLow
                         visible: win.playerMode !== "full"
                     }
                 }
@@ -557,7 +607,7 @@ ApplicationWindow {
         Behavior on opacity { NumberAnimation { duration: appTheme.durationShort3; easing.type: Easing.BezierSpline; easing.bezierCurve: appTheme.easingStandard } }
         Behavior on anchors.bottomMargin { NumberAnimation { duration: appTheme.durationMedium1; easing.type: Easing.BezierSpline; easing.bezierCurve: appTheme.easingEmphasizedDecelerate } }
 
-        Text {
+        Label {
             id: snackText
             anchors.fill: parent
             anchors.leftMargin: 20

@@ -5,6 +5,8 @@ import QtQuick.Controls.Basic
 // The lyrics of the playing track. vm is the LyricsViewModel. Timed lyrics follow the music: the current line
 // is centred, bold and full size, the others shrink and fade with their distance from it, and a click on a line
 // jumps there. Plain lyrics just scroll. The top and bottom edges fade out.
+// The controls row wraps onto a second line when the panel is narrow, and a line never grows past the panel: the
+// scale only ever shrinks (no overshoot) and a word wider than the panel is broken instead of cut.
 Rectangle {
     id: root
 
@@ -21,7 +23,7 @@ Rectangle {
         anchors.fill: parent
         spacing: 0
 
-        Text {
+        Label {
             Layout.fillWidth: true
             Layout.margins: 16
             Layout.bottomMargin: 4
@@ -30,10 +32,12 @@ Rectangle {
             font.pixelSize: 16
             font.weight: Font.Medium
             elide: Text.ElideRight
+            maximumLineCount: 1
         }
 
-        // Text size, and for timed lyrics the delay (+ shows the lines later than the music)
-        RowLayout {
+        // Text size, what goes under each line and, for timed lyrics, the delay (+ shows the lines later than the
+        // music). A Flow, so whatever does not fit goes to the next line instead of off the screen.
+        Flow {
             Layout.fillWidth: true
             Layout.leftMargin: 8
             Layout.rightMargin: 8
@@ -43,7 +47,6 @@ Rectangle {
             MButton { kind: "text"; text: "A−"; ToolTip.visible: hovered; ToolTip.text: root.tr("tip.smaller"); onClicked: root.vm.shrinkText() }
             MButton { kind: "text"; text: "A+"; ToolTip.visible: hovered; ToolTip.text: root.tr("tip.bigger"); onClicked: root.vm.growText() }
             MButton { kind: "text"; text: root.tr("lyrics.extra." + root.vm.extraMode); ToolTip.visible: hovered; ToolTip.text: root.tr("tip.lyricsExtra"); onClicked: root.vm.cycleExtra() }
-            Item { Layout.fillWidth: true }
             MButton { visible: root.vm.synced; kind: "text"; text: "−0,5"; ToolTip.visible: hovered; ToolTip.text: root.tr("tip.sooner"); onClicked: root.vm.nudgeOffset(-0.5) }
             MButton {
                 visible: root.vm.synced
@@ -109,7 +112,7 @@ Rectangle {
                             }
                         }
 
-                        Text {
+                        Label {
                             anchors.verticalCenter: parent.verticalCenter
                             text: root.vm.countdown + " s"
                             color: root.theme ? root.theme.primary : "#6750A4"
@@ -131,31 +134,32 @@ Rectangle {
                     Column {
                         id: textColumn
                         x: 20
-                        width: parent.width - 40
+                        // The room is the panel minus its margins; scaling is from the left edge and never goes
+                        // above 1, so the line cannot leave the panel.
+                        width: Math.max(0, parent.width - 40)
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: 2
                         transformOrigin: Item.Left
                         // The line being sung is full size and opaque; the others recede with their distance.
                         scale: row.current || !root.vm.synced ? 1 : 0.94
                         opacity: row.current || !root.vm.synced ? 1 : Math.max(0.5, 0.74 - 0.08 * row.distance)
-                        Behavior on scale { Anim { type: Anim.DefaultSpatial } }
+                        Behavior on scale { Anim { type: Anim.Standard } }
                         Behavior on opacity { Anim { type: Anim.DefaultEffects } }
 
-                        Text {
+                        Label {
                             width: parent.width
-                            height: Math.max(implicitHeight, root.vm.fontSize)
                             text: row.model.text
-                            wrapMode: Text.Wrap
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             font.pixelSize: root.vm.fontSize
                             font.weight: row.current ? Font.DemiBold : Font.Normal
                             color: root.theme ? root.theme.inkSurface : "#1D1B20"
                             Behavior on color { ColorAnimation { duration: 200 } }
                         }
-                        Text {
+                        Label {
                             visible: text.length > 0
                             width: parent.width
                             text: row.model.sub
-                            wrapMode: Text.Wrap
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             font.pixelSize: Math.round(root.vm.fontSize * 0.75)
                             color: root.theme ? root.theme.primary : "#6750A4"
                         }
@@ -204,7 +208,7 @@ Rectangle {
                     visible: root.vm.loading
                 }
 
-                Text {
+                Label {
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignHCenter
                     wrapMode: Text.Wrap
@@ -228,6 +232,6 @@ Rectangle {
         anchors.fill: parent
         z: 20
         radius: root.radius
-        color: root.theme ? root.theme.surface : "#FDF7FF"
+        color: root.theme ? root.theme.surfaceContainerLow : "#F8F2FA"
     }
 }

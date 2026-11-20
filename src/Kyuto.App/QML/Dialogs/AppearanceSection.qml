@@ -18,7 +18,7 @@ ColumnLayout {
 
     spacing: 12
 
-    component Heading: Text {
+    component Heading: Label {
         color: section.theme.primary
         font.pixelSize: 14
         font.weight: Font.Medium
@@ -61,7 +61,7 @@ ColumnLayout {
         }
     }
 
-    Text {
+    Label {
         text: section.tr("appearance.color")
         color: section.theme.inkSurfaceVariant
         font.pixelSize: 12
@@ -132,7 +132,7 @@ ColumnLayout {
         }
     }
 
-    Text {
+    Label {
         text: section.tr("appearance.variant")
         color: section.theme.inkSurfaceVariant
         font.pixelSize: 12
@@ -156,7 +156,7 @@ ColumnLayout {
         }
     }
 
-    Text {
+    Label {
         text: section.tr("appearance.contrast")
         color: section.theme.inkSurfaceVariant
         font.pixelSize: 12

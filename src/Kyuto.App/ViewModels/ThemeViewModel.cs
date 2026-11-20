@@ -12,6 +12,7 @@ public class ThemeViewModel : ViewModelBase
     public ThemeViewModel()
     {
         AppServices.EnsureStarted();
+        FontDir = new Uri(Path.Combine(AppContext.BaseDirectory, "Fonts")).AbsoluteUri;
         Sync();
     }
 
@@ -29,6 +30,8 @@ public class ThemeViewModel : ViewModelBase
     public bool Dynamic { get; private set => Set(ref field, value); }
     /// <summary>A JSON object with every Material color role as "#rrggbb".</summary>
     public string TokensJson { get; private set => Set(ref field, value); } = "{}";
+    /// <summary>file:// URL of the folder with the Google Sans files that ship next to the app.</summary>
+    public string FontDir { get; private set => Set(ref field, value); } = "";
 
     public void ChooseMode(string mode) { AppServices.Theme.ChooseMode(mode); Sync(); }
     public void ChooseAccent(string hex) { AppServices.Theme.ChooseAccent(hex); Sync(); }

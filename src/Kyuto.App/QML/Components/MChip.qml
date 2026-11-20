@@ -32,7 +32,7 @@ Button {
             size: 18
             tint: control.content
         }
-        Text {
+        Label {
             Layout.alignment: Qt.AlignVCenter
             text: control.text
             font.pixelSize: 14

@@ -123,7 +123,7 @@ Rectangle {
                 anchors.fill: parent
                 visible: !root.full
                 radius: stageRect.radius
-                color: root.theme.surfaceContainer
+                color: root.theme.surface
                 z: 20
             }
         }
@@ -137,7 +137,7 @@ Rectangle {
             width: Math.min(stageRect.width, 640)
             spacing: 4
 
-            Text {
+            Label {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
                 text: root.playback.currentTitle
@@ -146,7 +146,7 @@ Rectangle {
                 font.weight: Font.Medium
                 elide: Text.ElideRight
             }
-            Text {
+            Label {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
                 text: root.artistLine
@@ -154,7 +154,7 @@ Rectangle {
                 font.pixelSize: 14
                 elide: Text.ElideRight
             }
-            Text {
+            Label {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
                 visible: root.videoUnavailable
@@ -163,7 +163,7 @@ Rectangle {
                 font.pixelSize: 12
                 wrapMode: Text.Wrap
             }
-            Text {
+            Label {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
                 visible: root.video.message.length > 0
@@ -198,7 +198,7 @@ Rectangle {
             anchors.rightMargin: 220
             anchors.topMargin: 16
             spacing: 2
-            Text {
+            Label {
                 Layout.fillWidth: true
                 text: root.playback.currentTitle
                 color: "#FFFFFF"
@@ -206,7 +206,7 @@ Rectangle {
                 font.weight: Font.Medium
                 elide: Text.ElideRight
             }
-            Text {
+            Label {
                 Layout.fillWidth: true
                 text: root.artistLine
                 color: "#E6E0E9"

@@ -37,6 +37,7 @@ module Translations =
         "nav.openFailed", "No se pudo abrir la página: {0}", "Could not open the page: {0}"
         "nav.noArtist", "Esta canción no tiene página de artista.", "This song has no artist page."
         "nav.noAlbum", "Esta canción no tiene álbum.", "This song has no album."
+        "empty.history", "Sin historial", "No history yet"
 
         // search
         "search.placeholder", "Busca canciones, o pega un enlace o ruta", "Search songs, or paste a link or path"
@@ -111,6 +112,13 @@ module Translations =
 
         // lyrics extras and settings sections
         "settings.lyrics", "Letras", "Lyrics"
+        "lyrics.title", "Letra", "Lyrics"
+        "lyrics.idle", "Reproduce una canción para ver su letra.", "Play a song to see its lyrics."
+        "lyrics.loading", "Buscando la letra…", "Looking for the lyrics…"
+        "lyrics.none", "No se encontró la letra de esta canción.", "No lyrics found for this song."
+        "lyrics.instrumental", "Esta canción es instrumental.", "This song is instrumental."
+        "lyrics.error", "No se pudo cargar la letra.", "Could not load the lyrics."
+        "lyrics.unavailable", "No hay letra para enlaces ni archivos.", "There are no lyrics for links or files."
         "settings.section.general", "General", "General"
         "settings.section.accounts", "Cuentas", "Accounts"
         "lyrics.extra", "Texto bajo cada línea", "Text under each line"

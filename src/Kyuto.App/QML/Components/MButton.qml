@@ -39,7 +39,7 @@ Button {
     hoverEnabled: true
     focusPolicy: Qt.StrongFocus
 
-    contentItem: Text {
+    contentItem: Label {
         text: control.text
         font.pixelSize: 14
         font.weight: Font.Medium

@@ -1,5 +1,5 @@
 import QtQuick
-
+import QtQuick.Controls.Basic
 // A card for horizontal shelves: cover (round for artists) with a title and a supporting line under it.
 // showAdd (songs): right click or the ⋮ button opens a menu to play it next or add it to the queue.
 // With a videoId (songs) the menu also offers to like it. The ⋮ button sits on an almost opaque disc, so it reads on
@@ -62,7 +62,7 @@ Item {
         width: card.width
         spacing: 2
 
-        Text {
+        Label {
             width: parent.width
             text: card.heading
             color: card.cOnSurface
@@ -71,7 +71,7 @@ Item {
             horizontalAlignment: card.round ? Text.AlignHCenter : Text.AlignLeft
             elide: Text.ElideRight
         }
-        Text {
+        Label {
             width: parent.width
             text: card.supporting
             color: card.cOnSurfaceVariant

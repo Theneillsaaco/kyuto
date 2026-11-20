@@ -53,7 +53,7 @@ Popup {
     contentItem: ColumnLayout {
         spacing: 16
 
-        Text {
+        Label {
             Layout.fillWidth: true
             visible: dialog.title.length > 0
             text: dialog.title

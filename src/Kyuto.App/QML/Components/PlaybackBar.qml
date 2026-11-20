@@ -53,7 +53,7 @@ Rectangle {
         RowLayout {
             Layout.fillWidth: true
             spacing: 8
-            Text { text: root.playback.positionText; color: root.theme.inkSurfaceVariant; font.pixelSize: 12 }
+            Label { text: root.playback.positionText; color: root.theme.inkSurfaceVariant; font.pixelSize: 12; font.features: ({ "tnum": 1 }) }
             MSlider {
                 Layout.fillWidth: true
                 from: 0
@@ -65,7 +65,7 @@ Rectangle {
                 valueLabel: root.clock(value)
                 onChangedByUser: (v) => root.playback.seek(v)
             }
-            Text { text: root.playback.durationText; color: root.theme.inkSurfaceVariant; font.pixelSize: 12 }
+            Label { text: root.playback.durationText; color: root.theme.inkSurfaceVariant; font.pixelSize: 12; font.features: ({ "tnum": 1 }) }
         }
 
         RowLayout {
@@ -125,7 +125,7 @@ Rectangle {
                         Layout.minimumWidth: 0
                         spacing: 2
 
-                        Text {
+                        Label {
                             id: titleText
                             Layout.fillWidth: true
                             text: root.playback.currentTitle
@@ -145,7 +145,7 @@ Rectangle {
                                 onClicked: Window.window.openAlbumOf(root.playback.currentId)
                             }
                         }
-                        Text {
+                        Label {
                             id: artistText
                             Layout.fillWidth: true
                             text: root.playback.currentArtist

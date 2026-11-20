@@ -133,4 +133,5 @@ MIT, see [LICENSE](LICENSE).
 
 - Color solver ported from [Sung](https://github.com/yappologistic/Sung)'s `m3color.cpp` (MIT); item normalization in the sidecar follows Sung's `helper/catalog.py` (MIT)
 - Thanks to [Meiro](https://github.com/elianiva/meiro?tab=contributing-ov-file), which I used as the basis for several ideas, functions and the UI
+- [Google Sans](https://github.com/googlefonts/googlesans-code) is the font of the interface (SIL Open Font License, see `src/Kyuto.App/Fonts/OFL.txt`); the static weights are cut from the variable file that Meiro ships
 - [mpv](https://mpv.io), [ytmusicapi](https://github.com/sigma67/ytmusicapi), [yt-dlp](https://github.com/yt-dlp/yt-dlp), [LRCLIB](https://lrclib.net), [Qt Bridge for C#](https://github.com/qt/qtbridge-csharp)

@@ -34,7 +34,7 @@ ColumnLayout {
         }
     }
 
-    Text {
+    Label {
         Layout.fillWidth: true
         text: root.tr("lastfm.keysHelp")
         color: root.theme.inkSurfaceVariant

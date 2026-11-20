@@ -23,7 +23,7 @@ Switch {
     focusPolicy: Qt.StrongFocus
     opacity: enabled ? 1 : 0.38
 
-    contentItem: Text {
+    contentItem: Label {
         text: control.text
         font.pixelSize: 16
         color: control.cOnSurface

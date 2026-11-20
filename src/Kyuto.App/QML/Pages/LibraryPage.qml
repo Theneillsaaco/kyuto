@@ -22,7 +22,7 @@ Item {
         id: confirmDelete
         title: root.tr("playlist.delete")
 
-        Text {
+        Label {
             Layout.fillWidth: true
             text: root.tr("playlist.deleteAsk").replace("{0}", root.vm.openListTitle)
             color: root.theme ? root.theme.inkSurface : "#1D1B20"
@@ -52,28 +52,17 @@ Item {
     }
 
     // No account connected
-    ColumnLayout {
+    EmptyState {
         anchors.centerIn: parent
         width: parent.width - 48
         visible: !root.signedIn
-        spacing: 16
-
-        Text {
-            Layout.fillWidth: true
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.Wrap
-            color: root.theme ? root.theme.inkSurfaceVariant : "#49454F"
-            font.pixelSize: 14
-            text: root.vm.accountBusy || root.vm.accountState === "unavailable" ? root.vm.accountStatus
-                : root.vm.accountState === "expired" ? root.tr("library.expired")
-                    : root.tr("library.connect")
-        }
-        MButton {
-            Layout.alignment: Qt.AlignHCenter
-            visible: root.vm.accountState !== "unavailable" && !root.vm.accountBusy
-            text: root.tr("action.openSettings")
-            onClicked: root.settingsRequested()
-        }
+        glyph: "library"
+        busy: root.vm.accountBusy
+        title: root.vm.accountBusy || root.vm.accountState === "unavailable" ? root.vm.accountStatus
+            : root.vm.accountState === "expired" ? root.tr("library.expired")
+                : root.tr("library.connect")
+        action: root.vm.accountState !== "unavailable" && !root.vm.accountBusy ? root.tr("action.openSettings") : ""
+        onTriggered: root.settingsRequested()
     }
 
     // Playlists
@@ -100,7 +89,7 @@ Item {
         anchors.verticalCenterOffset: -44
         visible: root.signedIn && !root.inList && listsView.count === 0 && root.vm.working
     }
-    Text {
+    Label {
         anchors.centerIn: parent
         anchors.verticalCenterOffset: root.vm.working ? 44 : 0
         width: parent.width - 48
@@ -128,7 +117,7 @@ Item {
                 tip: root.tr("tip.back")
                 onClicked: root.vm.closeList()
             }
-            Text {
+            Label {
                 Layout.fillWidth: true
                 text: root.vm.openListTitle + (root.vm.listCount > 0 ? " · " + root.vm.listCount : "")
                 color: root.theme ? root.theme.inkSurface : "#1D1B20"
@@ -155,7 +144,7 @@ Item {
             }
         }
 
-        Text {
+        Label {
             Layout.leftMargin: 16
             Layout.bottomMargin: 4
             visible: root.vm.listStatus !== "" && tracksView.count > 0
@@ -191,7 +180,7 @@ Item {
                 anchors.verticalCenterOffset: -44
                 visible: tracksView.count === 0 && root.vm.working
             }
-            Text {
+            Label {
                 anchors.centerIn: parent
                 anchors.verticalCenterOffset: root.vm.working ? 44 : 0
                 width: parent.width - 48
