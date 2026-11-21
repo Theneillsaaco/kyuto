@@ -105,7 +105,6 @@
           app=$out/lib/kyuto
           qt=src/Kyuto.App/obj/Release/net11.0/qt/native
         
-          # Lo que Qt Bridge necesita junto a Kyuto.App
           for d in src/Kyuto.App/bin/Release/net11.0/linux-x64 src/Kyuto.App/bin/Release/net11.0; do
             for f in Application kyuto_app qt_bridge_metadata.json qtdeploy.txt; do
               if [ -e "$d/$f" ] && [ ! -e "$app/$f" ]; then
@@ -114,7 +113,6 @@
             done
           done
         
-          # Respaldo: el árbol de build de Qt (el deploy con cmake --install falla en Nix y se ignora)
           [ -e "$app/Application" ] || cp -r --no-preserve=mode "$qt/build/Application" "$app/"
           [ -e "$app/kyuto_app" ] || cp --no-preserve=mode "$qt/bin/kyuto_app" "$app/"
           if [ ! -e "$app/qt_bridge_metadata.json" ]; then
