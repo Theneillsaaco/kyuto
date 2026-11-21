@@ -1,3 +1,4 @@
+using Kyuto.App;
 using Kyuto.Core;
 using Qt.Quick;
 
@@ -12,3 +13,6 @@ TaskScheduler.UnobservedTaskException += (_, e) =>
 // Initialize Qt
 Qml.LoadFromRootModule("Main");
 Qml.WaitForExit();
+
+AppServices.Shutdown();
+Environment.Exit(0); // does not wait for foreground threads

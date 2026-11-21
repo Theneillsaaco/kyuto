@@ -108,22 +108,40 @@ internal static class AppServices
         LanguageChanged?.Invoke();
     }
 
-    private static void Shutdown()
+    public static void Shutdown()
     {
-        Playback.Shutdown();
-        Notifier?.Dispose();
-        Cache?.Dispose();
-        Scrobble?.Dispose();
-        Theme.Dispose();
-        Provider?.Dispose();
-        Engine.Dispose();
-        Db?.Dispose();
+        if (!_started || Interlocked.Exchange(ref _shutdown, 1) == 1)
+            return;
+    
+        // If anything below hangs (mpv waiting on the network, for instance), the process dies anyway.
+        new Thread(() =>
+        {
+            Thread.Sleep(4000);
+            Log.Warn("app", "shutdown took too long, killing the process");
+            System.Diagnostics.Process.GetCurrentProcess().Kill(true);
+        }) { IsBackground = true }.Start();
+    
+        Step("playback", () => Playback.Shutdown());
+        Step("scrobble", () => Scrobble?.Dispose());
+        Step("provider", () => Provider?.Dispose()); // kills the Python sidecar
+        Step("theme", () => Theme.Dispose()); // kills the busctl/gdbus monitor
+        Step("notifier", () => Notifier?.Dispose());
+        Step("cache", () => Cache?.Dispose());
+        Step("db", () => Db?.Dispose());
+        Step("engine", () => Engine.Dispose()); // last: it is the one that can block
+    }
+
+    private static void Step(string name, Action action)
+    {
+        try { action(); }
+        catch (Exception ex) { Log.Warn("app", "shutdown " + name, ex); }
     }
 
     #region Fields
 
     private static readonly Lock Gate = new();
     private static bool _started;
+    private static int _shutdown;
 
     public static IAudioEngine Engine { get; private set; } = null!;
     public static PlayerDatabase? Db { get; private set; }

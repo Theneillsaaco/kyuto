@@ -562,11 +562,15 @@ def handle(line):
 def main():
     # The first search or Home no longer pays the ytmusicapi import: it loads while the app starts.
     api()
-    with ThreadPoolExecutor(max_workers=WORKERS, thread_name_prefix="ytm") as pool:
-        for line in sys.stdin:
-            line = line.strip()
-            if line:
-                pool.submit(handle, line)
+    pool = ThreadPoolExecutor(max_workers=WORKERS, thread_name_prefix="ytm")
+    for line in sys.stdin:
+        line = line.strip()
+        if line:
+            pool.submit(handle, line)
+            
+    # stdin closed: the app is gone. Do not wait for resolves in flight.
+    pool.shutdown(wait=False, cancel_futures=True)
+    os._exit(0)
 
 if __name__ == "__main__":
     main()
