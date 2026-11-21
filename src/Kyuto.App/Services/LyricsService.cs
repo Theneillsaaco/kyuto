@@ -10,13 +10,55 @@ namespace Kyuto.App.Services;
 
 internal enum LyricsStage { Idle, Loading, Synced, Plain, Instrumental, None, Error, Unavailable }
 
+internal static class Lyr
+{
+    public sealed record Idle;
+    public sealed record Loading;
+    public sealed record Unavailable;
+    public sealed record None;
+    public sealed record Failed;
+    public sealed record Instrumental;
+    public sealed record Synced(LyricsBody Body);
+    public sealed record Plain(LyricsBody Body);
+}
+
+/// <summary>The lyrics found: text, where they came from, the parsed lines and the optional extras under each line.</summary>
+internal sealed record LyricsBody(string Text, string Source, LyricLine[] Lines, string[]? Romaji, string[]? Translation);
+
+internal union LyricsState(Lyr.Idle, Lyr.Loading, Lyr.Unavailable, Lyr.None, Lyr.Failed, Lyr.Instrumental, Lyr.Synced, Lyr.Plain);
+
+
 /// <summary>
-/// What is known about the lyrics of one track. Version goes up with every change, so a poll can tell. Lines are the
-/// lyrics already parsed (timed for Synced, Start = -1 for Plain, null for every other stage), so nobody parses the
-/// text again.
+/// What is known about the lyrics of one track. Version goes up with every change, so a poll can tell. Only Synced and
+/// Plain carry text and lines: every other state has none, and the type says so.
 /// </summary>
-internal sealed record LyricsSnapshot(string TrackId, LyricsStage Stage, string Text, string Source, int Version,
-    string[]? Romaji = null, string[]? Translation = null, LyricLine[]? Lines = null);
+internal sealed record LyricsSnapshot(string TrackId, LyricsState State, int Version)
+{
+    public LyricsStage Stage => State switch
+    {
+        Lyr.Idle => LyricsStage.Idle,
+        Lyr.Loading => LyricsStage.Loading,
+        Lyr.Unavailable => LyricsStage.Unavailable,
+        Lyr.None => LyricsStage.None,
+        Lyr.Failed => LyricsStage.Error,
+        Lyr.Instrumental => LyricsStage.Instrumental,
+        Lyr.Synced => LyricsStage.Synced,
+        Lyr.Plain => LyricsStage.Plain
+    };
+
+    private LyricsBody? Body => State switch
+    {
+        Lyr.Synced s => s.Body,
+        Lyr.Plain p => p.Body,
+        _ => null
+    };
+
+    public string Text => Body?.Text ?? "";
+    public string Source => Body?.Source ?? "";
+    public LyricLine[]? Lines => Body?.Lines;
+    public string[]? Romaji => Body?.Romaji;
+    public string[]? Translation => Body?.Translation;
+}
 
 /// <summary>
 /// Finds the lyrics of a track: the local cache first, then each source in order, keeping the best (timed beats
@@ -44,7 +86,7 @@ internal sealed class LyricsService(
     private const string SizeKey = "lyrics.size";
 
     private readonly Lock _gate = new();
-    private LyricsSnapshot _snapshot = new("", LyricsStage.Idle, "", "", 0);
+    private LyricsSnapshot _snapshot = new("", new Lyr.Idle(), 0);
     private int _ticket;
 
     public LyricsSnapshot Snapshot
@@ -220,9 +262,25 @@ internal sealed class LyricsService(
     }
 
     private void Publish(string trackId, LyricsStage stage, string text = "", string source = "",
-        string[]? romaji = null, string[]? translation = null, LyricLine[]? lines = null) =>
-        _snapshot = new LyricsSnapshot(trackId, stage, text, source, _snapshot.Version + 1, romaji, translation, lines);
-
+        string[]? romaji = null, string[]? translation = null, LyricLine[]? lines = null)
+    {
+        var body = new LyricsBody(text, source, lines ?? [], romaji, translation);
+    
+        LyricsState state = stage switch
+        {
+            LyricsStage.Loading => new Lyr.Loading(),
+            LyricsStage.Unavailable => new Lyr.Unavailable(),
+            LyricsStage.None => new Lyr.None(),
+            LyricsStage.Error => new Lyr.Failed(),
+            LyricsStage.Instrumental => new Lyr.Instrumental(),
+            LyricsStage.Synced => new Lyr.Synced(body),
+            LyricsStage.Plain => new Lyr.Plain(body),
+            _ => new Lyr.Idle(),
+        };
+    
+        _snapshot = new LyricsSnapshot(trackId, state, _snapshot.Version + 1);
+    }
+    
     private long Now() => clock?.Invoke() ?? Clock.UnixNow();
 
     private static string DelayKey(string trackId) => "lyrics.delay:" + trackId;
