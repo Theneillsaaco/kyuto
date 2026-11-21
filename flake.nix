@@ -130,7 +130,7 @@
           ${pythonEnv.interpreter} -m compileall -o 1 $out/share/kyuto/sidecar
         
           mkdir -p $out/share/icons/hicolor/scalable/apps
-          cp flatpak/io.github.Theneillsaaco.Kyuto.svg $out/share/icons/hicolor/scalable/apps/kyuto.svg
+          cp flatpak/io.github.Theneillsaaco.Kyuto.svg $out/share/icons/hicolor/scalable/apps/io.github.Theneillsaaco.Kyuto.svg
           
           mkdir -p $out/share/applications
           cat <<'EOF' > $out/share/applications/kyuto.desktop
@@ -138,7 +138,7 @@
           Type=Application
           Name=Kyuto
           Exec=kyuto
-          Icon=kyuto
+          Icon=io.github.Theneillsaaco.Kyuto
           Comment=YouTube Music player (.NET + Qt Bridge + libmpv)
           Categories=AudioVideo;Audio;Player;Music;
           Terminal=false
