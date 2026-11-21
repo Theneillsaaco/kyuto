@@ -1,7 +1,7 @@
 {
   description = "Kyuto: YouTube Music player (.NET + Qt Bridge for C# + libmpv)";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable-small";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
   outputs = { self, nixpkgs }:
     let
