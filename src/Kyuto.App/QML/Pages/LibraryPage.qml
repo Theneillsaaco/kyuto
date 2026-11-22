@@ -153,6 +153,38 @@ Item {
             font.pixelSize: 12
         }
 
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.leftMargin: 16
+            Layout.rightMargin: 16
+            Layout.bottomMargin: 8
+            spacing: 8
+            visible: root.vm.listCount > 1
+
+            MSearchField {
+                id: filterField
+                Layout.fillWidth: true
+                implicitHeight: 44
+                placeholderText: root.tr("list.filter")
+                clearTip: root.tr("tip.clearSearch")
+                onTextChanged: root.vm.chooseListFilter(text)
+            }
+            Repeater {
+                model: ["title", "artist", "duration"]
+                MChip {
+                    required property string modelData
+                    text: root.tr("sort." + modelData)
+                    selected: root.vm.listSort === modelData
+                    onClicked: root.vm.chooseListSort(root.vm.listSort === modelData ? "default" : modelData)
+                }
+            }
+        }
+
+        Connections {
+            target: root.vm
+            function onOpenListIdChanged() { filterField.clear() }
+        }
+        
         ListView {
             id: tracksView
             Layout.fillWidth: true

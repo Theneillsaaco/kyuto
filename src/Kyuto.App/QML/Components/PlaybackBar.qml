@@ -28,6 +28,7 @@ Rectangle {
 
     readonly property Item miniSlot: slot
     readonly property bool linkable: root.playback.currentId !== "" && root.playback.isLoaded
+    readonly property bool narrow: Window.window ? Window.window.width < 900 : false
 
     signal coverClicked()
 
@@ -223,7 +224,7 @@ Rectangle {
                 }
             }
 
-            // Right block: volume and speed, as wide as the left block (up to 250 px), against the right edge.
+            // Right block: volume, speed and sleep timer (responsive to window width).
             Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
@@ -232,15 +233,17 @@ Rectangle {
                 RowLayout {
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
-                    width: Math.min(parent.width, 250)
+                    width: Math.min(parent.width, 290)
                     spacing: 4
 
                     MIconButton {
+                        visible: !root.narrow
                         glyph: root.playback.volume > 0 ? "volume" : "volume_off"
                         tip: root.playback.volume > 0 ? root.tr("tip.mute") : root.tr("tip.unmute")
                         onClicked: if (Window.window && Window.window.toggleMute) Window.window.toggleMute()
                     }
                     MSlider {
+                        visible: !root.narrow
                         Layout.fillWidth: true
                         from: 0
                         to: 100
@@ -256,11 +259,57 @@ Rectangle {
                         }
                     }
                     MButton {
+                        visible: !root.narrow
                         kind: "text"
                         text: root.playback.speedText
                         ToolTip.visible: hovered
                         ToolTip.text: root.tr("tip.speed")
                         onClicked: root.playback.cycleSpeed()
+                    }
+                    MIconButton {
+                        id: sleepBtn
+                        visible: !root.narrow
+                        glyph: "timer"
+                        selected: root.playback.sleepText !== ""
+                        tip: root.playback.sleepText !== "" ? root.playback.sleepText : root.tr("tip.sleep")
+                        onClicked: sleepMenu.popup(sleepBtn, 0, sleepBtn.height)
+                    }
+
+                    // Ventana estrecha: volumen, velocidad y temporizador pasan a un menú.
+                    Item { Layout.fillWidth: true; visible: root.narrow }
+                    MIconButton {
+                        id: moreBtn
+                        visible: root.narrow
+                        glyph: "more"
+                        tip: root.tr("tip.more")
+                        onClicked: barMenu.popup(moreBtn, 0, moreBtn.height)
+                    }
+
+                    MMenu {
+                        id: barMenu
+                        MMenuItem {
+                            glyph: root.playback.volume > 0 ? "volume" : "volume_off"
+                            text: root.playback.volume > 0 ? root.tr("tip.mute") : root.tr("tip.unmute")
+                            onTriggered: if (Window.window && Window.window.toggleMute) Window.window.toggleMute()
+                        }
+                        MMenuItem {
+                            text: root.tr("tip.speed") + " · " + root.playback.speedText
+                            onTriggered: root.playback.cycleSpeed()
+                        }
+                        MMenuItem {
+                            glyph: "timer"
+                            text: root.tr("tip.sleep")
+                            onTriggered: Qt.callLater(() => sleepMenu.popup(moreBtn, 0, moreBtn.height))
+                        }
+                    }
+
+                    MMenu {
+                        id: sleepMenu
+                        MMenuItem { text: root.tr("sleep.minutes").replace("{0}", 15); onTriggered: root.playback.chooseSleep(15) }
+                        MMenuItem { text: root.tr("sleep.minutes").replace("{0}", 30); onTriggered: root.playback.chooseSleep(30) }
+                        MMenuItem { text: root.tr("sleep.minutes").replace("{0}", 45); onTriggered: root.playback.chooseSleep(45) }
+                        MMenuItem { text: root.tr("sleep.minutes").replace("{0}", 60); onTriggered: root.playback.chooseSleep(60) }
+                        MMenuItem { visible: root.playback.sleepText !== ""; text: root.tr("sleep.off"); onTriggered: root.playback.chooseSleep(0) }
                     }
                 }
             }

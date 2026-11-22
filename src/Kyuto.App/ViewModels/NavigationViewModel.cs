@@ -197,6 +197,27 @@ public class NavigationViewModel : ViewModelBase
 
     public void PlayNextArtistSong(int index) => AppServices.Playback.PlayNextFrom(_artistSongs, index);
 
+    /// <summary>The song and its radio become the queue.</summary>
+    public void StartRadio(string videoId)
+    {
+        if (videoId.Length != 11 || TrackSource.IsDirect(videoId) || AppServices.Provider is not { } provider)
+            return;
+
+        Message = Tr.T("radio.starting");
+
+        _work.Run(Task.Run(async () =>
+            {
+                var seed = await provider.GetTrack(videoId);
+                var more = await provider.Radio(videoId);
+                Track[] all = [seed, .. more];
+                return all;
+            }),
+            tracks => AppServices.Playback.PlayFrom(tracks, 0),
+            error => Message = Tr.F("status.error", error.Message));
+
+        Working = true;
+    }
+    
     /// <summary>Applies finished background work. QML calls it from a Timer while something loads.</summary>
     public void Poll()
     {

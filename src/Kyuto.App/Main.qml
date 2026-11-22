@@ -201,6 +201,8 @@ ApplicationWindow {
 
     PlaylistPicker { id: playlistPicker; vm: libraryVm; theme: appTheme }
 
+    ShortcutsDialog { id: shortcutsDialog }
+    
     // Called by the lists and the playback bar: a name opens its page, from wherever the user is.
     function openEntity(kind, entityId) {
         playerMode = "mini"
@@ -348,6 +350,11 @@ ApplicationWindow {
     Shortcut {
         sequence: "F5"
         onActivated: navVm.retry()
+    }
+    Shortcut {
+        sequences: ["?", "Shift+/"]
+        enabled: !win.typing && !settings.visible
+        onActivated: shortcutsDialog.open()
     }
 
     ColumnLayout {

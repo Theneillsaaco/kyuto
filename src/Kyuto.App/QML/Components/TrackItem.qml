@@ -34,14 +34,15 @@ Item {
 
     readonly property bool playing: current && Window.window && Window.window.playingNow === true
     readonly property bool linkable: videoId !== "" && supporting !== ""
-    readonly property bool hasMenu: showAdd || showRemove || canLike
+    readonly property bool hasId: /^[A-Za-z0-9_-]{11}$/.test(videoId)
+    readonly property bool hasMenu: showAdd || showRemove || canLike || hasId
     // A real YouTube id and a signed-in account (Main.qml decides). `liked` is read when the menu opens.
     readonly property bool canLike: {
         const w = row.Window.window
         return videoId !== "" && w && w.canLikeId ? w.canLikeId(videoId) : false
     }
     property bool liked: false
-
+    
     signal activated()
     signal addRequested()
     signal playNextRequested()
@@ -67,9 +68,41 @@ Item {
             menuHost.item.popup()
     }
 
+    function moveFocus(delta) {
+        const v = ListView.view
+        if (!v || !v.indexAt)
+            return
+        const i = v.indexAt(row.x + 1, row.y + 1) + delta
+        if (i < 0 || i >= v.count)
+            return
+        v.positionViewAtIndex(i, ListView.Contain)
+        const target = v.itemAtIndex(i)
+        if (target)
+            target.forceActiveFocus(Qt.TabFocusReason)
+    }
+
     implicitHeight: 64
     opacity: dimmed ? 0.4 : 1
+    activeFocusOnTab: true
+    Accessible.role: Accessible.ListItem
+    Accessible.name: heading + (supporting !== "" ? ", " + supporting : "")
+    Accessible.onPressAction: row.activated()
 
+    Keys.onReturnPressed: row.activated()
+    Keys.onEnterPressed: row.activated()
+    Keys.onDownPressed: moveFocus(1)
+    Keys.onUpPressed: moveFocus(-1)
+    Keys.onMenuPressed: if (hasMenu) row.openMenu(more, 0, more.height)
+    Keys.onPressed: (event) => {
+        if (event.key === Qt.Key_Delete && row.showRemove) {
+            row.removeRequested()
+            event.accepted = true
+        } else if (event.key === Qt.Key_F10 && (event.modifiers & Qt.ShiftModifier) && row.hasMenu) {
+            row.openMenu(more, 0, more.height)
+            event.accepted = true
+        }
+    }
+    
     Rectangle {
         anchors.fill: parent
         anchors.leftMargin: 8
@@ -86,6 +119,19 @@ Item {
             color: row.current ? row.cOnSecondaryContainer : row.cOnSurface
             opacity: area.pressed ? 0.10 : area.containsMouse ? 0.08 : 0
             Behavior on opacity { NumberAnimation { duration: 100 } }
+        }
+
+        Rectangle { // focus ring
+            anchors.fill: parent
+            anchors.leftMargin: 8
+            anchors.rightMargin: 8
+            anchors.topMargin: 2
+            anchors.bottomMargin: 2
+            radius: 16
+            color: "transparent"
+            border.width: 3
+            border.color: row.cPrimary
+            visible: row.activeFocus
         }
     }
 
@@ -273,6 +319,33 @@ Item {
                 glyph: "delete"
                 text: row.tr("menu.removeFromQueue")
                 onTriggered: row.removeRequested()
+            }
+            MMenuItem {
+                visible: row.hasId
+                glyph: "album"
+                text: row.tr("menu.goAlbum")
+                onTriggered: if (row.Window.window) row.Window.window.openAlbumOf(row.videoId)
+            }
+            MMenuItem {
+                visible: row.hasId
+                glyph: "person"
+                text: row.tr("menu.goArtist")
+                onTriggered: if (row.Window.window) row.Window.window.openArtistOf(row.videoId)
+            }
+            MMenuItem {
+                visible: row.hasId
+                glyph: "radio"
+                text: row.tr("menu.radio")
+                onTriggered: if (row.Window.window) row.Window.window.startRadio(row.videoId)
+            }
+            MMenuItem {
+                visible: row.hasId
+                glyph: "link"
+                text: row.tr("menu.copyLink")
+                onTriggered: {
+                    row.Window.window.copyText("https://music.youtube.com/watch?v=" + row.videoId)
+                    row.toast("link.copied")
+                }
             }
         }
     }
