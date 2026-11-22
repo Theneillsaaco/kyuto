@@ -181,20 +181,27 @@ Slider {
         Behavior on w { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
     }
 
+    property var hoverFormat: null
+
+    HoverHandler { id: hover; enabled: slider.hoverFormat !== null }
+
     ToolTip {
-        visible: slider.valueLabel.length > 0 && slider.pressed
+        id: hoverTip
+        visible: slider.hoverFormat !== null && hover.hovered && !slider.pressed && slider.enabled
         delay: 0
         timeout: -1
-        x: slider.leftPadding + slider.visualPosition * (slider.availableWidth - width)
-        y: -height - 12
         padding: 8
+        x: Math.max(0, Math.min(slider.width - width, hover.point.position.x - width / 2))
+        y: -height - 12
+        text: slider.hoverFormat
+            ? slider.hoverFormat(slider.valueAt(Math.max(0, Math.min(1, (hover.point.position.x - slider.leftPadding) / slider.availableWidth))))
+            : ""
 
         contentItem: Label {
-            text: slider.valueLabel
+            text: hoverTip.text
             color: slider.cOnInverse
             font.pixelSize: 12
         }
-
         background: Rectangle {
             color: slider.cInverse
             radius: height / 2

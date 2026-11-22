@@ -19,6 +19,7 @@ Popup {
 
     signal chosen(string text)
     signal clearRecent()
+    signal removeRecent(string text)
 
     function tr(key) { return i18n ? i18n.t(key) : key }
 
@@ -132,6 +133,14 @@ Popup {
                     color: root.theme ? root.theme.inkSurface : "#1D1B20"
                     font.pixelSize: 16
                     elide: Text.ElideRight
+                }
+                MIconButton {
+                    visible: root.recent && (area.containsMouse || hovered)
+                    containerSize: 32
+                    glyph: "close"
+                    tip: root.tr("tip.removeRecent")
+                    focusPolicy: Qt.NoFocus // If it gets the focus, the list closes before the click.
+                    onClicked: root.removeRecent(entry.modelData)
                 }
             }
 

@@ -51,7 +51,24 @@ ApplicationWindow {
     function tr(key) { return appTr.t(key) }
 
     // A short note in the snackbar.
-    function toast(text) { navVm.notify(text) }
+    property var undoAction: null
+    property var scrollMemory: ({})
+
+    function toast(text) { undoAction = null; navVm.notify(text) }
+    function toastUndo(text, action) { undoAction = action; navVm.notify(text) }
+    function goBack() {
+        if (playerOpen) playerMode = "mini"
+        else navVm.goBack()
+    }
+    function copyText(text) {
+        clipboardProxy.text = text
+        clipboardProxy.selectAll()
+        clipboardProxy.copy()
+    }
+    function startRadio(id) { navVm.startRadio(id) }
+
+    TextEdit { id: clipboardProxy; visible: false }
+    TapHandler { acceptedButtons: Qt.BackButton; onTapped: win.goBack() }   // botón atrás del ratón
 
     // The heading of the top bar: where the user is.
     function pageTitle() {
@@ -163,6 +180,7 @@ ApplicationWindow {
             ? (searchVm.recentJson.length > 0 ? JSON.parse(searchVm.recentJson) : [])
             : (searchVm.suggestionsJson.length > 0 ? JSON.parse(searchVm.suggestionsJson) : [])
         onClearRecent: searchVm.clearRecent()
+        onRemoveRecent: (text) => searchVm.removeRecent(text)
         onChosen: (text) => {
             input.text = text
             close()
@@ -240,9 +258,9 @@ ApplicationWindow {
 
     // The snackbar goes away by itself.
     Timer {
-        interval: 4000
+        interval: win.undoAction !== null ? 7000 : 4000
         running: navVm.message.length > 0
-        onTriggered: navVm.dismissMessage()
+        onTriggered: { navVm.dismissMessage(); win.undoAction = null }
     }
 
     // Opening the library, or signing in while it is open, loads the playlists.
@@ -598,7 +616,7 @@ ApplicationWindow {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: navVm.message.length > 0 ? 124 : 108
         z: 100
-        width: Math.min(snackText.implicitWidth + 40, parent.width - 48)
+        width: Math.min(snackText.implicitWidth + 40 + (undoBtn.visible ? undoBtn.width : 0), parent.width - 48)
         height: 48
         radius: 12
         color: appTheme.inverseSurface
@@ -609,14 +627,31 @@ ApplicationWindow {
 
         Label {
             id: snackText
-            anchors.fill: parent
+            anchors.left: parent.left
             anchors.leftMargin: 20
-            anchors.rightMargin: 20
-            verticalAlignment: Text.AlignVCenter
+            anchors.right: undoBtn.visible ? undoBtn.left : parent.right
+            anchors.rightMargin: undoBtn.visible ? 4 : 20
+            anchors.verticalCenter: parent.verticalCenter
             text: navVm.message
             color: appTheme.inverseOnSurface
             font.pixelSize: 14
             elide: Text.ElideRight
+        }
+        MButton {
+            id: undoBtn
+            visible: win.undoAction !== null
+            anchors.right: parent.right
+            anchors.rightMargin: 8
+            anchors.verticalCenter: parent.verticalCenter
+            kind: "text"
+            cPrimary: appTheme.inversePrimary
+            text: win.tr("action.undo")
+            onClicked: {
+                const a = win.undoAction
+                win.undoAction = null
+                navVm.dismissMessage()
+                if (a) a()
+            }
         }
     }
 }

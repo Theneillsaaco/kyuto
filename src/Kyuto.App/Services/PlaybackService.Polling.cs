@@ -9,6 +9,7 @@ internal sealed partial class PlaybackService
 {
     public void Poll()
     {
+        CheckSleep();
         PollCore();
         UpdateWaiting();
         PublishMpris();

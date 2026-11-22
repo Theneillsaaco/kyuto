@@ -57,7 +57,11 @@ public class PlaybackViewModel : ViewModelBase
     public double Speed { get; private set => Set(ref field, value); } = 1.0;
     /// <summary>"1×", "1.25×".</summary>
     public string SpeedText { get; private set => Set(ref field, value); } = "1×";
+    /// <summary>"12 min left" while the sleep timer runs, "" otherwise.</summary>
+    public string SleepText { get; private set => Set(ref field, value); } = "";
 
+    public void ChooseSleep(int minutes) => AppServices.Playback.ChooseSleepMinutes(minutes);
+    
     public void Toggle() => AppServices.Playback.Toggle();
     public void Next() => AppServices.Playback.Next();
     public void Previous() => AppServices.Playback.Previous();
@@ -95,6 +99,7 @@ public class PlaybackViewModel : ViewModelBase
         CanPrevious = p.CanPrevious;
         Speed = p.Speed;
         SpeedText = PlaybackSpeed.label(p.Speed);
+        SleepText = p.SleepRemaining > 0 ? Tr.F("sleep.left", (int)Math.Ceiling(p.SleepRemaining / 60)) : "";
 
         var stats = AppServices.Stats;
         stats.Request(p.CurrentId);

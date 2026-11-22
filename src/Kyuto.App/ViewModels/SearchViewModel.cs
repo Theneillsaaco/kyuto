@@ -90,6 +90,13 @@ public class SearchViewModel : ViewModelBase
         _recent = [];
         SaveRecent();
     }
+    
+    /// <summary>Forgets one recent search.</summary>
+    public void RemoveRecent(string query)
+    {
+        _recent.RemoveAll(q => string.Equals(q, query, StringComparison.OrdinalIgnoreCase));
+        SaveRecent();
+    }
 
     /// <summary>Asks for the suggestions of what is typed. Links, paths and one letter get none.</summary>
     public void Suggest(string text)

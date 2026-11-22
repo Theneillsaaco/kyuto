@@ -17,7 +17,8 @@ public class HistoryViewModel : ViewModelBase
     private const int Limit = 300;
 
     private IReadOnlyList<Track> _tracks = [];
-
+    private IReadOnlyList<HistoryEntry> _cleared = [];
+    
     public HistoryViewModel()
     {
         AppServices.EnsureStarted();
@@ -45,18 +46,38 @@ public class HistoryViewModel : ViewModelBase
 
     public void ClearAll()
     {
-        try { AppServices.Db?.ClearHistory(); }
+        try
+        {
+            _cleared = AppServices.Db?.GetHistory(int.MaxValue) ?? [];
+            AppServices.Db?.ClearHistory();
+        }
         catch (Exception e) { Log.Warn("history", "clear", e); }
 
         Load();
     }
 
+    public void UndoClear()
+    {
+        if (AppServices.Db is not { } db)
+            return;
+
+        try
+        {
+            foreach (var e in _cleared.Reverse()) // oldest first, so the ids keep their order
+                db.AddHistory(new Listen(e.StartedAt, e.Artist, e.Title, e.Album, e.Duration, true), e.Listened, e.TrackId);
+        }
+        catch (Exception e) { Log.Warn("history", "undo", e); }
+
+        _cleared = [];
+        Load();
+    }
+    
     public void PlayItem(int index) => AppServices.Playback.PlayFrom(_tracks, index);
 
     public void AddItem(int index) => AppServices.Playback.AddFrom(_tracks, index);
 
     public void PlayNextItem(int index) => AppServices.Playback.PlayNextFrom(_tracks, index);
-
+    
     private static string ArtOf(string id) => id.Length == 11 ? "https://i.ytimg.com/vi/" + id + "/mqdefault.jpg" : "";
 
     private static Track ToTrack(HistoryEntry e)
