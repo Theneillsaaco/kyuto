@@ -63,6 +63,7 @@ Rectangle {
                 expressive: true
                 playing: root.playback.isLoaded && !root.playback.paused && !root.playback.audioWaiting
                 valueLabel: root.clock(value)
+                hoverFormat: (v) => root.clock(v)
                 onChangedByUser: (v) => root.playback.seek(v)
             }
             Label { text: root.playback.durationText; color: root.theme.inkSurfaceVariant; font.pixelSize: 12; font.features: ({ "tnum": 1 }) }
@@ -248,6 +249,11 @@ Rectangle {
                         expressive: false
                         valueLabel: Math.round(value) + "%"
                         onChangedByUser: (v) => root.playback.setVolume(Math.round(v))
+
+                        WheelHandler {
+                            onWheel: (event) => root.playback.setVolume(
+                                Math.max(0, Math.min(100, root.playback.volume + (event.angleDelta.y > 0 ? 5 : -5))))
+                        }
                     }
                     MButton {
                         kind: "text"

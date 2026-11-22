@@ -21,6 +21,25 @@ module Translations =
         "action.signOut", "Cerrar sesión", "Sign out"
         "action.openSettings", "Abrir ajustes", "Open settings"
 
+        // undo, entities, menus
+        "action.undo", "Deshacer", "Undo"
+        "entity.subscribers", "{0} suscriptores", "{0} subscribers"
+        "entity.untitled", "Sin título", "Untitled"
+        "library.liked", "Me gusta", "Liked music"
+        "menu.goAlbum", "Ir al álbum", "Go to album"
+        "menu.goArtist", "Ir al artista", "Go to artist"
+        "menu.radio", "Iniciar radio", "Start radio"
+        "menu.copyLink", "Copiar enlace", "Copy link"
+        "link.copied", "Enlace copiado", "Link copied"
+        "radio.starting", "Preparando la radio…", "Starting the radio…"
+        "tip.removeRecent", "Quitar", "Remove"
+        "queue.hoursMinutes", "{0} h {1} min", "{0} h {1} min"
+        "queue.minutes", "{0} min", "{0} min"
+        "list.filter", "Filtrar esta lista", "Filter this list"
+        "sort.title", "Título", "Title"
+        "sort.artist", "Artista", "Artist"
+        "sort.duration", "Duración", "Duration"
+        
         // navigation
         "nav.home", "Inicio", "Home"
         "nav.search", "Buscar", "Search"
@@ -39,6 +58,29 @@ module Translations =
         "nav.noAlbum", "Esta canción no tiene álbum.", "This song has no album."
         "empty.history", "Sin historial", "No history yet"
 
+        // sleep timer
+        "tip.sleep", "Temporizador", "Sleep timer"
+        "sleep.off", "Desactivar", "Turn off"
+        "sleep.minutes", "{0} min", "{0} min"
+        "sleep.left", "{0} min restantes", "{0} min left"
+        "sleep.paused", "Pausa por el temporizador", "Paused by the sleep timer"
+
+        // shortcuts overlay
+        "shortcuts.title", "Atajos de teclado", "Keyboard shortcuts"
+        "shortcut.playPause", "Reproducir / pausa", "Play / pause"
+        "shortcut.seek", "Retroceder / avanzar 5 s", "Seek back / forward 5 s"
+        "shortcut.nextPrev", "Siguiente / anterior", "Next / previous"
+        "shortcut.volume", "Subir / bajar volumen", "Volume up / down"
+        "shortcut.mute", "Silenciar", "Mute"
+        "shortcut.search", "Buscar", "Search"
+        "shortcut.queue", "Cola", "Queue"
+        "shortcut.lyrics", "Letra", "Lyrics"
+        "shortcut.settings", "Ajustes", "Settings"
+        "shortcut.back", "Atrás", "Back"
+        "shortcut.reload", "Recargar la página", "Reload the page"
+        "shortcut.leaveFull", "Salir del reproductor maximizado", "Leave the maximized player"
+        "shortcut.help", "Esta ayuda", "This help"
+        
         // search
         "search.placeholder", "Busca canciones, o pega un enlace o ruta", "Search songs, or paste a link or path"
         "search.hint", "Busca una canción o pega un enlace o ruta", "Search for a song or paste a link or path"

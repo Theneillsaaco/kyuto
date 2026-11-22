@@ -38,8 +38,8 @@ Item {
                 text: root.tr("history.clear")
                 onClicked: {
                     root.vm.clearAll()
-                    if (Window.window && Window.window.toast)
-                        Window.window.toast(root.tr("history.cleared"))
+                    if (Window.window && Window.window.toastUndo)
+                        Window.window.toastUndo(root.tr("history.cleared"), () => root.vm.undoClear())
                 }
             }
         }

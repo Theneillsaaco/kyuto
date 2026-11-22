@@ -74,7 +74,7 @@ Rectangle {
 
             Label {
                 Layout.fillWidth: true
-                text: root.tr("queue.title") + (root.vm.count > 0 ? " · " + root.vm.count : "")
+                text: root.tr("queue.title") + (root.vm.count > 0 ? " · " + root.vm.count + (root.vm.totalText !== "" ? " · " + root.vm.totalText : "") : "")
                 color: root.theme ? root.theme.inkSurface : "#1D1B20"
                 font.pixelSize: 18
                 font.weight: Font.Medium
@@ -86,8 +86,8 @@ Rectangle {
                 text: root.tr("queue.clear")
                 onClicked: {
                     root.vm.clearAll()
-                    if (Window.window && Window.window.toast)
-                        Window.window.toast(root.tr("queue.cleared"))
+                    if (Window.window && Window.window.toastUndo)
+                        Window.window.toastUndo(root.tr("queue.cleared"), () => root.vm.undoLast())
                 }
             }
         }
@@ -120,8 +120,8 @@ Rectangle {
                     onActivated: root.vm.playItem(index)
                     onRemoveRequested: {
                         root.keepScroll(() => root.vm.removeItem(index))
-                        if (Window.window && Window.window.toast)
-                            Window.window.toast(root.tr("queue.removed"))
+                        if (Window.window && Window.window.toastUndo)
+                            Window.window.toastUndo(root.tr("queue.removed"), () => root.vm.undoLast())
                     }
                     onGripPressed: {
                         root.dragFrom = index
