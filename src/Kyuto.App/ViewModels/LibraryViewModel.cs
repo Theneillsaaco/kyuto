@@ -94,7 +94,7 @@ public class LibraryViewModel : ViewModelBase
         var list = _playlists[index];
         var id = list.Id;
         OpenListId = id;
-        OpenListTitle = list.Title;
+        OpenListTitle = id == LikedList ? Tr.T("library.liked") : list.Title;
 
         var cached = SafeCache(() => AppServices.Db?.LoadTracks(id)) ?? [];
         SetListTracks(cached);

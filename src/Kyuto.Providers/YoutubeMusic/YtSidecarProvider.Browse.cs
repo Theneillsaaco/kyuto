@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Kyuto.Core.Contracts;
 using Kyuto.Core.Domain;
+using Kyuto.Core.Localization;
 using static Kyuto.Providers.YoutubeMusic.TrackMapper;
 
 namespace Kyuto.Providers.YoutubeMusic;
@@ -124,6 +125,17 @@ public partial class YtSidecarProvider : IBrowseProvider
         }
 
         var id = Text(e, "id");
-        return id.Length == 0 ? null : new Entity(kind, id, Text(e, "title"), Text(e, "subtitle"), Text(e, "art"));
+        if (id.Length == 0)
+            return null;
+
+        var extra = Text(e, "subscribers") is { Length: > 0 } subs ? I18n.tf("entity.subscribers", [subs])
+            : JsonRead.Number(e, "count") is var count and > 0 ? I18n.tf("playlist.songs.many", [(int)count])
+            : "";
+        var subtitle = Text(e, "subtitle");
+        if (extra.Length > 0)
+            subtitle = subtitle.Length > 0 ? subtitle + " · " + extra : extra;
+
+        var title = Text(e, "title");
+        return new Entity(kind, id, title.Length > 0 ? title : I18n.t("entity.untitled"), subtitle, Text(e, "art"));
     }
 }

@@ -14,6 +14,12 @@ Item {
 
     signal entityActivated(string kind, string entityId)
 
+    ScrollMemory { id: memory; view: flick; key: root.nav.pageKey }
+    Connections {
+        target: root.nav.artistRelated // lo último que ApplyArtist rellena
+        function onModelReset() { if (root.nav.artistName !== "") memory.contentReady() }
+    }
+    
     function tr(key) { return i18n ? i18n.t(key) : key }
 
     component SectionTitle: Label {

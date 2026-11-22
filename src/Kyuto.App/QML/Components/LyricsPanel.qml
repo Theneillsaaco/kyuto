@@ -47,7 +47,7 @@ Rectangle {
             MButton { kind: "text"; text: "A−"; ToolTip.visible: hovered; ToolTip.text: root.tr("tip.smaller"); onClicked: root.vm.shrinkText() }
             MButton { kind: "text"; text: "A+"; ToolTip.visible: hovered; ToolTip.text: root.tr("tip.bigger"); onClicked: root.vm.growText() }
             MButton { kind: "text"; text: root.tr("lyrics.extra." + root.vm.extraMode); ToolTip.visible: hovered; ToolTip.text: root.tr("tip.lyricsExtra"); onClicked: root.vm.cycleExtra() }
-            MButton { visible: root.vm.synced; kind: "text"; text: "−0,5"; ToolTip.visible: hovered; ToolTip.text: root.tr("tip.sooner"); onClicked: root.vm.nudgeOffset(-0.5) }
+            MButton { visible: root.vm.synced; kind: "text"; text: root.vm.soonerText; ToolTip.visible: hovered; ToolTip.text: root.tr("tip.sooner"); onClicked: root.vm.nudgeOffset(-0.5) }
             MButton {
                 visible: root.vm.synced
                 kind: "text"
@@ -56,7 +56,7 @@ Rectangle {
                 ToolTip.text: root.tr("tip.resetDelay")
                 onClicked: root.vm.clearOffset()
             }
-            MButton { visible: root.vm.synced; kind: "text"; text: "+0,5"; ToolTip.visible: hovered; ToolTip.text: root.tr("tip.later"); onClicked: root.vm.nudgeOffset(0.5) }
+            MButton { visible: root.vm.synced; kind: "text"; text: root.vm.laterText; ToolTip.visible: hovered; ToolTip.text: root.tr("tip.later"); onClicked: root.vm.nudgeOffset(0.5) }
         }
 
         Item {
