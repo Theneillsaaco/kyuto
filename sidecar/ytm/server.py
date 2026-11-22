@@ -60,8 +60,8 @@ _auth = None   # signed-in client, set by auth.set / auth.import_browser
 _init = threading.Lock()        # guards the lazy creation of the shared client
 _write = threading.Lock()       # one reply line at a time
 _resolving = threading.BoundedSemaphore(RESOLVE_SLOTS)
-_local = threading.local()      # one YoutubeDL per worker thread, reused between calls
 
+_lease = None
 
 class AuthError(Exception):
     """The Google session is missing, rejected or expired. `code` travels in the reply."""
@@ -288,27 +288,6 @@ def song(params):
 
 YT_CLIENTS = [c.strip() for c in os.environ.get("KYUTO_YT_CLIENTS", "visionos").split(",") if c.strip()]
     
-def _ydl(fmt=AUDIO_FORMAT):
-    """One YoutubeDL per worker thread and format, reused between calls."""
-    cache = getattr(_local, "ydl", None)
-    if cache is None:
-        cache = _local.ydl = {}
-    ydl = cache.get(fmt)
-    if ydl is None:
-        from yt_dlp import YoutubeDL
-        options = {
-            "format": fmt,
-            "noplaylist": True,
-            "quiet": True,
-            "no_warnings": True,
-            "skip_download": True,
-            "socket_timeout": 20,
-            "extractor_args": {"youtube": {"player_client": YT_CLIENTS}},
-            "js_runtimes": {"node": {}},
-        }
-        ydl = cache[fmt] = YoutubeDL(options)
-    return ydl
-
 
 def _expires_at(url):
     """googlevideo URLs carry their end of life as expire=<unix seconds> (or /expire/<n>/)."""
@@ -321,9 +300,8 @@ def _extract(video, fmt, codec="acodec", slot=None):
     """yt-dlp's answer for a video id in a format: (info, the format entry that holds the URL).
     `codec` says which part to take when the selection is a merge: acodec for audio, vcodec for video."""
     with (slot if slot is not None else _resolving):
-        ydl = _ydl(fmt)
-        apply_cookies(ydl)
-        info = ydl.extract_info("https://music.youtube.com/watch?v=" + video, download=False)
+        with _lease(fmt) as ydl:
+            info = ydl.extract_info("https://music.youtube.com/watch?v=" + video, download=False)
         _remember_stats(video, info)
     chosen = info
     url = info.get("url")
@@ -380,7 +358,8 @@ def stats(params):
                 known = _stats.get(video)
             if known is None:
                 try:
-                    info = _ydl().extract_info("https://music.youtube.com/watch?v=" + video, download=False)
+                    with _lease(AUDIO_FORMAT) as ydl:
+                        info = ydl.extract_info("https://music.youtube.com/watch?v=" + video, download=False)
                     known = _remember_stats(video, info)
                 except Exception:
                     known = None

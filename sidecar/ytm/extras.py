@@ -10,6 +10,8 @@ resolve is replaced by a version that first asks yt-dlp for the audio with the v
 HLS and DASH manifests, which needs no JavaScript solving and is much cheaper; if that fails, the original
 resolve (the full set of clients) answers.
 """
+import contextlib
+import ctypes
 import gc
 import queue
 import re
@@ -17,6 +19,11 @@ import sys
 import threading
 import time
 from ytm_util import clock as _clock
+
+try:
+    _libc = ctypes.CDLL("libc.so.6")
+except OSError:
+    _libc = None
 
 VIDEO_ID = re.compile(r"[A-Za-z0-9_-]{11}")
 PLAYLIST_ID = re.compile(r"[A-Za-z0-9_-]{2,64}")
@@ -28,6 +35,13 @@ LIGHT_ARGS = {"youtube": {"player_client": ["visionos"], "skip": ["hls", "dash"]
 RESOLVE_SLOTS = 3
 # Cada tantas resoluciones se fuerza una pasada del recolector de basura de Python (yt-dlp deja ciclos de objetos).
 COLLECT_EVERY = 25
+
+def _trim():
+    if _libc is not None:
+        try:
+            _libc.malloc_trim(0)
+        except Exception:
+            pass
 
 def _check(value, pattern, what):
     value = str(value or "")
@@ -42,15 +56,15 @@ def build(server):
     # guarda el JavaScript del reproductor de YouTube y sus cachés. Ahora hay una reserva de, como mucho, RESOLVE_SLOTS
     # instancias que se prestan y se devuelven, y el semáforo de server.py se sustituye por uno del mismo tamaño.
     server._resolving = threading.BoundedSemaphore(RESOLVE_SLOTS)
-    pool = queue.LifoQueue()
-    made = [0]
+    pools = {}
+    made = {}
     count = [0]
     lock = threading.Lock()
 
-    def new_ydl():
+    def new_ydl(fmt):
         from yt_dlp import YoutubeDL
         return YoutubeDL({
-            "format": server.AUDIO_FORMAT,
+            "format": fmt,
             "noplaylist": True,
             "quiet": True,
             "no_warnings": True,
@@ -59,30 +73,47 @@ def build(server):
             "js_runtimes": {"node": {}},
         })
 
-    def checkout():
+    def checkout(fmt):
+        with lock:
+            pool = pools.setdefault(fmt, queue.LifoQueue())
+            made.setdefault(fmt, 0)
         try:
             return pool.get_nowait()
         except queue.Empty:
             pass
         with lock:
-            create = made[0] < RESOLVE_SLOTS
+            create = made[fmt] < RESOLVE_SLOTS
             if create:
-                made[0] += 1
+                made[fmt] += 1
         if not create:
             return pool.get()
         try:
-            return new_ydl()
+            return new_ydl(fmt)
         except Exception:
             with lock:
-                made[0] -= 1
+                made[fmt] -= 1
             raise
 
+    @contextlib.contextmanager
+    def lease(fmt=None):
+        """Presta una instancia de YoutubeDL con las cookies de la sesión; el formato se fija al crearla."""
+        fmt = fmt or server.AUDIO_FORMAT
+        ydl = checkout(fmt)
+        try:
+            server.apply_cookies(ydl)
+            yield ydl
+        finally:
+            pools[fmt].put(ydl)
+
+    server._lease = lease
+    
     def collect():
         with lock:
             count[0] += 1
             due = count[0] % COLLECT_EVERY == 0
         if due:
             gc.collect()
+            _trim()
 
     # ---- resolve ----
 
@@ -99,13 +130,9 @@ def build(server):
             raise ValueError("Invalid YouTube video ID")
         try:
             with server._resolving:
-                ydl = checkout()
-                try:
-                    server.apply_cookies(ydl)
+                with lease() as ydl:
                     ydl.params["extractor_args"] = LIGHT_ARGS
                     info = ydl.extract_info("https://music.youtube.com/watch?v=" + video, download=False)
-                finally:
-                    pool.put(ydl)
             server._remember_stats(video, info)
             collect()
             chosen = pick(info)

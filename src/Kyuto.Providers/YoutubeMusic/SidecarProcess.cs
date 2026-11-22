@@ -69,6 +69,8 @@ internal sealed class SidecarProcess(string python, string script) : IDisposable
             
             psi.ArgumentList.Add("-u");
             psi.ArgumentList.Add(script);
+
+            psi.Environment["MALLOC_ARENA_MAX"] = "2";
             
             var proc = Process.Start(psi) ?? throw new InvalidOperationException("Could not start " + python);
             var session = new Session(proc);
