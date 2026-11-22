@@ -22,6 +22,8 @@ public class LibraryViewModel : ViewModelBase
     private IReadOnlyList<Track> _listTracks = [];
     private HashSet<string> _likedIds = [];
     private bool _libraryLoaded;
+    private IReadOnlyList<Track> _shown = []; // what the list shows now (filtered and sorted); row indexes refer to it
+    private string _filter = "", _sort = "default";
 
     public LibraryViewModel()
     {
@@ -40,6 +42,8 @@ public class LibraryViewModel : ViewModelBase
     public TrackListModel Tracks { get; } = new();
 
     public string LibraryStatus { get; private set => Set(ref field, value); } = "";
+    /// <summary>default, title, artist or duration.</summary>
+    public string ListSort { get; private set => Set(ref field, value); } = "default";
     /// <summary>Id of the open playlist, "" while the playlist list is showing.</summary>
     public string OpenListId { get; private set => Set(ref field, value); } = "";
     public string OpenListTitle { get; private set => Set(ref field, value); } = "";
@@ -47,6 +51,7 @@ public class LibraryViewModel : ViewModelBase
     public int ListCount { get; private set => Set(ref field, value); }
     public bool CanLike { get; private set => Set(ref field, value); }
     public bool Liked { get; private set => Set(ref field, value); }
+    
 
     /// <summary>How the last playlist action went ("" when there is none). QML shows it in the snackbar.</summary>
     public string Notice { get; private set => Set(ref field, value); } = "";
@@ -125,18 +130,21 @@ public class LibraryViewModel : ViewModelBase
         OpenListId = "";
         OpenListTitle = "";
         ListStatus = "";
+        _filter = "";
+        _sort = "default";
+        ListSort = "default";
         SetListTracks([]);
     }
 
     /// <summary>Replaces the queue with the open playlist, in order or shuffled.</summary>
-    public void PlayList(bool shuffle) => AppServices.Playback.PlayList(_listTracks, shuffle);
+    public void PlayList(bool shuffle) => AppServices.Playback.PlayList(_shown, shuffle);
 
-    public void PlayListItem(int index) => AppServices.Playback.PlayFrom(_listTracks, index);
+    public void PlayListItem(int index) => AppServices.Playback.PlayFrom(_shown, index);
 
-    public void AddListItem(int index) => AppServices.Playback.AddFrom(_listTracks, index);
+    public void AddListItem(int index) => AppServices.Playback.AddFrom(_shown, index);
 
-    public void PlayNextListItem(int index) => AppServices.Playback.PlayNextFrom(_listTracks, index);
-
+    public void PlayNextListItem(int index) => AppServices.Playback.PlayNextFrom(_shown, index);
+    
     /// <summary>Likes or unlikes the playing track on YouTube Music.</summary>
     public void ToggleLike()
     {
@@ -212,6 +220,19 @@ public class LibraryViewModel : ViewModelBase
             },
             e => SayOnce(Tr.F("playlist.failed", e.Message)));
     }
+    
+    public void ChooseListFilter(string text)
+    {
+        _filter = text.Trim();
+        ApplyView();
+    }
+
+    public void ChooseListSort(string key)
+    {
+        _sort = key is "title" or "artist" or "duration" ? key : "default";
+        ListSort = _sort;
+        ApplyView();
+    }
 
     /// <summary>Sets the notice twice, so the same text twice in a row still reaches QML.</summary>
     private void SayOnce(string text)
@@ -260,8 +281,28 @@ public class LibraryViewModel : ViewModelBase
     private void SetListTracks(IReadOnlyList<Track> tracks)
     {
         _listTracks = tracks;
-        Tracks.Replace(tracks.Select(Rows.FromTrack));
-        ListCount = tracks.Count;
+        ApplyView();
+    }
+    
+    private void ApplyView()
+    {
+        IEnumerable<Track> view = _listTracks;
+        var cmp = StringComparison.CurrentCultureIgnoreCase;
+
+        if (_filter.Length > 0)
+            view = view.Where(t => t.Title.Contains(_filter, cmp) || t.Artist.Contains(_filter, cmp) || t.Album.Contains(_filter, cmp));
+
+        view = _sort switch
+        {
+            "title" => view.OrderBy(t => t.Title, StringComparer.CurrentCultureIgnoreCase),
+            "artist" => view.OrderBy(t => t.Artist, StringComparer.CurrentCultureIgnoreCase).ThenBy(t => t.Title, StringComparer.CurrentCultureIgnoreCase),
+            "duration" => view.OrderBy(t => t.DurationSeconds),
+            _ => view,
+        };
+
+        _shown = [.. view];
+        Tracks.Replace(_shown.Select(Rows.FromTrack));
+        ListCount = _listTracks.Count;
     }
 
     /// <summary>The language changed: the rows that carry a text ("12 songs") are built again.</summary>
