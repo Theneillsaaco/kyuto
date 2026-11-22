@@ -20,7 +20,7 @@ internal static class Rows
     public static TrackRow FromPlaylist(PlaylistInfo p) => new()
     {
         VideoId = p.Id,
-        Title = p.Title,
+        Title = p.Id == "LM" ? Tr.T("library.liked") : p.Title,
         Artist = p.Count switch { 0 => "", 1 => Tr.T("playlist.songs.one"), var n => Tr.F("playlist.songs.many", n) },
         ArtUrl = p.ArtUrl
     };

@@ -25,6 +25,12 @@ Item {
     readonly property real titleIn: stage(0.12)
     readonly property real actionsIn: stage(0.3)
 
+    ScrollMemory { id: memory; view: list; key: root.nav.pageKey }
+    Connections {
+        target: root.nav.collection
+        function onModelReset() { memory.contentReady() }
+    }
+    
     function tr(key) { return i18n ? i18n.t(key) : key }
 
     function stage(from) { return Math.min(Math.max((shown - from) / 0.35, 0), 1) }

@@ -31,6 +31,7 @@ public class LyricsViewModel : ViewModelBase
         {
             Message = MessageFor(State);
             ShowOffset(Offset);
+            ShowNudgeLabels();
             if (ExtraMode is "translation" or "both") 
                 Retry();
         };
@@ -56,7 +57,10 @@ public class LyricsViewModel : ViewModelBase
     public double Offset { get; private set => Set(ref field, value); }
     public string OffsetText { get; private set => Set(ref field, value); } = "0,0 s";
     public string ExtraMode { get; private set => Set(ref field, value); } = "off";
+    public string SoonerText { get; private set => Set(ref field, value); } = "−0.5";
+    public string LaterText { get; private set => Set(ref field, value); } = "+0.5";
 
+    
     /// <summary>QML tells the view model whether the panel is open.</summary>
     public void PanelShown(bool shown)
     {
@@ -192,6 +196,13 @@ public class LyricsViewModel : ViewModelBase
     {
         FontSize = Math.Clamp(FontSize + step, LyricsService.MinFontSize, LyricsService.MaxFontSize);
         AppServices.Lyrics.SaveFontSize(FontSize);
+    }
+    
+    private void ShowNudgeLabels()
+    {
+        var d = I18n.decimalSeparator();
+        SoonerText = $"−0{d}5";
+        LaterText = $"+0{d}5";
     }
 
     private static string MessageFor(string state) => state switch

@@ -466,7 +466,7 @@ def library_playlists(_params):
         liked = {"id": LIKED, "title": "", "count": 0, "art": ""}
     else:
         lists.remove(liked)
-    liked["title"] = "Me gusta"
+    liked["title"] = ""
     return [liked] + lists
 
 

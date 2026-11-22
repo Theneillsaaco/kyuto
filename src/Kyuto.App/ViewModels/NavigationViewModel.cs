@@ -157,6 +157,10 @@ public class NavigationViewModel : ViewModelBase
 
     /// <summary>Shows a short note in the snackbar.</summary>
     public void Notify(string text) => Message = text;
+    
+    /// <summary>"page:id" of what is on screen; the pages use it to remember their scroll.</summary>
+    public string PageKey { get; private set => Set(ref field, value); } = "home:";
+
 
     // ---- playing from the pages ----
 
@@ -209,6 +213,7 @@ public class NavigationViewModel : ViewModelBase
         var entry = _stack[^1];
         Section = _stack[0].Page;
         Page = entry.Page;
+        PageKey = entry.Page + ":" + entry.Id;
         CanBack = _stack.Count > 1;
         Title = "";
         Status = "";

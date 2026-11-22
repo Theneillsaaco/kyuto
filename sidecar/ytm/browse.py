@@ -29,6 +29,10 @@ def build(api, signed_in, get_auth, track, artwork, artist_names):
             raise ValueError("Invalid " + what)
         return value
 
+    def count_of(value):
+        digits = re.sub(r"\D", "", str(value or ""))
+        return int(digits) if digits else 0
+
     def subtitle(raw, kind):
         bits = []
         if kind == "album":
@@ -39,10 +43,7 @@ def build(api, signed_in, get_auth, track, artwork, artist_names):
                 bits.append(str(raw["year"]))
             elif isinstance(raw.get("type"), str) and raw["type"]:
                 bits.append(raw["type"])
-        elif kind == "artist":
-            if raw.get("subscribers"):
-                bits.append(str(raw["subscribers"]) + " suscriptores")
-        else:
+        elif kind == "playlist":
             author = raw.get("author")
             if isinstance(author, str) and author:
                 bits.append(author)
@@ -54,8 +55,6 @@ def build(api, signed_in, get_auth, track, artwork, artist_names):
                 bits.append(str(author["name"]))
             elif raw.get("description"):
                 bits.append(str(raw["description"])[:80])
-            if raw.get("itemCount"):
-                bits.append(str(raw["itemCount"]) + " canciones")
         return " · ".join(bits)
 
     def item(raw, fallback=""):
@@ -93,8 +92,10 @@ def build(api, signed_in, get_auth, track, artwork, artist_names):
         return {
             "type": kind,
             "id": key,
-            "title": raw.get("title") or raw.get("name") or artist_name or "Sin título",
+            "title": raw.get("title") or raw.get("name") or artist_name or "",
             "subtitle": subtitle(raw, kind),
+            "subscribers": str(raw.get("subscribers") or "") if kind == "artist" else "",
+            "count": count_of(raw.get("itemCount")) if kind == "playlist" else 0,
             "art": artwork(raw),
         }
 
