@@ -369,10 +369,7 @@ internal sealed partial class ScrobbleService : IDisposable
 
     private static void OpenBrowser(string url)
     {
-        try
-        {
-            using var process = Process.Start(new ProcessStartInfo("xdg-open") { ArgumentList = { url }, UseShellExecute = false });
-        }
+        try { Process.StartAndForget("xdg-open", [url]); }
         catch (Exception e) { Log("could not open the browser", e); }
     }
 
