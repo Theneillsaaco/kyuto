@@ -309,25 +309,37 @@ def _go_anonymous(ydl):
     ydl.params["extractor_args"] = {"youtube": {"player_client": ANON_CLIENTS}}
 
 
+def _extract_info(ydl, url_page, video):
+    """Asks yt-dlp, with two ways to do it when there is a session: signed in (cookies) or anonymous (visionos/android).
+    The way that worked last goes first; if it fails (no formats, a bot check...) the other one is tried before giving up."""
+    if not _cookie_header:
+        return ydl.extract_info(url_page, download=False)
+
+    anon_first = _anon_first
+    for anon in (anon_first, not anon_first):
+        try:
+            if anon:
+                _go_anonymous(ydl)
+            else:
+                ydl.cookiejar.clear()
+                apply_cookies(ydl)  # puts the session back after an anonymous attempt
+            info = ydl.extract_info(url_page, download=False)
+            _set_anon_first(anon)
+            return info
+        except Exception as exc:
+            if anon != anon_first:
+                raise  # both ways failed
+            print("resolve: the " + ("anonymous" if anon else "signed-in") + " way failed for " + video + " ("
+                  + (str(exc) or type(exc).__name__)[:100] + "), trying the other", file=sys.stderr)
+
+
 def _extract(video, fmt, codec="acodec", slot=None):
     """yt-dlp's answer for a video id in a format: (info, the format entry that holds the URL).
     `codec` says which part to take when the selection is a merge: acodec for audio, vcodec for video."""
     url_page = "https://music.youtube.com/watch?v=" + video
     with (slot if slot is not None else _resolving):
         with _lease(fmt) as ydl:
-            if _anon_first and _cookie_header:
-                _go_anonymous(ydl)
-            try:
-                info = ydl.extract_info(url_page, download=False)
-            except Exception as exc:
-                if not (_cookie_header and not _anon_first and "Requested format is not available" in str(exc)):
-                    raise
-                # With a session yt-dlp drops visionos (it cannot use cookies) and the web clients need the JS solver,
-                # which may be broken: try again without the cookies, with the clients that need neither.
-                print("resolve: signed-in clients gave no formats for " + video + ", retrying anonymously", file=sys.stderr)
-                _go_anonymous(ydl)
-                info = ydl.extract_info(url_page, download=False)
-                _set_anon_first(True)  # it worked: skip the signed-in attempt from now on (until the session changes)
+            info = _extract_info(ydl, url_page, video)
         _remember_stats(video, info)
     chosen = info
     url = info.get("url")

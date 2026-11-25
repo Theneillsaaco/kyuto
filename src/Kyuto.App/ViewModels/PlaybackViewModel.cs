@@ -2,6 +2,7 @@ using System.Globalization;
 using Kyuto.App.Services;
 using Kyuto.App.ViewModels.Base;
 using Kyuto.Core.Contracts;
+using Kyuto.Core.Localization;
 using Kyuto.Core.Playback;
 
 namespace Kyuto.App.ViewModels;
@@ -77,13 +78,38 @@ public class PlaybackViewModel : ViewModelBase
     /// <summary>Runs what the desktop asked for (playerctl, media keys). QML calls it from an always-on Timer.</summary>
     public void Pump() => AppServices.Playback.Pump();
 
+    // Texts that only change now and then are rebuilt when their input changes, not on every tick.
+    private int _posSecond = -1, _durSecond = -1, _sleepMinutes = -1;
+    private double _speedKey = double.NaN;
+    private string _lang = "";
+    private TrackStats? _statsShown;
+    private bool _statsKnown;
+    private string _statsId = "";
+
     private void Refresh()
     {
         var p = AppServices.Playback;
+        var lang = I18n.current();
+        var langChanged = lang != _lang;
+        _lang = lang;
+
         Position = p.Position;
         Duration = p.Duration;
-        PositionText = TimeFormat.Clock(p.Position, "0:00");
-        DurationText = TimeFormat.Clock(p.Duration, "0:00");
+
+        var posSecond = (int)Math.Max(p.Position, 0);
+        if (posSecond != _posSecond)
+        {
+            _posSecond = posSecond;
+            PositionText = TimeFormat.Clock(p.Position, "0:00");
+        }
+
+        var durSecond = (int)Math.Max(p.Duration, 0);
+        if (durSecond != _durSecond)
+        {
+            _durSecond = durSecond;
+            DurationText = TimeFormat.Clock(p.Duration, "0:00");
+        }
+
         Paused = p.Paused;
         IsLoaded = p.IsLoaded;
         AudioWaiting = p.AudioWaiting;
@@ -98,12 +124,31 @@ public class PlaybackViewModel : ViewModelBase
         CanNext = p.CanNext;
         CanPrevious = p.CanPrevious;
         Speed = p.Speed;
-        SpeedText = PlaybackSpeed.label(p.Speed);
-        SleepText = p.SleepRemaining > 0 ? Tr.F("sleep.left", (int)Math.Ceiling(p.SleepRemaining / 60)) : "";
+
+        if (p.Speed != _speedKey)
+        {
+            _speedKey = p.Speed;
+            SpeedText = PlaybackSpeed.label(p.Speed);
+        }
+
+        var sleepMinutes = p.SleepRemaining > 0 ? (int)Math.Ceiling(p.SleepRemaining / 60) : 0;
+        if (sleepMinutes != _sleepMinutes || langChanged)
+        {
+            _sleepMinutes = sleepMinutes;
+            SleepText = sleepMinutes > 0 ? Tr.F("sleep.left", sleepMinutes) : "";
+        }
 
         var stats = AppServices.Stats;
         stats.Request(p.CurrentId);
-        StatsText = FormatStats(stats.TryGet(p.CurrentId));
+        var current = stats.TryGet(p.CurrentId);
+        if (!_statsKnown || !ReferenceEquals(current, _statsShown) || p.CurrentId != _statsId || langChanged)
+        {
+            _statsKnown = true;
+            _statsShown = current;
+            _statsId = p.CurrentId;
+            StatsText = FormatStats(current);
+        }
+
         StatsPending = stats.Pending(p.CurrentId);
     }
 

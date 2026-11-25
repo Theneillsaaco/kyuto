@@ -74,10 +74,12 @@ public class MpvEngine : IAudioEngine
         string? error = null;
         for (;;)
         {
-            var ev = Marshal.PtrToStructure<MpvEvent>(mpv_wait_event(_h, 0));
-            
-            if (ev.Id == 0)
-                return error ?? ""; // MPV_EVENT_NONE: queue empty
+            var evPtr = mpv_wait_event(_h, 0);
+
+            if (Marshal.ReadInt32(evPtr) == 0) // MPV_EVENT_NONE: queue empty (the usual case: no struct copy)
+                return error ?? "";
+
+            var ev = Marshal.PtrToStructure<MpvEvent>(evPtr);
             if (ev.Id == 7 && ev.Data != IntPtr.Zero) // MPV_EVENT_END_FILE
             {
                 var end = Marshal.PtrToStructure<MpvEndFile>(ev.Data);
@@ -124,8 +126,14 @@ public class MpvEngine : IAudioEngine
         finally { mpv_free(p); }
     }
     
+    private const int FormatFlag = 3, FormatDouble = 5; // MPV_FORMAT_FLAG, MPV_FORMAT_DOUBLE
+
+    // Typed reads skip the string allocation and the parse; an unavailable property (nothing loaded) reads as 0 / false.
     private double GetDouble(string name) =>
-        double.TryParse(Get(name), NumberStyles.Float, CultureInfo.InvariantCulture, out var v) ? v : 0;
+        mpv_get_property(_h, name, FormatDouble, out double v) >= 0 ? v : 0;
+
+    private bool GetFlag(string name) =>
+        mpv_get_property(_h, name, FormatFlag, out int v) >= 0 && v != 0;
     
     private int Command(params string[] args)
     {
@@ -197,9 +205,9 @@ public class MpvEngine : IAudioEngine
     
     public double Position => GetDouble("time-pos");
     public double Duration => GetDouble("duration");
-    public bool Paused => Get("pause") == "yes";
-    public bool Idle => Get("idle-active") == "yes";
-    public bool Buffering => Get("pause") != "yes" && Get("core-idle") == "yes";
+    public bool Paused => GetFlag("pause");
+    public bool Idle => GetFlag("idle-active");
+    public bool Buffering => !GetFlag("pause") && GetFlag("core-idle");
     
     public MpvEngine()
     {

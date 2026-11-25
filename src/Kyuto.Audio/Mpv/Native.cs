@@ -19,6 +19,8 @@ internal static class Native
     [DllImport(Lib)] public static extern int mpv_set_option_string(IntPtr h, [MarshalAs(UnmanagedType.LPUTF8Str)] string name, [MarshalAs(UnmanagedType.LPUTF8Str)] string data);
     [DllImport(Lib)] public static extern int mpv_set_property_string(IntPtr h, [MarshalAs(UnmanagedType.LPUTF8Str)] string name, [MarshalAs(UnmanagedType.LPUTF8Str)] string data);
     [DllImport(Lib)] public static extern IntPtr mpv_get_property_string(IntPtr h, [MarshalAs(UnmanagedType.LPUTF8Str)] string name);
+    [DllImport(Lib)] public static extern int mpv_get_property(IntPtr h, [MarshalAs(UnmanagedType.LPUTF8Str)] string name, int format, out double data);
+    [DllImport(Lib)] public static extern int mpv_get_property(IntPtr h, [MarshalAs(UnmanagedType.LPUTF8Str)] string name, int format, out int data);
     [DllImport(Lib)] public static extern void mpv_free(IntPtr data);
     [DllImport(Lib)] public static extern int mpv_command(IntPtr h, IntPtr[] args);
     [DllImport(Lib)] public static extern IntPtr mpv_wait_event(IntPtr h, double timeout);
