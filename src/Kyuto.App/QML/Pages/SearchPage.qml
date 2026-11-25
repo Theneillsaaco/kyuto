@@ -109,7 +109,11 @@ Item {
     PickState { id: pick }
     Connections {
         target: root.vm.results
-        function onModelReset() { pick.clear() }
+        function onModelReset() { pick.clear(); tracksView.positionViewAtBeginning() }
+    }
+    Connections {
+        target: root.vm.entities
+        function onModelReset() { entitiesView.positionViewAtBeginning() }
     }
 
     ColumnLayout {
@@ -151,6 +155,35 @@ Item {
                 boundsBehavior: Flickable.StopAtBounds
                 model: root.vm.results
                 header: TopResult { full: tracksView.width }
+                // With no filter, the albums, artists and playlists of the search come after the songs.
+                footer: Column {
+                    width: tracksView.width
+                    visible: root.vm.allMode && moreEntities.count > 0
+                    height: visible ? implicitHeight : 0
+
+                    Label {
+                        x: 16
+                        topPadding: 16
+                        bottomPadding: 4
+                        text: root.tr("search.more")
+                        color: root.theme ? root.theme.inkSurface : "#1D1B20"
+                        font.pixelSize: 16
+                        font.weight: Font.Medium
+                    }
+                    Repeater {
+                        id: moreEntities
+                        model: root.vm.allMode ? root.vm.entities : null
+                        delegate: TrackItem {
+                            required property var model
+                            width: tracksView.width
+                            heading: model.title
+                            supporting: model.subtitle
+                            artUrl: model.artUrl
+                            round: model.kind === "artist"
+                            onActivated: root.entityActivated(model.kind, model.entityId)
+                        }
+                    }
+                }
                 ScrollBar.vertical: MScrollBar {}
                 delegate: TrackItem {
                     required property int index
@@ -196,7 +229,9 @@ Item {
             EmptyState {
                 anchors.centerIn: parent
                 width: parent.width - 48
-                visible: (root.vm.entityMode ? entitiesView.count : tracksView.count) === 0
+                visible: (root.vm.entityMode ? entitiesView.count
+                          : root.vm.allMode ? tracksView.count + entitiesView.count
+                          : tracksView.count) === 0
                 glyph: "search"
                 busy: root.vm.searching
                 title: root.vm.status

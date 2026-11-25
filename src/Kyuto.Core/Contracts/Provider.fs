@@ -119,10 +119,12 @@ type ArtistPage = {
     Subscribed: bool
 }
 
-/// What a typed search found: Tracks for the songs and videos filters, Entities for the rest.
+/// What a search found: Tracks (songs and videos) and Entities (albums, artists, playlists), each in the order
+/// YouTube ranked them. TopEntity says the best match overall is Entities[0] rather than Tracks[0].
 type SearchHits = {
     Tracks: Track[]
     Entities: Entity[]
+    TopEntity: bool
 }
 
 /// The ids behind a track's artist and album, "" when it has none.
@@ -147,7 +149,7 @@ type IBrowseProvider =
     /// A public playlist or a mix.
     abstract Collection: id: string -> Task<TrackCollection>
     abstract Artist: id: string -> Task<ArtistPage>
-    /// filter: songs, videos, albums, artists or playlists.
+    /// filter: "" for everything, or songs, videos, albums, artists or playlists.
     abstract SearchTyped: query: string * filter: string -> Task<SearchHits>
     abstract Suggestions: query: string -> Task<string[]>
     abstract Links: trackId: string -> Task<TrackLinks>

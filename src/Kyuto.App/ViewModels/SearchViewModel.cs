@@ -31,7 +31,7 @@ public class SearchViewModel : ViewModelBase
     private bool _pendingReady;
     private SearchHits? _pendingHits;
     private string? _pendingError;
-    private string _pendingFilter = "songs";
+    private string _pendingFilter = "";
     private int _searchTicket;
 
     // The same for the suggestions.
@@ -53,9 +53,11 @@ public class SearchViewModel : ViewModelBase
     public TrackListModel Results { get; } = new();
     /// <summary>Albums, artists and playlists.</summary>
     public EntityListModel Entities { get; } = new();
-    /// <summary>songs, videos, albums, artists or playlists.</summary>
-    public string Filter { get; private set => Set(ref field, value); } = "songs";
-    /// <summary>The results on show are entities, not tracks.</summary>
+    /// <summary>"" for everything, or songs, videos, albums, artists or playlists.</summary>
+    public string Filter { get; private set => Set(ref field, value); } = "";
+    /// <summary>No filter: songs, videos and entities together, best match first.</summary>
+    public bool AllMode { get; private set => Set(ref field, value); } = true;
+    /// <summary>The results on show are only entities (albums, artists or playlists filter).</summary>
     public bool EntityMode { get; private set => Set(ref field, value); }
     public bool Searching { get; private set => Set(ref field, value); }
 
@@ -153,10 +155,19 @@ public class SearchViewModel : ViewModelBase
         Suggesting = false;
     }
 
-    /// <summary>Changes what is searched for; with a query already made, it searches again.</summary>
+    /// <summary>
+    /// Changes what is searched for; with a query already made, it searches again. Choosing the filter already
+    /// on (or "") goes back to everything.
+    /// </summary>
     public void ChooseFilter(string filter)
     {
-        if (!Filters.Contains(filter) || filter == Filter)
+        if (filter == Filter)
+            filter = "";
+
+        if (filter.Length > 0 && !Filters.Contains(filter))
+            return;
+
+        if (filter == Filter)
             return;
 
         Filter = filter;
@@ -209,26 +220,34 @@ public class SearchViewModel : ViewModelBase
         }
 
         EntityMode = filter is "albums" or "artists" or "playlists";
+        AllMode = filter.Length == 0; // with the answer, so the screen never mixes old results with a new mode
         _results = hits.Tracks;
-        Results.Replace(hits.Tracks.Select(Rows.FromTrack));
-        Entities.Replace(hits.Entities.Select(Rows.FromEntity));
-        ShowTop(hits);
 
-        var count = EntityMode ? hits.Entities.Length : hits.Tracks.Length;
+        // The top card goes first: it is the list header, and a header that grows after the model reset
+        // is left above the visible area.
+        ShowTop(hits);
+        Results.Replace(hits.Tracks.Select(Rows.FromTrack));
+        Entities.Replace(hits.Entities.Select(e => Rows.FromEntity(e, withKind: filter.Length == 0)));
+
+        var count = EntityMode ? hits.Entities.Length
+            : filter.Length == 0 ? hits.Tracks.Length + hits.Entities.Length
+            : hits.Tracks.Length;
         AppServices.Status.Text = count == 0 ? Tr.T("search.noResults") : Tr.F("search.results", count);
     }
 
     private void ShowTop(SearchHits hits)
     {
-        if (!EntityMode && hits.Tracks.Length > 0)
+        var entityFirst = (EntityMode || hits.TopEntity) && hits.Entities.Length > 0;
+
+        if (!entityFirst && hits.Tracks.Length > 0)
         {
             var t = hits.Tracks[0];
             (TopKind, TopId, TopTitle, TopSubtitle, TopArt) = ("track", t.Id, t.Title, t.Artist, t.ArtUrl);
             HasTop = true;
         }
-        else if (EntityMode && hits.Entities.Length > 0)
+        else if (entityFirst)
         {
-            var e = Rows.FromEntity(hits.Entities[0]);
+            var e = Rows.FromEntity(hits.Entities[0], withKind: !EntityMode);
             (TopKind, TopId, TopTitle, TopSubtitle, TopArt) = (e.Kind, e.EntityId, e.Title, e.Subtitle, e.ArtUrl);
             HasTop = true;
         }
@@ -276,9 +295,7 @@ public class SearchViewModel : ViewModelBase
             string? error = null;
             try
             {
-                hits = filter == "songs"
-                    ? new SearchHits([.. await provider.Search(query)], [])
-                    : await provider.SearchTyped(query, filter);
+                hits = await provider.SearchTyped(query, filter);
             }
             catch (Exception e) { error = e.Message; }
 
