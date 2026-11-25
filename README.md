@@ -1,6 +1,6 @@
 # Kyuto
 
-A desktop YouTube Music player for Linux, built with **.NET 10**, **Qt Bridge for C#** (custom Material 3 QML) and **libmpv**.
+A desktop YouTube Music player for Linux, built with **.NET 11**, **Qt Bridge for C#** (custom Material 3 QML) and **libmpv**.
 
 > Unofficial. Not affiliated with YouTube, Google or Last.fm.
 
@@ -66,7 +66,7 @@ inputs.kyuto.packages.${pkgs.stdenv.hostPlatform.system}.default
 flatpak run io.github.Theneillsaaco.Kyuto
 ```
 
-`build.sh` installs the KDE 6.11 runtime and the .NET 10 extension, generates the offline NuGet and Python dependency lists the first time, then builds and installs the app for your user. The first build compiles ffmpeg, mpv and libplacebo, so it takes a while.
+`build.sh` installs the KDE 6.11 runtime and the .NET 11 extension, generates the offline NuGet and Python dependency lists the first time, then builds and installs the app for your user. The first build compiles ffmpeg, mpv and libplacebo, so it takes a while.
 
 "Import session from browser" needs read access to the browser profile. The manifest grants it for the common browsers; remove what you do not use with `flatpak override --user --nofilesystem=...`.
 

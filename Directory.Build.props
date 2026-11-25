@@ -1,0 +1,6 @@
+<Project>
+    <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.csproj'">
+    	<TieredPGO>true</TieredPGO>
+        <Features>$(Features);runtime-async=on</Features>
+    </PropertyGroup>
+</Project>

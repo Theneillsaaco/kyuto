@@ -8,6 +8,8 @@ using Kyuto.Core.Domain;
 
 namespace Kyuto.App.ViewModels;
 
+internal union PageData(Shelf[], TrackCollection, ArtistPage);
+
 /// <summary>
 /// Where the user is: one of the three root sections (home, search, library) and, on top of it, a stack of
 /// detail pages (album, playlist or mix, artist) with back. The app opens on Home. Instantiated once from
@@ -25,7 +27,7 @@ public class NavigationViewModel : ViewModelBase
 
     private readonly BackgroundWork _work = new();
     private readonly List<Entry> _stack = [new("home", "")];
-    private readonly Dictionary<string, (long At, object Value)> _cache = [];
+    private readonly Dictionary<string, (long At, PageData Value)> _cache = [];
     private readonly Dictionary<string, TrackLinks> _links = [];
     private Shelf[] _homeShelves = [];
     private IReadOnlyList<Track> _collection = [];
@@ -287,14 +289,14 @@ public class NavigationViewModel : ViewModelBase
 
         switch (entry.Page)
         {
-            case "home": Fetch(entry, key, () => provider.Home()); break;
-            case "album": Fetch(entry, key, () => provider.Album(entry.Id)); break;
-            case "collection": Fetch(entry, key, () => provider.Collection(entry.Id)); break;
-            case "artist": Fetch(entry, key, () => provider.Artist(entry.Id)); break;
+            case "home": Fetch(entry, key, async () => await provider.Home()); break;
+            case "album": Fetch(entry, key, async () => await provider.Album(entry.Id)); break;
+            case "collection": Fetch(entry, key, async () => await provider.Collection(entry.Id)); break;
+            case "artist": Fetch(entry, key, async () => await provider.Artist(entry.Id)); break;
         }
     }
 
-    private void Fetch<T>(Entry entry, string key, Func<Task<T>> call) where T : class
+    private void Fetch(Entry entry, string key, Func<Task<PageData>> call)
     {
         _work.Run(Task.Run(call),
             value =>
@@ -321,7 +323,7 @@ public class NavigationViewModel : ViewModelBase
         Working = true;
     }
 
-    private void Apply(object value)
+    private void Apply(PageData value)
     {
         Status = "";
         Failed = false;
@@ -422,7 +424,7 @@ public class NavigationViewModel : ViewModelBase
             OpenEntity(artist ? "artist" : "album", id);
     }
 
-    private bool TryCached(string key, long ttl, out object value)
+    private bool TryCached(string key, long ttl, out PageData value)
     {
         if (_cache.TryGetValue(key, out var hit) && Now() - hit.At < ttl)
         {
@@ -430,7 +432,7 @@ public class NavigationViewModel : ViewModelBase
             return true;
         }
 
-        value = null!;
+        value = default!;
         return false;
     }
 

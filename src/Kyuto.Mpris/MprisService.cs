@@ -112,10 +112,9 @@ public class MprisService : IDisposable
     private sealed class Handler(MprisService owner, DBusConnection connection) : DBusHandler(connection, Root, handlesChildPaths: false, handleOnCapturedContext: false), IMediaPlayer2Handler, IMediaPlayer2Properties, IPlayerHandler, IPlayerProperties
     {
         private MprisState State => owner._state;
-        
-        private void Send(MprisAction action, double number = 0, string text = "") =>
-            owner._commands.Enqueue(new MprisCommand(action, number, text));
-        
+
+        private void Send(MprisCommand command) => owner._commands.Enqueue(command);
+
         // ---- org.mpris.MediaPlayer2 ----
         public bool CanQuit => false;
         public bool CanRaise => false;
@@ -129,13 +128,13 @@ public class MprisService : IDisposable
 
         ValueTask IMediaPlayer2Handler.RaiseAsync() => default;
         ValueTask IMediaPlayer2Handler.QuitAsync() => default;
-        
+
         // ---- org.mpris.MediaPlayer2.Player ----
         public string PlaybackStatus => State.Status;
-        public string LoopStatus { get => State.Loop; set => Send(MprisAction.SetLoop, text: value); }
-        public double Rate { get => State.Rate; set => Send(MprisAction.SetRate, value); }
-        public bool Shuffle { get => State.Shuffle; set => Send(MprisAction.SetShuffle, value ? 1 : 0); }
-        public double Volume { get => State.Volume; set => Send(MprisAction.SetVolume, value); }
+        public string LoopStatus { get => State.Loop; set => Send(new Cmd.SetLoop(value)); }
+        public double Rate { get => State.Rate; set => Send(new Cmd.SetRate(value)); }
+        public bool Shuffle { get => State.Shuffle; set => Send(new Cmd.SetShuffle(value)); }
+        public double Volume { get => State.Volume; set => Send(new Cmd.SetVolume(value)); }
         public long Position => State.PositionMicros;
         public double MinimumRate => 0.5;
         public double MaximumRate => 3.0;
@@ -157,7 +156,7 @@ public class MprisService : IDisposable
                 };
                 if (s.TrackKey.Length == 0)
                     return metadata;
-                
+
                 if (s.LengthMicros > 0)
                     metadata["mpris:length"] = VariantValue.Int64(s.LengthMicros);
                 if (s.ArtUrl.Length > 0)
@@ -168,28 +167,28 @@ public class MprisService : IDisposable
                     metadata["xesam:album"] = s.Album;
                 if (s.Artists.Count > 0)
                     metadata["xesam:artist"] = VariantValue.Array(s.Artists.ToArray());
-                
+
                 return metadata;
             }
         }
-        
-        ValueTask IPlayerHandler.NextAsync() { Send(MprisAction.Next); return default; }
-        ValueTask IPlayerHandler.PreviousAsync() { Send(MprisAction.Previous); return default; }
-        ValueTask IPlayerHandler.PauseAsync() { Send(MprisAction.Pause); return default; }
-        ValueTask IPlayerHandler.PlayPauseAsync() { Send(MprisAction.PlayPause); return default; }
-        ValueTask IPlayerHandler.StopAsync() { Send(MprisAction.Stop); return default; }
-        ValueTask IPlayerHandler.PlayAsync() { Send(MprisAction.Play); return default; }
-        ValueTask IPlayerHandler.SeekAsync(long offset) { Send(MprisAction.SeekRelative, offset); return default; }
+
+        ValueTask IPlayerHandler.NextAsync() { Send(new Cmd.Next()); return default; }
+        ValueTask IPlayerHandler.PreviousAsync() { Send(new Cmd.Previous()); return default; }
+        ValueTask IPlayerHandler.PauseAsync() { Send(new Cmd.Pause()); return default; }
+        ValueTask IPlayerHandler.PlayPauseAsync() { Send(new Cmd.PlayPause()); return default; }
+        ValueTask IPlayerHandler.StopAsync() { Send(new Cmd.Stop()); return default; }
+        ValueTask IPlayerHandler.PlayAsync() { Send(new Cmd.Play()); return default; }
+        ValueTask IPlayerHandler.SeekAsync(long offset) { Send(new Cmd.SeekRelative(offset)); return default; }
 
         ValueTask IPlayerHandler.SetPositionAsync(ObjectPath trackId, long position)
         {
             // The spec says to ignore it when it names a track that is no longer the current one.
             if (trackId.ToString() == TrackPath(State.TrackKey))
-                Send(MprisAction.SeekTo, position);
-            
+                Send(new Cmd.SeekTo(position));
+    
             return default;
         }
-        
+
         ValueTask IPlayerHandler.OpenUriAsync(string uri) => default;
 
         // ---- property plumbing, generated ----

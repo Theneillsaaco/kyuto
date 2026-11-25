@@ -65,18 +65,12 @@ internal sealed partial class PlaybackService
 
     private void Handle(MprisCommand command)
     {
-        switch (command.Action)
+        switch (command)
         {
-            case MprisAction.Play:
-                if (!IsLoaded || Paused)
-                    Toggle();
-                break;
-            case MprisAction.Pause:
-                if (IsLoaded && !Paused)
-                    Toggle();
-                break;
-            case MprisAction.PlayPause: Toggle(); break;
-            case MprisAction.Stop:
+            case Cmd.Play: if (!IsLoaded || Paused) Toggle(); break;
+            case Cmd.Pause: if (IsLoaded && !Paused) Toggle(); break;
+            case Cmd.PlayPause: Toggle(); break;
+            case Cmd.Stop:
                 if (IsLoaded && _awaitingId is null)
                 {
                     _engine.SetPaused(true);
@@ -84,21 +78,20 @@ internal sealed partial class PlaybackService
                     _mpris?.Seeked(0);
                 }
                 break;
-            case MprisAction.Next: Next(); break;
-            case MprisAction.Previous: Previous(); break;
-            case MprisAction.SeekRelative: Seek(Math.Clamp(Position + command.Number / 1e6, 0, Duration)); break;
-            case MprisAction.SeekTo: Seek(Math.Clamp(command.Number / 1e6, 0, Duration)); break;
-            case MprisAction.SetVolume: SetVolume((int)Math.Round(Math.Clamp(command.Number, 0, 1) * 100)); break;
-            case MprisAction.SetRate: ChooseSpeed(command.Number); break;
-            case MprisAction.SetShuffle:
-                if (_queue.Shuffle != command.Number > 0) ToggleShuffle();
-                break;
-            case MprisAction.SetLoop:
-                _queue = PlayQueue.setRepeat(MprisMapper.RepeatOf(command.Text), _queue);
+            case Cmd.Next: Next(); break;
+            case Cmd.Previous: Previous(); break;
+            case Cmd.SeekRelative s: Seek(Math.Clamp(Position + s.Micros / 1e6, 0, Duration)); break;
+            case Cmd.SeekTo s: Seek(Math.Clamp(s.Micros / 1e6, 0, Duration)); break;
+            case Cmd.SetVolume v: SetVolume((int)Math.Round(Math.Clamp(v.Level, 0, 1) * 100)); break;
+            case Cmd.SetRate r: ChooseSpeed(r.Rate); break;
+            case Cmd.SetShuffle s: if (_queue.Shuffle != s.On) ToggleShuffle(); break;
+            case Cmd.SetLoop l:
+                _queue = PlayQueue.setRepeat(MprisMapper.RepeatOf(l.Status), _queue);
                 PersistQueue();
                 AfterQueueEdit();
                 break;
         }
+        
         Poll();
     }
 
