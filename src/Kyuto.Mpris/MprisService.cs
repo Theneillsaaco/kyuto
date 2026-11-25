@@ -141,7 +141,7 @@ public class MprisService : IDisposable
         public bool CanGoNext => State.CanGoNext;
         public bool CanGoPrevious => State.CanGoPrevious;
         public bool CanPlay => State.CanPlay;
-        public bool CanPause => State.CanPlay;
+        public bool CanPause => !State.CanPlay;
         public bool CanSeek => State.CanSeek;
         public bool CanControl => true;
 
