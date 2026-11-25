@@ -14,6 +14,12 @@ Item {
 
     signal entityActivated(string kind, string entityId)
 
+    PickState { id: pick }
+    Connections {
+        target: root.nav.artistSongs
+        function onModelReset() { pick.clear() }
+    }
+
     ScrollMemory { id: memory; view: flick; key: root.nav.pageKey }
     Connections {
         target: root.nav.artistRelated // lo último que ApplyArtist rellena
@@ -176,6 +182,10 @@ Item {
                     artUrl: model.artUrl
                     videoId: model.videoId
                     showAdd: true
+                    pickable: true
+                    selecting: pick.active
+                    picked: pick.has(index)
+                    onPickToggled: pick.toggle(index)
                     onActivated: root.nav.playArtistSong(index)
                     onAddRequested: root.nav.addArtistSong(index)
                     onPlayNextRequested: root.nav.playNextArtistSong(index)
@@ -201,17 +211,33 @@ Item {
         }
     }
 
+    SelectionBar {
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 16
+        count: pick.count
+        onQueueRequested: { root.nav.addSelectedOfArtist(pick.json()); Window.window.toast(root.tr("queue.added")); pick.clear() }
+        onNextRequested: { root.nav.playNextSelectedOfArtist(pick.json()); Window.window.toast(root.tr("queue.addedNext")); pick.clear() }
+        onPlaylistRequested: { root.nav.stageSelectedOfArtist(pick.json()); Window.window.pickPlaylistStaged(); pick.clear() }
+        onCleared: pick.clear()
+    }
+
     // Loading or error, while there is nothing to show yet.
+    SkeletonRows {
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        header: true
+        round: true
+        rows: 5
+        visible: root.nav.artistName === "" && root.nav.working && !root.nav.failed
+    }
+
     ColumnLayout {
         anchors.centerIn: parent
         width: parent.width - 48
-        visible: root.nav.artistName === "" && root.nav.status !== ""
+        visible: root.nav.artistName === "" && root.nav.status !== "" && (root.nav.failed || !root.nav.working)
         spacing: 16
-
-        LoadingIndicator {
-            Layout.alignment: Qt.AlignHCenter
-            visible: root.nav.working && !root.nav.failed
-        }
 
         Label {
             Layout.fillWidth: true

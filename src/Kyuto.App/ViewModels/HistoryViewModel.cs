@@ -77,6 +77,16 @@ public class HistoryViewModel : ViewModelBase
     public void AddItem(int index) => AppServices.Playback.AddFrom(_tracks, index);
 
     public void PlayNextItem(int index) => AppServices.Playback.PlayNextFrom(_tracks, index);
+
+    /// <summary>The ticked rows (JSON array of indexes) go to the end of the queue.</summary>
+    public void AddSelected(string indexes) => AppServices.Playback.AddMany(Selection.Pick(_tracks, indexes), next: false);
+
+    /// <summary>The ticked rows play right after the current song.</summary>
+    public void PlayNextSelected(string indexes) => AppServices.Playback.AddMany(Selection.Pick(_tracks, indexes), next: true);
+
+    /// <summary>Hands the ticked rows to the playlist picker.</summary>
+    public void StageSelected(string indexes) => AppServices.Staged = Selection.Pick(_tracks, indexes);
+
     
     private static string ArtOf(string id) => id.Length == 11 ? "https://i.ytimg.com/vi/" + id + "/mqdefault.jpg" : "";
 

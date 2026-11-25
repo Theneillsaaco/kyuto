@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls.Basic
+import QtQuick.Window
 import "../QML/Components"
 import "../QML/Pages"
 import "../QML/Dialogs"
@@ -9,8 +10,9 @@ ApplicationWindow {
     id: win
     width: 1100
     height: 700
-    minimumWidth: 720
-    minimumHeight: 480
+    minimumWidth: miniWindow ? 300 : 720
+    minimumHeight: miniWindow ? 420 : 480
+    flags: Qt.Window | (miniWindow && pinned ? Qt.WindowStaysOnTopHint : 0)
     visible: true
     title: playback.currentTitle !== ""
         ? playback.currentTitle + (playback.currentArtist !== "" ? " · " + playback.currentArtist : "")
@@ -105,6 +107,86 @@ ApplicationWindow {
 
     property bool queueOpen: true
     property bool lyricsOpen: false
+
+    // The lyrics over the whole window, on the color of the cover.
+    property bool lyricsFull: false
+    property color lyricsTint: appTheme.primary
+
+    // The small window (cover and controls only). The size of the big one is kept to come back to it.
+    property bool miniWindow: false
+    property bool pinned: false
+    property int savedWidth: 1100
+    property int savedHeight: 700
+
+    function enterMini() {
+        if (miniWindow) return
+        settings.close()
+        lyricsFull = false
+        playerMode = "mini"
+        savedWidth = width
+        savedHeight = height
+        miniWindow = true
+        width = 380
+        height = 560
+    }
+    function leaveMini() {
+        if (!miniWindow) return
+        miniWindow = false
+        pinned = false
+        width = savedWidth
+        height = savedHeight
+    }
+    function toggleMini() { if (miniWindow) leaveMini(); else enterMini() }
+
+    // The tray: closing hides the window while the option is on, the icon brings it back.
+    readonly property bool trayReady: trayLoader.status === Loader.Ready
+    property var keepAlive: null
+    function toggleWindow() {
+        if (visible && visibility !== Window.Minimized) {
+            hide()
+        } else {
+            show()
+            raise()
+            requestActivate()
+        }
+    }
+    onClosing: (close) => {
+        if (settingsVm.closeToTray && win.trayReady) {
+            close.accepted = false
+            win.hide()
+        }
+    }
+
+    // A song dragged sideways from a list onto the queue or the playback bar. TrackItem calls it with
+    // "begin", "move" and "end" (which answers whether it landed on a target).
+    property bool trackDragging: false
+    property bool trackDropOver: false
+    property string trackDragTitle: ""
+    property real trackDragX: 0
+    property real trackDragY: 0
+    function overItem(item, x, y) {
+        if (!item || !item.visible) return false
+        const p = item.mapFromItem(null, x, y)
+        return p.x >= 0 && p.y >= 0 && p.x <= item.width && p.y <= item.height
+    }
+    function trackDrag(phase, title, x, y) {
+        trackDragX = x
+        trackDragY = y
+        trackDropOver = overItem(queuePanel, x, y) || overItem(bar, x, y)
+        if (phase === "begin") {
+            trackDragTitle = title
+            trackDragging = true
+            return false
+        }
+        if (phase === "end") {
+            const landed = trackDropOver
+            trackDragging = false
+            trackDropOver = false
+            return landed
+        }
+        return false
+    }
+    function pickPlaylistStaged() { playlistPicker.showStaged() }
     readonly property bool playingNow: playback.isLoaded && !playback.paused
 
     // The player: "mini" (the picture lives in the playback bar and the pages show), "page" (the player takes the
@@ -149,6 +231,17 @@ ApplicationWindow {
         opacity: win.queueOpen ? 1 : 0
         visible: opacity > 0
         Behavior on opacity { Anim { type: Anim.FastEffects } }
+
+        Rectangle { // drop target
+            anchors.fill: parent
+            radius: parent.radius
+            color: "transparent"
+            border.width: 3
+            border.color: appTheme.primary
+            visible: win.trackDragging
+            opacity: win.trackDropOver ? 1 : 0.35
+            z: 40
+        }
     }
 
     LyricsPanel {
@@ -230,7 +323,7 @@ ApplicationWindow {
     // Polls only while something is playing, searching or working in the background,
     // so an idle player wakes nothing. It ticks faster while the lyrics are open, to follow the line.
     Timer {
-        interval: win.lyricsOpen ? 120 : 250
+        interval: win.lyricsOpen || win.lyricsFull ? 120 : 250
         repeat: true
         running: (playback.isLoaded && !playback.paused) || searchVm.searching || searchVm.suggesting || playback.statsPending || libraryVm.working || settingsVm.busy || lyricsVm.loading || videoVm.loading || navVm.working
         onTriggered: win.pollAll()
@@ -277,8 +370,12 @@ ApplicationWindow {
     // The queue and the lyrics share the right-hand side: opening one closes the other.
     onQueueOpenChanged: if (queueOpen) lyricsOpen = false
     onLyricsOpenChanged: {
-        lyricsVm.panelShown(lyricsOpen)
+        lyricsVm.panelShown(lyricsOpen || lyricsFull)
         if (lyricsOpen) queueOpen = false
+    }
+    onLyricsFullChanged: {
+        lyricsVm.panelShown(lyricsOpen || lyricsFull)
+        if (lyricsFull) leaveMini()
     }
 
     // ---- keyboard ----
@@ -286,12 +383,27 @@ ApplicationWindow {
     // Escape leaves the maximized player.
     Shortcut {
         sequence: "Esc"
-        enabled: win.playerMode === "full" && !settings.opened
+        enabled: win.lyricsFull && !settings.opened
+        onActivated: win.lyricsFull = false
+    }
+    Shortcut {
+        sequence: "Esc"
+        enabled: win.playerMode === "full" && !settings.opened && !win.lyricsFull
         onActivated: win.playerMode = "page"
     }
     Shortcut {
         sequence: "Alt+Left"
-        onActivated: navVm.goBack()
+        enabled: !win.miniWindow
+        onActivated: win.goBack()
+    }
+    Shortcut {
+        sequence: "Ctrl+M"
+        onActivated: win.toggleMini()
+    }
+    Shortcut {
+        sequence: "Ctrl+Shift+F"
+        enabled: !win.miniWindow
+        onActivated: win.lyricsFull = !win.lyricsFull
     }
     Shortcut {
         sequence: "Space"
@@ -320,6 +432,7 @@ ApplicationWindow {
     }
     Shortcut {
         sequence: "Ctrl+,"
+        enabled: !win.miniWindow
         onActivated: settings.open()
     }
 
@@ -360,6 +473,7 @@ ApplicationWindow {
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
+        visible: !win.miniWindow
 
         // Top bar: back and where you are on the left, search on the right, then the panels.
         RowLayout {
@@ -407,6 +521,7 @@ ApplicationWindow {
                 placeholderText: win.tr("search.placeholder")
                 clearTip: win.tr("tip.clearSearch")
                 onTextEdited: suggestTimer.restart()
+                onCleared: { suggestTimer.stop(); searchVm.clearSuggestions() }
                 Keys.onDownPressed: suggestions.step(1)
                 Keys.onUpPressed: suggestions.step(-1)
                 Keys.onEscapePressed: { suggestions.close(); searchVm.clearSuggestions() }
@@ -437,6 +552,11 @@ ApplicationWindow {
                 tip: win.tr("tip.queue")
                 selected: win.queueOpen
                 onClicked: win.queueOpen = !win.queueOpen
+            }
+            MIconButton {
+                glyph: "mini"
+                tip: win.tr("tip.miniPlayer")
+                onClicked: win.enterMini()
             }
             MIconButton {
                 glyph: "settings"
@@ -614,6 +734,108 @@ ApplicationWindow {
         vm: videoVm
         playback: playback
         fit: win.playerMode === "full"
+        suspended: win.miniWindow
+    }
+
+    MiniPlayer {
+        id: miniPlayer
+        anchors.fill: parent
+        z: 70
+        visible: win.miniWindow
+        playback: playback
+        library: libraryVm
+        theme: appTheme
+        pinned: win.pinned
+        onPinToggled: win.pinned = !win.pinned
+        onExpandRequested: win.leaveMini()
+    }
+
+    // Color of the cover for the full-screen lyrics (independent of the "dynamic color" setting).
+    CoverColor {
+        source: playback.currentArt
+        active: win.lyricsFull
+        onFound: (hex) => win.lyricsTint = hex !== "" ? Qt.color(hex) : appTheme.primary
+    }
+
+    Loader {
+        id: lyricsFullLoader
+        anchors.fill: parent
+        z: 80
+        active: win.lyricsFull
+
+        sourceComponent: LyricsFullscreen {
+            vm: lyricsVm
+            playback: playback
+            theme: appTheme
+            tint: win.lyricsTint
+            onCloseRequested: win.lyricsFull = false
+        }
+    }
+
+    // A song on its way to the queue: it follows the pointer; the targets light up when it is over them.
+    Rectangle {
+        visible: win.trackDragging
+        z: 150
+        x: Math.min(win.width - width - 8, win.trackDragX + 12)
+        y: win.trackDragY + 12
+        width: Math.min(260, dragLabel.implicitWidth + 32)
+        height: 40
+        radius: 20
+        color: win.trackDropOver ? appTheme.primary : appTheme.inverseSurface
+        opacity: 0.94
+
+        Label {
+            id: dragLabel
+            anchors.fill: parent
+            anchors.leftMargin: 16
+            anchors.rightMargin: 16
+            verticalAlignment: Text.AlignVCenter
+            text: win.trackDropOver ? win.tr("queue.added") : win.trackDragTitle
+            color: win.trackDropOver ? appTheme.inkPrimary : appTheme.inverseOnSurface
+            font.pixelSize: 14
+            elide: Text.ElideRight
+        }
+    }
+
+    // The tray icon, only while the option is on.
+    Loader {
+        id: trayLoader
+        active: settingsVm.closeToTray
+        source: "../QML/Components/TrayHost.qml"
+        onLoaded: {
+            item.host = win
+            item.playback = playback
+        }
+    }
+
+    // Hiding the only window would end the app. While the tray keeps it alive, a 1x1 transparent window of its own
+    // stays on screen.
+    Component {
+        id: keepAliveComponent
+
+        Window {
+            width: 1
+            height: 1
+            x: 0
+            y: 0
+            color: "transparent"
+            flags: Qt.Tool | Qt.FramelessWindowHint | Qt.WindowDoesNotAcceptFocus | Qt.WindowTransparentForInput
+            visible: true
+        }
+    }
+    function syncKeepAlive() {
+        const wanted = settingsVm.closeToTray && trayReady
+        if (wanted && keepAlive === null) {
+            keepAlive = keepAliveComponent.createObject(null)
+        } else if (!wanted && keepAlive !== null) {
+            keepAlive.destroy()
+            keepAlive = null
+        }
+    }
+    onTrayReadyChanged: syncKeepAlive()
+    Connections {
+        target: settingsVm
+        function onCloseToTrayChanged() { win.syncKeepAlive() }
     }
 
     // Snackbar: short messages ("added to the queue", "this track has no album"...).

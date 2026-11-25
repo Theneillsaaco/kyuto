@@ -181,6 +181,28 @@ Slider {
         Behavior on w { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
     }
 
+    // While dragging: the value (valueLabel) over the handle.
+    ToolTip {
+        visible: slider.valueLabel.length > 0 && slider.pressed
+        delay: 0
+        timeout: -1
+        x: slider.leftPadding + slider.visualPosition * (slider.availableWidth - width)
+        y: -height - 12
+        padding: 8
+
+        contentItem: Label {
+            text: slider.valueLabel
+            color: slider.cOnInverse
+            font.pixelSize: 12
+        }
+
+        background: Rectangle {
+            color: slider.cInverse
+            radius: height / 2
+        }
+    }
+
+    // While hovering (hoverFormat: (value) => text): the value under the pointer.
     property var hoverFormat: null
 
     HoverHandler { id: hover; enabled: slider.hoverFormat !== null }

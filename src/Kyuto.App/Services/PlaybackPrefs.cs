@@ -15,6 +15,7 @@ internal sealed class PlaybackPrefs
     private const string SpeedKey = "playback.speed";
     private const string CacheKey = "cache.limit";
     private const string NotifyKey = "notifications.enabled";
+    private const string TrayKey = "app.closeToTray";
 
     private readonly SafeSettings _settings;
 
@@ -23,6 +24,7 @@ internal sealed class PlaybackPrefs
         _settings = settings;
         AutoPlay = settings.Get(AutoPlayKey) != "0";
         Notify = settings.Get(NotifyKey) != "0";
+        CloseToTray = settings.Get(TrayKey) == "1";
         Normalize = settings.Get(NormalizeKey) != "0";
         Speed = double.TryParse(settings.Get(SpeedKey), NumberStyles.Float, CultureInfo.InvariantCulture, out var speed)
             ? PlaybackSpeed.normalize(speed)
@@ -46,6 +48,15 @@ internal sealed class PlaybackPrefs
     public int CacheLimit { get; private set; }
 
     public bool Notify { get; private set; }
+
+    /// <summary>Closing the window keeps the player running in the system tray. Off by default.</summary>
+    public bool CloseToTray { get; private set; }
+
+    public void SaveCloseToTray(bool on)
+    {
+        CloseToTray = on;
+        _settings.Set(TrayKey, on ? "1" : "0");
+    }
     
     public void SaveCacheLimit(int limit)
     {

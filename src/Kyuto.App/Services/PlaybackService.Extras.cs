@@ -1,3 +1,4 @@
+using Kyuto.Core.Domain;
 using Kyuto.Core.Playback;
 
 namespace Kyuto.App.Services;
@@ -8,6 +9,17 @@ internal sealed partial class PlaybackService
     private double _sleepAt = -1; // _clock seconds at which playback pauses, -1 = off
 
     public QueueState QueueSnapshot => _queue;
+
+    /// <summary>Adds several songs at once: at the end of the queue, or right after the one that plays now.</summary>
+    public void AddMany(IReadOnlyList<Track> tracks, bool next)
+    {
+        if (tracks.Count == 0)
+            return;
+
+        var wasEmpty = PlayQueue.count(_queue) == 0;
+        _queue = next ? PlayQueue.addNext(tracks, _queue) : PlayQueue.add(tracks, _queue);
+        AfterAdd(wasEmpty);
+    }
 
     public void RestoreQueue(QueueState snapshot)
     {

@@ -18,6 +18,12 @@ Item {
 
     function tr(key) { return i18n ? i18n.t(key) : key }
 
+    PickState { id: pick }
+    Connections {
+        target: root.vm.tracks
+        function onModelReset() { pick.clear() }
+    }
+
     MDialog {
         id: confirmDelete
         title: root.tr("playlist.delete")
@@ -203,6 +209,10 @@ Item {
                 artUrl: model.artUrl
                 videoId: model.videoId
                 showAdd: true
+                pickable: true
+                selecting: pick.active
+                picked: pick.has(index)
+                onPickToggled: pick.toggle(index)
                 onActivated: root.vm.playListItem(index)
                 onAddRequested: root.vm.addListItem(index)
                 onPlayNextRequested: root.vm.playNextListItem(index)
@@ -224,5 +234,17 @@ Item {
                 font.pixelSize: 14
             }
         }
+    }
+
+    SelectionBar {
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 16
+        visible: root.vm.openListId !== ""
+        count: pick.count
+        onQueueRequested: { root.vm.addSelected(pick.json()); Window.window.toast(root.tr("queue.added")); pick.clear() }
+        onNextRequested: { root.vm.playNextSelected(pick.json()); Window.window.toast(root.tr("queue.addedNext")); pick.clear() }
+        onPlaylistRequested: { root.vm.stageSelected(pick.json()); Window.window.pickPlaylistStaged(); pick.clear() }
+        onCleared: pick.clear()
     }
 }

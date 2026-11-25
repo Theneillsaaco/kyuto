@@ -252,6 +252,17 @@ Rectangle {
                         }
                     }
                     Card {
+                        Heading { text: root.tr("settings.window") }
+                        MSwitch {
+                            id: trayDockSwitch
+                            Layout.fillWidth: true
+                            text: root.tr("settings.closeToTray")
+                            onToggled: root.vm.chooseCloseToTray(checked)
+                            Binding { target: trayDockSwitch; property: "checked"; value: root.vm.closeToTray }
+                        }
+                        Note { text: root.tr("settings.closeToTrayNote") }
+                    }
+                    Card {
                         Heading { text: root.tr("settings.startup") }
                         Note { text: root.tr("settings.startupNote") }
                         Flow {

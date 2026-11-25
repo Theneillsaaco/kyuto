@@ -11,17 +11,61 @@ import QtQuick
 //
 // Motion and type tokens are at the end. Do not name a token on<Uppercase> either.
 QtObject {
+    id: root
+
     property string tokensJson: ""
     // Google Sans ships in Fonts/ (Main.qml loads it); the window hands it down to every Label and control.
     readonly property string fontFamily: "Google Sans"
-    readonly property var tokens: parse(tokensJson)
+
+    // Colors glide from the old scheme to the new one (a new cover, light/dark, another accent) instead of jumping.
+    // `blend` runs 0 -> 1 while it changes; every role is the mix of the old and the new value.
+    property var tokens: ({})
+    property var previousTokens: ({})
+    property real blend: 1
 
     function parse(json) {
         try { return json.length > 0 ? JSON.parse(json) : ({}) } catch (e) { return ({}) }
     }
+    function mix(from, to, t) {
+        const a = Qt.color(from), b = Qt.color(to)
+        return Qt.rgba(a.r + (b.r - a.r) * t, a.g + (b.g - a.g) * t, a.b + (b.b - a.b) * t, 1)
+    }
     function role(name, fallback) {
-        const value = tokens[name]
-        return value ? value : fallback
+        const value = tokens[name] ? tokens[name] : fallback
+        if (blend >= 1)
+            return value
+        const old = previousTokens[name] ? previousTokens[name] : fallback
+        return mix(old, value, blend)
+    }
+
+    onTokensJsonChanged: {
+        const next = parse(tokensJson)
+        const first = Object.keys(tokens).length === 0
+        if (!first) {
+            // Start from what is on screen right now, in case a change interrupts another one.
+            const shown = ({})
+            for (const key in next)
+                shown[key] = String(role(key, next[key]))
+            previousTokens = shown
+        }
+        tokens = next
+        if (first) {
+            blend = 1
+        } else {
+            fade.stop()
+            blend = 0
+            fade.start()
+        }
+    }
+
+    readonly property NumberAnimation fadeAnimation: NumberAnimation {
+        id: fade
+        target: root
+        property: "blend"
+        from: 0
+        to: 1
+        duration: 320
+        easing.type: Easing.OutCubic
     }
 
     readonly property color background: role("background", "#fdf7ff")

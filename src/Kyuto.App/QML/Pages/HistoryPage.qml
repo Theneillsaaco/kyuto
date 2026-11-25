@@ -13,6 +13,12 @@ Item {
 
     function tr(key) { return i18n ? i18n.t(key) : key }
 
+    PickState { id: pick }
+    Connections {
+        target: root.vm.items
+        function onModelReset() { pick.clear() }
+    }
+
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
@@ -63,6 +69,10 @@ Item {
                 artUrl: model.artUrl
                 videoId: model.videoId
                 showAdd: true
+                pickable: true
+                selecting: pick.active
+                picked: pick.has(index)
+                onPickToggled: pick.toggle(index)
                 onActivated: root.vm.playItem(index)
                 onAddRequested: root.vm.addItem(index)
                 onPlayNextRequested: root.vm.playNextItem(index)
@@ -77,5 +87,16 @@ Item {
                 body: root.tr("history.empty")
             }
         }
+    }
+
+    SelectionBar {
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 16
+        count: pick.count
+        onQueueRequested: { root.vm.addSelected(pick.json()); Window.window.toast(root.tr("queue.added")); pick.clear() }
+        onNextRequested: { root.vm.playNextSelected(pick.json()); Window.window.toast(root.tr("queue.addedNext")); pick.clear() }
+        onPlaylistRequested: { root.vm.stageSelected(pick.json()); Window.window.pickPlaylistStaged(); pick.clear() }
+        onCleared: pick.clear()
     }
 }

@@ -23,16 +23,27 @@ Rectangle {
         anchors.fill: parent
         spacing: 0
 
-        Label {
+        RowLayout {
             Layout.fillWidth: true
             Layout.margins: 16
             Layout.bottomMargin: 4
-            text: root.tr("lyrics.title") + (root.vm.source.length > 0 ? " · " + root.vm.source : "")
-            color: root.theme ? root.theme.inkSurface : "#1D1B20"
-            font.pixelSize: 16
-            font.weight: Font.Medium
-            elide: Text.ElideRight
-            maximumLineCount: 1
+            Layout.rightMargin: 8
+            spacing: 4
+
+            Label {
+                Layout.fillWidth: true
+                text: root.tr("lyrics.title") + (root.vm.source.length > 0 ? " · " + root.vm.source : "")
+                color: root.theme ? root.theme.inkSurface : "#1D1B20"
+                font.pixelSize: 16
+                font.weight: Font.Medium
+                elide: Text.ElideRight
+                maximumLineCount: 1
+            }
+            MIconButton {
+                glyph: "fullscreen"
+                tip: root.tr("lyrics.full")
+                onClicked: if (Window.window) Window.window.lyricsFull = true
+            }
         }
 
         // Text size, what goes under each line and, for timed lyrics, the delay (+ shows the lines later than the

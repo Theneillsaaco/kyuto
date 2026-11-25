@@ -65,6 +65,26 @@ module Translations =
         "sleep.left", "{0} min restantes", "{0} min left"
         "sleep.paused", "Pausa por el temporizador", "Paused by the sleep timer"
 
+        // mini player, full-screen lyrics, tray, selection, search
+        "tip.miniPlayer", "Mini reproductor", "Mini player"
+        "mini.pin", "Mantener encima", "Keep on top"
+        "mini.expand", "Volver a la ventana grande", "Back to the full window"
+        "lyrics.full", "Letra a pantalla completa", "Full-screen lyrics"
+        "lyrics.leaveFull", "Salir de la pantalla completa", "Leave full screen"
+        "tray.show", "Mostrar u ocultar Kyuto", "Show or hide Kyuto"
+        "tray.quit", "Salir", "Quit"
+        "settings.window", "Ventana", "Window"
+        "settings.closeToTray", "Al cerrar, seguir sonando en la bandeja del sistema", "On close, keep playing from the system tray"
+        "settings.closeToTrayNote", "Necesita una bandeja del sistema (StatusNotifier). Desde su icono puedes pausar, cambiar de canción, mostrar la ventana o salir.", "Needs a system tray (StatusNotifier). From its icon you can pause, skip, show the window or quit."
+        "menu.select", "Seleccionar", "Select"
+        "select.count", "{0} seleccionadas", "{0} selected"
+        "select.queue", "A la cola", "To queue"
+        "select.next", "A continuación", "Play next"
+        "select.playlist", "A una lista", "To playlist"
+        "select.clear", "Cancelar selección", "Clear selection"
+        "playlist.addedMany", "{0} canciones añadidas a {1}", "{0} songs added to {1}"
+        "search.topResult", "Mejor resultado", "Top result"
+
         // shortcuts overlay
         "shortcuts.title", "Atajos de teclado", "Keyboard shortcuts"
         "shortcut.playPause", "Reproducir / pausa", "Play / pause"
@@ -80,6 +100,9 @@ module Translations =
         "shortcut.reload", "Recargar la página", "Reload the page"
         "shortcut.leaveFull", "Salir del reproductor maximizado", "Leave the maximized player"
         "shortcut.help", "Esta ayuda", "This help"
+        "shortcut.mini", "Mini reproductor", "Mini player"
+        "shortcut.lyricsFull", "Letra a pantalla completa", "Full-screen lyrics"
+        "shortcut.select", "Seleccionar varias canciones", "Select several songs"
         
         // search
         "search.placeholder", "Busca canciones, o pega un enlace o ruta", "Search songs, or paste a link or path"

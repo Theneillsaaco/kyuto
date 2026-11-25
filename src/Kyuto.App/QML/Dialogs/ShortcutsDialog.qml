@@ -22,6 +22,9 @@ MDialog {
         { keys: "Alt + ←", label: "shortcut.back" },
         { keys: "F5", label: "shortcut.reload" },
         { keys: "Esc", label: "shortcut.leaveFull" },
+        { keys: "Ctrl + M", label: "shortcut.mini" },
+        { keys: "Ctrl + Shift + F", label: "shortcut.lyricsFull" },
+        { keys: "Ctrl + clic", label: "shortcut.select" },
         { keys: "?", label: "shortcut.help" }
     ]
 

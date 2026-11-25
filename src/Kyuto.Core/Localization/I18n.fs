@@ -44,6 +44,6 @@ module I18n =
     let tableJson (lang: string) =
         JsonSerializer.Serialize(Dictionary<string, string>(tables[normalize lang]))
         
-    /// Spanish writes decimals with a point ("0.5 s"), English with a comma.
-    let decimalSeparator () = if language = "es" then '.' else ','
+    /// Dominican Spanish and English both write decimals with a point ("0.5 s").
+    let decimalSeparator () = '.'
 

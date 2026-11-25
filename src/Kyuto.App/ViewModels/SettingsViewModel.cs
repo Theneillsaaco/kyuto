@@ -17,6 +17,7 @@ public class SettingsViewModel : ViewModelBase
         AutoPlay = AppServices.Prefs.AutoPlay;
         NormalizeVolume = AppServices.Prefs.Normalize;
         Notifications = AppServices.Prefs.Notify;
+        CloseToTray = AppServices.Prefs.CloseToTray;
         CacheLimit = AppServices.Cache?.Limit ?? AppServices.Prefs.CacheLimit;
         SyncCache();
         SyncScrobbler();
@@ -32,6 +33,9 @@ public class SettingsViewModel : ViewModelBase
     public bool NormalizeVolume { get; private set => Set(ref field, value); } = true;
     
     public bool Notifications { get; private set => Set(ref field, value); } = true;
+
+    /// <summary>Closing the window keeps the player in the system tray.</summary>
+    public bool CloseToTray { get; private set => Set(ref field, value); }
     
     /// <summary>How many songs the disk cache keeps; 0 is off.</summary>
     public int CacheLimit { get; private set => Set(ref field, value); } = 30;
@@ -91,6 +95,12 @@ public class SettingsViewModel : ViewModelBase
         AppServices.Prefs.SaveNormalize(on);
         NormalizeVolume = on;
         AppServices.Playback.RefreshSound();
+    }
+
+    public void ChooseCloseToTray(bool on)
+    {
+        AppServices.Prefs.SaveCloseToTray(on);
+        CloseToTray = on;
     }
 
     public void ChooseNotifications(bool on)

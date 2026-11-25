@@ -116,7 +116,16 @@ Popup {
                 Behavior on opacity { NumberAnimation { duration: 100 } }
             }
 
-            RowLayout {
+            MouseArea {
+                id: area
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onEntered: root.current = entry.index
+                onClicked: root.chosen(entry.modelData)
+            }
+
+            RowLayout { // above the MouseArea, so the remove button gets its own clicks
                 anchors.fill: parent
                 anchors.leftMargin: 16
                 anchors.rightMargin: 16
@@ -142,15 +151,6 @@ Popup {
                     focusPolicy: Qt.NoFocus // If it gets the focus, the list closes before the click.
                     onClicked: root.removeRecent(entry.modelData)
                 }
-            }
-
-            MouseArea {
-                id: area
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onEntered: root.current = entry.index
-                onClicked: root.chosen(entry.modelData)
             }
         }
     }

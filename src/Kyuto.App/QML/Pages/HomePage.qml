@@ -160,6 +160,7 @@ Item {
                     artUrl: modelData.art
                     videoId: modelData.id
                     showAdd: true
+                    dragToQueue: false
                     onActivated: root.nav.playHomeTrack(shelf.index, modelData.index)
                     onAddRequested: root.nav.addHomeTrack(shelf.index, modelData.index)
                     onPlayNextRequested: root.nav.playNextHomeTrack(shelf.index, modelData.index)
@@ -176,16 +177,18 @@ Item {
         }
     }
 
+    SkeletonShelves {
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        visible: list.count === 0 && root.nav.working && !root.nav.failed
+    }
+
     ColumnLayout {
         anchors.centerIn: parent
         width: parent.width - 48
-        visible: list.count === 0
+        visible: list.count === 0 && (root.nav.failed || !root.nav.working)
         spacing: 16
-
-        LoadingIndicator {
-            Layout.alignment: Qt.AlignHCenter
-            visible: root.nav.working && !root.nav.failed
-        }
 
         Label {
             Layout.fillWidth: true
