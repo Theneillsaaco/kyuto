@@ -112,6 +112,8 @@ module Translations =
         "search.results", "{0} resultados", "{0} results"
         "search.noResponse", "sin respuesta", "no response"
         "search.clearRecent", "Borrar recientes", "Clear recent"
+        "search.more", "Más resultados", "More results"
+        "search.kind.artist", "Artista", "Artist"
         "hero.album", "Álbum", "Album"
         "hero.playlist", "Lista", "Playlist"
         "filter.songs", "Canciones", "Songs"

@@ -61,7 +61,9 @@ public partial class YtSidecarProvider : IBrowseProvider
     public async Task<SearchHits> SearchTyped(string query, string filter)
     {
         var r = await CallAsync("search_typed", new { query, filter, limit = 30 });
-        return new SearchHits(ReadTracks(r), ReadEntities(r));
+        var first = r.GetArrayLength() > 0 ? r[0] : default;
+        var topEntity = first.ValueKind == JsonValueKind.Object && !first.TryGetProperty("track", out _);
+        return new SearchHits(ReadTracks(r), ReadEntities(r), topEntity);
     }
 
     /// <summary>The songs that follow a track in its radio (what autoplay adds when the queue ends).</summary>

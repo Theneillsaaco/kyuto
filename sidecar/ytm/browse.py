@@ -61,6 +61,9 @@ def build(api, signed_in, get_auth, track, artwork, artist_names):
         if not isinstance(raw, dict):
             return None
 
+        if raw.get("resultType") in ("episode", "podcast"):
+            return None
+
         if raw.get("videoId"):
             if raw.get("isAvailable") is False:
                 return None
@@ -79,8 +82,15 @@ def build(api, signed_in, get_auth, track, artwork, artist_names):
 
         if kind in ("album", "single", "ep"):
             kind, key = "album", browse
-        elif kind in ("artist", "profile"):
+        elif kind == "artist":
+            # The top-result card of an unfiltered search has no browseId: the artist is in "artists".
+            first = (raw.get("artists") or [{}])[0] if isinstance(raw.get("artists"), list) else {}
+            if not browse and isinstance(first, dict):
+                browse = first.get("id") or ""
+                raw = {**raw, "name": raw.get("name") or first.get("name") or ""}
             kind, key = "artist", browse
+        elif kind == "profile":
+            return None  # user channels have no artist page
         elif kind in ("playlist", "station"):
             kind, key = "playlist", re.sub(r"^VL", "", playlist or browse)
         else:
@@ -114,9 +124,12 @@ def build(api, signed_in, get_auth, track, artwork, artist_names):
 
     def search_typed(params):
         query = str(params.get("query", "")).strip()
-        kind = str(params.get("filter", "")).strip()
+        kind = str(params.get("filter") or "").strip()
         if not query:
             return []
+        if kind in ("", "all"):  # no filter: everything, best match first
+            limit = min(max(int(params.get("limit", 30)), 1), 100)
+            return clean(api().search(query, limit=limit))
         if kind not in FILTERS:
             raise ValueError("Invalid filter")
         limit = min(max(int(params.get("limit", 30)), 1), 100)

@@ -25,14 +25,27 @@ internal static class Rows
         ArtUrl = p.ArtUrl
     };
 
-    public static EntityRow FromEntity(Entity e) => new()
+    public static EntityRow FromEntity(Entity e) => FromEntity(e, withKind: false);
+
+    /// <summary>With <paramref name="withKind"/>, the subtitle starts with what it is ("Artista · 1 M suscriptores").</summary>
+    public static EntityRow FromEntity(Entity e, bool withKind)
     {
-        Kind = e.Kind switch { EntityKind.Artist => "artist", EntityKind.Playlist => "playlist", _ => "album" },
-        EntityId = e.Id,
-        Title = e.Title,
-        Subtitle = e.Subtitle,
-        ArtUrl = e.ArtUrl
-    };
+        var label = e.Kind switch
+        {
+            EntityKind.Artist => Tr.T("search.kind.artist"),
+            EntityKind.Playlist => Tr.T("hero.playlist"),
+            _ => Tr.T("hero.album")
+        };
+
+        return new()
+        {
+            Kind = e.Kind switch { EntityKind.Artist => "artist", EntityKind.Playlist => "playlist", _ => "album" },
+            EntityId = e.Id,
+            Title = e.Title,
+            Subtitle = !withKind ? e.Subtitle : e.Subtitle.Length > 0 ? label + " · " + e.Subtitle : label,
+            ArtUrl = e.ArtUrl
+        };
+    }
 
     /// <summary>A song inside a shelf of Home.</summary>
     public static EntityRow FromTrackEntity(Track t)
