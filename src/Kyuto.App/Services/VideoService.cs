@@ -24,6 +24,7 @@ internal sealed class VideoService(
 {
     private const long RetryAfterSeconds = 30;
     private const int MaxStreams = 6;
+    private const int MaxInfo = 256;
     private const string AutoKey = "video.auto";
 
     private readonly Lock _gate = new();
@@ -217,6 +218,10 @@ internal sealed class VideoService(
 
             lock (_gate)
             {
+                if (_info.Count >= MaxInfo)
+                    foreach (var key in _info.Keys.Where(k => k != _trackId && !_warm.Contains(k)).ToList())
+                        _info.Remove(key);
+
                 _info[id] = info;
                 Finish("i:" + id, null);
             }

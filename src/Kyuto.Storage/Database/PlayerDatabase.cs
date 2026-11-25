@@ -193,19 +193,38 @@ public partial class PlayerDatabase : IDisposable
             using var tx = _db.BeginTransaction();
             Run("DELETE FROM track_cache WHERE list_id = $l", ("$l", listId));
 
+            using var cmd = _db.CreateCommand();
+            cmd.Transaction = tx;
+            cmd.CommandText = """
+                              INSERT INTO track_cache (list_id, position, id, title, artist, artists, album, seconds, art, kind)
+                              VALUES ($l, $p, $id, $title, $artist, $artists, $album, $seconds, $art, $kind)
+                              """;
+            var pPos = cmd.Parameters.Add("$p", SqliteType.Integer);
+            var pId = cmd.Parameters.Add("$id", SqliteType.Text);
+            var pTitle = cmd.Parameters.Add("$title", SqliteType.Text);
+            var pArtist = cmd.Parameters.Add("$artist", SqliteType.Text);
+            var pArtists = cmd.Parameters.Add("$artists", SqliteType.Text);
+            var pAlbum = cmd.Parameters.Add("$album", SqliteType.Text);
+            var pSeconds = cmd.Parameters.Add("$seconds", SqliteType.Real);
+            var pArt = cmd.Parameters.Add("$art", SqliteType.Text);
+            var pKind = cmd.Parameters.Add("$kind", SqliteType.Text);
+            cmd.Parameters.AddWithValue("$l", listId);
+
             for (var i = 0; i < tracks.Count; i++)
             {
                 var t = tracks[i];
-                Run("""
-                    INSERT INTO track_cache (list_id, position, id, title, artist, artists, album, seconds, art, kind)
-                    VALUES ($l, $p, $id, $title, $artist, $artists, $album, $seconds, $art, $kind)
-                    """,
-                    ("$l", listId), ("$p", i), ("$id", t.Id), ("$title", t.Title), ("$artist", t.Artist),
-                    ("$artists", JsonSerializer.Serialize(t.Artists ?? [])), ("$album", t.Album),
-                    ("$seconds", t.DurationSeconds), ("$art", t.ArtUrl),
-                    ("$kind", t.Kind.IsVideo ? "video" : "song"));
+                pPos.Value = i;
+                pId.Value = t.Id;
+                pTitle.Value = t.Title;
+                pArtist.Value = t.Artist;
+                pArtists.Value = JsonSerializer.Serialize(t.Artists ?? []);
+                pAlbum.Value = t.Album;
+                pSeconds.Value = t.DurationSeconds;
+                pArt.Value = t.ArtUrl;
+                pKind.Value = t.Kind.IsVideo ? "video" : "song";
+                cmd.ExecuteNonQuery();
             }
-            
+
             tx.Commit();
         }
     }

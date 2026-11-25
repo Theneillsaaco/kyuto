@@ -192,6 +192,7 @@ _cookie_header = ""
 def _set_cookie_header(header):
     global _cookie_header
     _cookie_header = header
+    _set_anon_first(False)  # a new session gets tried signed-in once more
 
 def apply_cookies(ydl):
     """Mete la cookie de la sesión en un YoutubeDL; sin sesión, vuelve al cliente anónimo (visionos)."""
@@ -287,6 +288,7 @@ def song(params):
 # ---- streams ----
 
 YT_CLIENTS = [c.strip() for c in os.environ.get("KYUTO_YT_CLIENTS", "visionos").split(",") if c.strip()]
+ANON_CLIENTS = ["visionos", "android"]  # anonymous fallback when the signed-in clients return no formats
     
 
 def _expires_at(url):
@@ -296,12 +298,36 @@ def _expires_at(url):
 
 _video_slot = threading.BoundedSemaphore(1)  # video never waits behind audio resolves
 
+_anon_first = False
+
+def _set_anon_first(value):
+    global _anon_first
+    _anon_first = value
+
+def _go_anonymous(ydl):
+    ydl.cookiejar.clear()
+    ydl.params["extractor_args"] = {"youtube": {"player_client": ANON_CLIENTS}}
+
+
 def _extract(video, fmt, codec="acodec", slot=None):
     """yt-dlp's answer for a video id in a format: (info, the format entry that holds the URL).
     `codec` says which part to take when the selection is a merge: acodec for audio, vcodec for video."""
+    url_page = "https://music.youtube.com/watch?v=" + video
     with (slot if slot is not None else _resolving):
         with _lease(fmt) as ydl:
-            info = ydl.extract_info("https://music.youtube.com/watch?v=" + video, download=False)
+            if _anon_first and _cookie_header:
+                _go_anonymous(ydl)
+            try:
+                info = ydl.extract_info(url_page, download=False)
+            except Exception as exc:
+                if not (_cookie_header and not _anon_first and "Requested format is not available" in str(exc)):
+                    raise
+                # With a session yt-dlp drops visionos (it cannot use cookies) and the web clients need the JS solver,
+                # which may be broken: try again without the cookies, with the clients that need neither.
+                print("resolve: signed-in clients gave no formats for " + video + ", retrying anonymously", file=sys.stderr)
+                _go_anonymous(ydl)
+                info = ydl.extract_info(url_page, download=False)
+                _set_anon_first(True)  # it worked: skip the signed-in attempt from now on (until the session changes)
         _remember_stats(video, info)
     chosen = info
     url = info.get("url")
