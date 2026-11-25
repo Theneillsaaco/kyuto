@@ -8,6 +8,9 @@ TextField {
     readonly property var theme: Window.window ? Window.window.theme : null
 
     property string clearTip: ""
+
+    /// The clear button emptied the field (clear() alone does not emit textEdited).
+    signal cleared()
     property color cPrimary: theme ? theme.primary : "#6750A4"
     property color cContainer: theme ? theme.surfaceContainerHigh : "#ECE6F0"
     property color cOnSurface: theme ? theme.inkSurface : "#1D1B20"
@@ -42,6 +45,12 @@ TextField {
         glyph: "close"
         tip: field.clearTip
         visible: field.text.length > 0
-        onClicked: { field.clear(); field.forceActiveFocus() }
+        focusPolicy: Qt.NoFocus // taking the focus would close the suggestions before the click lands
+        z: 2
+        onClicked: {
+            field.clear()
+            field.forceActiveFocus()
+            field.cleared()
+        }
     }
 }

@@ -25,6 +25,13 @@ Item {
     property bool draggable: false
     property bool dimmed: false
     property bool round: false
+    /// The row can be ticked (Ctrl+click or "Select" in its menu). `selecting`: some row of the list is ticked, so a
+    /// plain click ticks too. `picked`: this row is ticked.
+    property bool pickable: false
+    property bool selecting: false
+    property bool picked: false
+    /// A horizontal drag onto the queue (or the playback bar) adds the song. Off where the list scrolls sideways.
+    property bool dragToQueue: true
     property color backdrop: theme ? theme.surfaceContainer : "#F2ECF4"
     property color cPrimary: theme ? theme.primary : "#6750A4"
     property color cOnSurface: theme ? theme.inkSurface : "#1D1B20"
@@ -35,7 +42,7 @@ Item {
     readonly property bool playing: current && Window.window && Window.window.playingNow === true
     readonly property bool linkable: videoId !== "" && supporting !== ""
     readonly property bool hasId: /^[A-Za-z0-9_-]{11}$/.test(videoId)
-    readonly property bool hasMenu: showAdd || showRemove || canLike || hasId
+    readonly property bool hasMenu: showAdd || showRemove || canLike || hasId || pickable
     // A real YouTube id and a signed-in account (Main.qml decides). `liked` is read when the menu opens.
     readonly property bool canLike: {
         const w = row.Window.window
@@ -47,6 +54,7 @@ Item {
     signal addRequested()
     signal playNextRequested()
     signal removeRequested()
+    signal pickToggled()
     // The grip of a draggable item: positions are in window coordinates.
     signal gripPressed()
     signal gripMoved(real sceneX, real sceneY)
@@ -66,6 +74,14 @@ Item {
             menuHost.item.popup(target, x, y)
         else
             menuHost.item.popup()
+    }
+
+    // A click: ticks the row while a selection is going on (or with Ctrl), plays or opens it otherwise.
+    function click(ctrl) {
+        if (row.pickable && (row.selecting || ctrl))
+            row.pickToggled()
+        else
+            row.activated()
     }
 
     function moveFocus(delta) {
@@ -88,8 +104,8 @@ Item {
     Accessible.name: heading + (supporting !== "" ? ", " + supporting : "")
     Accessible.onPressAction: row.activated()
 
-    Keys.onReturnPressed: row.activated()
-    Keys.onEnterPressed: row.activated()
+    Keys.onReturnPressed: row.click(false)
+    Keys.onEnterPressed: row.click(false)
     Keys.onDownPressed: moveFocus(1)
     Keys.onUpPressed: moveFocus(-1)
     Keys.onMenuPressed: if (hasMenu) row.openMenu(more, 0, more.height)
@@ -110,7 +126,7 @@ Item {
         anchors.topMargin: 2
         anchors.bottomMargin: 2
         radius: 16
-        color: row.current ? row.cSecondaryContainer : "transparent"
+        color: row.current || row.picked ? row.cSecondaryContainer : "transparent"
         Behavior on color { ColorAnimation { duration: 200 } }
 
         Rectangle { // state layer
@@ -145,7 +161,7 @@ Item {
             if (mouse.button === Qt.RightButton && row.hasMenu)
                 row.openMenu(null, 0, 0)
             else if (mouse.button === Qt.LeftButton)
-                row.activated()
+                row.click((mouse.modifiers & Qt.ControlModifier) !== 0)
         }
     }
 
@@ -206,6 +222,23 @@ Item {
                     anchors.centerIn: parent
                     running: row.playing
                     color: "#FFFFFF"
+                }
+            }
+
+            // Ticked: a disc with a check over the cover.
+            Rectangle {
+                anchors.fill: parent
+                radius: coverArt.radius
+                color: row.cPrimary
+                opacity: row.picked ? 0.92 : 0
+                visible: opacity > 0
+                Behavior on opacity { Anim { type: Anim.FastEffects } }
+
+                Icon {
+                    anchors.centerIn: parent
+                    name: "check"
+                    size: 24
+                    tint: row.theme ? row.theme.inkPrimary : "#FFFFFF"
                 }
             }
         }
@@ -274,6 +307,29 @@ Item {
         }
     }
 
+    // Drag the row sideways onto the queue panel or the playback bar to add it. Vertical drags stay with the list.
+    DragHandler {
+        enabled: row.showAdd && row.dragToQueue && !row.draggable
+        target: null
+        acceptedButtons: Qt.LeftButton
+        yAxis.enabled: false
+        onActiveChanged: {
+            const w = row.Window.window
+            if (!w || !w.trackDrag)
+                return
+            const p = centroid.scenePosition
+            if (active)
+                w.trackDrag("begin", row.heading, p.x, p.y)
+            else if (w.trackDrag("end", "", p.x, p.y))
+                row.addRequested()
+        }
+        onCentroidChanged: {
+            const w = row.Window.window
+            if (active && w && w.trackDrag)
+                w.trackDrag("move", "", centroid.scenePosition.x, centroid.scenePosition.y)
+        }
+    }
+
     // The menu only exists once someone opens it.
     Loader { id: menuHost }
 
@@ -313,6 +369,12 @@ Item {
                     const w = row.Window.window
                     if (w && w.pickPlaylist) w.pickPlaylist(row.videoId)
                 }
+            }
+            MMenuItem {
+                visible: row.pickable
+                glyph: "check"
+                text: row.tr("menu.select")
+                onTriggered: row.pickToggled()
             }
             MMenuItem {
                 visible: row.showRemove

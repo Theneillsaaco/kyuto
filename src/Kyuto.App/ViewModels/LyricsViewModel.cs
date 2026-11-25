@@ -26,6 +26,7 @@ public class LyricsViewModel : ViewModelBase
         FontSize = AppServices.Lyrics.FontSize;
         ExtraMode = AppServices.Lyrics.Extra;
         Message = MessageFor("idle");
+        ShowNudgeLabels();
         AppServices.Playback.Changed += Poll;
         AppServices.LanguageChanged += () =>
         {

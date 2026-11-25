@@ -144,6 +144,16 @@ public class LibraryViewModel : ViewModelBase
     public void AddListItem(int index) => AppServices.Playback.AddFrom(_shown, index);
 
     public void PlayNextListItem(int index) => AppServices.Playback.PlayNextFrom(_shown, index);
+
+    /// <summary>The ticked rows (JSON array of indexes) go to the end of the queue.</summary>
+    public void AddSelected(string indexes) => AppServices.Playback.AddMany(Selection.Pick(_shown, indexes), next: false);
+
+    /// <summary>The ticked rows play right after the current song.</summary>
+    public void PlayNextSelected(string indexes) => AppServices.Playback.AddMany(Selection.Pick(_shown, indexes), next: true);
+
+    /// <summary>Hands the ticked rows to the playlist picker.</summary>
+    public void StageSelected(string indexes) => AppServices.Staged = Selection.Pick(_shown, indexes);
+
     
     /// <summary>Likes or unlikes the playing track on YouTube Music.</summary>
     public void ToggleLike()
@@ -187,6 +197,65 @@ public class LibraryViewModel : ViewModelBase
                 SayOnce(Tr.F("playlist.addedTo", title));
             },
             e => SayOnce(e.Message == "duplicate" ? Tr.T("playlist.exists") : Tr.F("playlist.failed", e.Message)));
+    }
+
+    private string[] StagedIds() =>
+        [.. AppServices.Staged.Select(t => t.Id).Where(id => id.Length == 11 && !TrackSource.IsDirect(id)).Distinct()];
+
+    /// <summary>Adds the ticked songs (see <see cref="AppServices.Staged"/>) to one of the user's playlists.</summary>
+    public void AddStagedToPlaylist(string playlistId)
+    {
+        var ids = StagedIds();
+        if (AppServices.Account is not { } account || playlistId.Length == 0 || ids.Length == 0) return;
+
+        var title = _playlists.FirstOrDefault(p => p.Id == playlistId)?.Title ?? "";
+
+        Run(Task.Run(async () =>
+            {
+                var added = 0;
+                foreach (var id in ids)
+                {
+                    try
+                    {
+                        await account.AddToPlaylistAsync(playlistId, id);
+                        added++;
+                    }
+                    catch (Exception e) when (e.Message == "duplicate") { /* it already had it */ }
+                }
+                return added;
+            }),
+            added =>
+            {
+                _libraryLoaded = false;
+                SayOnce(added == 0 ? Tr.T("playlist.exists") : Tr.F("playlist.addedMany", added, title));
+            },
+            e => SayOnce(Tr.F("playlist.failed", e.Message)));
+    }
+
+    /// <summary>Makes a playlist with the ticked songs in it.</summary>
+    public void CreatePlaylistWithStaged(string title)
+    {
+        title = title.Trim();
+        var ids = StagedIds();
+        if (AppServices.Account is not { } account || title.Length == 0 || ids.Length == 0) return;
+
+        Run(Task.Run(async () =>
+            {
+                var made = await account.CreatePlaylistAsync(title, ids[0]);
+                foreach (var id in ids.Skip(1))
+                {
+                    try { await account.AddToPlaylistAsync(made, id); }
+                    catch (Exception e) when (e.Message == "duplicate") { /* the same song twice */ }
+                }
+                return made;
+            }),
+            _ =>
+            {
+                _libraryLoaded = false;
+                LoadLibrary();
+                SayOnce(Tr.F("playlist.created", title));
+            },
+            e => SayOnce(Tr.F("playlist.failed", e.Message)));
     }
 
     /// <summary>Makes a playlist, with the song in it when videoId is not empty.</summary>

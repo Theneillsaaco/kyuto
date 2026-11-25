@@ -175,6 +175,10 @@ Item {
             artUrl: model.artUrl
             videoId: model.videoId
             showAdd: true
+            pickable: true
+            selecting: pick.active
+            picked: pick.has(index)
+            onPickToggled: pick.toggle(index)
             onActivated: root.nav.playCollectionItem(index)
             onAddRequested: root.nav.addCollectionItem(index)
             onPlayNextRequested: root.nav.playNextCollectionItem(index)
@@ -250,16 +254,36 @@ Item {
         }
     }
 
+    PickState { id: pick }
+    Connections {
+        target: root.nav.collection
+        function onModelReset() { pick.clear() }
+    }
+
+    SelectionBar {
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 16
+        count: pick.count
+        onQueueRequested: { root.nav.addSelectedOfCollection(pick.json()); Window.window.toast(root.tr("queue.added")); pick.clear() }
+        onNextRequested: { root.nav.playNextSelectedOfCollection(pick.json()); Window.window.toast(root.tr("queue.addedNext")); pick.clear() }
+        onPlaylistRequested: { root.nav.stageSelectedOfCollection(pick.json()); Window.window.pickPlaylistStaged(); pick.clear() }
+        onCleared: pick.clear()
+    }
+
+    SkeletonRows {
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        header: true
+        visible: list.count === 0 && root.nav.working && !root.nav.failed
+    }
+
     ColumnLayout {
         anchors.centerIn: parent
         width: parent.width - 48
-        visible: list.count === 0 && root.nav.status !== ""
+        visible: list.count === 0 && root.nav.status !== "" && (root.nav.failed || !root.nav.working)
         spacing: 16
-
-        LoadingIndicator {
-            Layout.alignment: Qt.AlignHCenter
-            visible: root.nav.working && !root.nav.failed
-        }
 
         Label {
             Layout.fillWidth: true

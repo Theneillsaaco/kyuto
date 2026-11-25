@@ -2,6 +2,7 @@ using Kyuto.App.Services;
 using Kyuto.Audio.Mpv;
 using Kyuto.Core;
 using Kyuto.Core.Contracts;
+using Kyuto.Core.Domain;
 using Kyuto.Core.Localization;
 using Kyuto.Mpris;
 using Kyuto.Providers.Lyrics;
@@ -163,6 +164,9 @@ internal static class AppServices
     public static AudioCache? Cache { get; private set; }
     public static PlaybackService Playback { get; private set; } = null!;
     public static StatusLine Status { get; } = new();
+
+    /// <summary>The songs ticked in a list that the playlist picker is about to receive.</summary>
+    public static IReadOnlyList<Track> Staged { get; set; } = [];
 
     /// <summary>Why the database could not be opened, "" when it could. Shown in settings.</summary>
     public static string DatabaseError { get; private set; } = "";

@@ -58,6 +58,15 @@ public class SearchViewModel : ViewModelBase
     /// <summary>The results on show are entities, not tracks.</summary>
     public bool EntityMode { get; private set => Set(ref field, value); }
     public bool Searching { get; private set => Set(ref field, value); }
+
+    // The best result of the last search, shown big above the list: a song, album, artist or playlist.
+    public bool HasTop { get; private set => Set(ref field, value); }
+    /// <summary>track, album, artist or playlist.</summary>
+    public string TopKind { get; private set => Set(ref field, value); } = "";
+    public string TopId { get; private set => Set(ref field, value); } = "";
+    public string TopTitle { get; private set => Set(ref field, value); } = "";
+    public string TopSubtitle { get; private set => Set(ref field, value); } = "";
+    public string TopArt { get; private set => Set(ref field, value); } = "";
     /// <summary>Also shows playback messages ("Cargando…", "Error: …"), as the one status line always did.</summary>
     public string Status { get; private set => Set(ref field, value); } = "";
 
@@ -163,6 +172,16 @@ public class SearchViewModel : ViewModelBase
 
     public void PlayNextResult(int index) => AppServices.Playback.PlayNextFrom(_results, index);
 
+    /// <summary>The ticked rows (JSON array of indexes) go to the end of the queue.</summary>
+    public void AddSelected(string indexes) => AppServices.Playback.AddMany(Selection.Pick(_results, indexes), next: false);
+
+    /// <summary>The ticked rows play right after the current song.</summary>
+    public void PlayNextSelected(string indexes) => AppServices.Playback.AddMany(Selection.Pick(_results, indexes), next: true);
+
+    /// <summary>Hands the ticked rows to the playlist picker.</summary>
+    public void StageSelected(string indexes) => AppServices.Staged = Selection.Pick(_results, indexes);
+
+
     /// <summary>Picks up a finished search or suggestion. QML calls it from a Timer while one is running.</summary>
     public void Poll()
     {
@@ -193,9 +212,30 @@ public class SearchViewModel : ViewModelBase
         _results = hits.Tracks;
         Results.Replace(hits.Tracks.Select(Rows.FromTrack));
         Entities.Replace(hits.Entities.Select(Rows.FromEntity));
+        ShowTop(hits);
 
         var count = EntityMode ? hits.Entities.Length : hits.Tracks.Length;
         AppServices.Status.Text = count == 0 ? Tr.T("search.noResults") : Tr.F("search.results", count);
+    }
+
+    private void ShowTop(SearchHits hits)
+    {
+        if (!EntityMode && hits.Tracks.Length > 0)
+        {
+            var t = hits.Tracks[0];
+            (TopKind, TopId, TopTitle, TopSubtitle, TopArt) = ("track", t.Id, t.Title, t.Artist, t.ArtUrl);
+            HasTop = true;
+        }
+        else if (EntityMode && hits.Entities.Length > 0)
+        {
+            var e = Rows.FromEntity(hits.Entities[0]);
+            (TopKind, TopId, TopTitle, TopSubtitle, TopArt) = (e.Kind, e.EntityId, e.Title, e.Subtitle, e.ArtUrl);
+            HasTop = true;
+        }
+        else
+        {
+            HasTop = false;
+        }
     }
 
     private void PollSuggestions()

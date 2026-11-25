@@ -10,10 +10,21 @@ MDialog {
 
     required property var vm
     property string videoId: ""
+    /// The songs come from a selection (the view models staged them) instead of one videoId.
+    property bool staged: false
 
     title: dialog.tr("picker.title")
 
+    function showStaged() {
+        staged = true
+        videoId = ""
+        newName.text = ""
+        vm.loadLibrary()
+        open()
+    }
+
     function show(id) {
+        staged = false
         videoId = id
         newName.text = ""
         vm.loadLibrary()
@@ -41,7 +52,8 @@ MDialog {
             supporting: model.artist
             artUrl: model.artUrl
             onActivated: {
-                dialog.vm.addToPlaylist(model.videoId, dialog.videoId)
+                if (dialog.staged) dialog.vm.addStagedToPlaylist(model.videoId)
+                else dialog.vm.addToPlaylist(model.videoId, dialog.videoId)
                 dialog.close()
             }
         }
@@ -77,7 +89,8 @@ MDialog {
             text: dialog.tr("picker.create")
             enabled: newName.text.trim().length > 0
             onClicked: {
-                dialog.vm.createPlaylist(newName.text, dialog.videoId)
+                if (dialog.staged) dialog.vm.createPlaylistWithStaged(newName.text)
+                else dialog.vm.createPlaylist(newName.text, dialog.videoId)
                 dialog.close()
             }
         }

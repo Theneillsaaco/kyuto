@@ -189,6 +189,25 @@ public class NavigationViewModel : ViewModelBase
 
     public void PlayNextCollectionItem(int index) => AppServices.Playback.PlayNextFrom(_collection, index);
 
+    /// <summary>The ticked rows (JSON array of indexes) go to the end of the queue.</summary>
+    public void AddSelectedOfCollection(string indexes) => AppServices.Playback.AddMany(Selection.Pick(_collection, indexes), next: false);
+
+    /// <summary>The ticked rows play right after the current song.</summary>
+    public void PlayNextSelectedOfCollection(string indexes) => AppServices.Playback.AddMany(Selection.Pick(_collection, indexes), next: true);
+
+    /// <summary>Hands the ticked rows to the playlist picker.</summary>
+    public void StageSelectedOfCollection(string indexes) => AppServices.Staged = Selection.Pick(_collection, indexes);
+
+    /// <summary>The ticked rows (JSON array of indexes) go to the end of the queue.</summary>
+    public void AddSelectedOfArtist(string indexes) => AppServices.Playback.AddMany(Selection.Pick(_artistSongs, indexes), next: false);
+
+    /// <summary>The ticked rows play right after the current song.</summary>
+    public void PlayNextSelectedOfArtist(string indexes) => AppServices.Playback.AddMany(Selection.Pick(_artistSongs, indexes), next: true);
+
+    /// <summary>Hands the ticked rows to the playlist picker.</summary>
+    public void StageSelectedOfArtist(string indexes) => AppServices.Staged = Selection.Pick(_artistSongs, indexes);
+
+
     public void PlayArtist(bool shuffle) => AppServices.Playback.PlayList(_artistSongs, shuffle);
 
     public void PlayArtistSong(int index) => AppServices.Playback.PlayFrom(_artistSongs, index);

@@ -11,6 +11,8 @@ Item {
     property var playback: null
     /// Letterbox instead of cropping (the maximized player); the small slots crop to fill.
     property bool fit: false
+    /// The window shows no picture (the mini player): the stream is let go.
+    property bool suspended: false
 
     readonly property bool ready: loader.item !== null && loader.item.ready
     readonly property bool failed: loader.status === Loader.Error
@@ -22,7 +24,7 @@ Item {
     Loader {
         id: loader
         anchors.fill: parent
-        active: root.vm !== null && root.vm.showing && root.vm.url !== ""
+        active: root.vm !== null && root.vm.showing && root.vm.url !== "" && !root.suspended
         source: "VideoSurface.qml"
         opacity: root.ready ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: 300 } }
