@@ -97,6 +97,7 @@
           "--set" "QT_PLUGIN_PATH" "${qtPrefix}/${qt.qtbase.qtPluginPrefix}"
           "--set" "QML_IMPORT_PATH" "${qtPrefix}/${qt.qtbase.qtQmlPrefix}"
           "--set" "QT_QUICK_CONTROLS_STYLE" "Basic"
+          "--unset QT_WAYLAND_DISABLE_WINDOWDECORATION"
           "--set" "KYUTO_SIDECAR_DIR" "${placeholder "out"}/share/kyuto/sidecar"
           "--prefix" "PATH" ":" "${lib.makeBinPath runtimeBins}" 
         ];
