@@ -68,11 +68,19 @@ public class SystemColorScheme : IDisposable
     {
         try
         {
+            var quickEnds = 0;
+
             while (!token.IsCancellationRequested)
             {
                 await RefreshAsync(token);
+                var started = Environment.TickCount64;
                 await MonitorAsync(token); // returns when the monitor ends or cannot run
-                await Task.Delay(Interval, token);
+
+                // A monitor that ends at once means there is none to run: wait longer each time (5 s up to 5 min)
+                // instead of spawning the probes forever. One that lived for a while starts the count again.
+                quickEnds = Environment.TickCount64 - started < 10_000 ? Math.Min(quickEnds + 1, 6) : 0;
+                var wait = quickEnds == 0 ? Interval : TimeSpan.FromSeconds(Math.Min(Interval.TotalSeconds * (1 << quickEnds), 300));
+                await Task.Delay(wait, token);
             }
         }
         catch (OperationCanceledException) { }

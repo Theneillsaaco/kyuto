@@ -167,13 +167,18 @@ Item {
             spacing: 8
             visible: root.vm.listCount > 1
 
+            Timer {
+                id: filterDebounce
+                interval: 150 // filtering rebuilds every row: wait until typing pauses
+                onTriggered: root.vm.chooseListFilter(filterField.text)
+            }
             MSearchField {
                 id: filterField
                 Layout.fillWidth: true
                 implicitHeight: 44
                 placeholderText: root.tr("list.filter")
                 clearTip: root.tr("tip.clearSearch")
-                onTextChanged: root.vm.chooseListFilter(text)
+                onTextChanged: filterDebounce.restart()
             }
             Repeater {
                 model: ["title", "artist", "duration"]
