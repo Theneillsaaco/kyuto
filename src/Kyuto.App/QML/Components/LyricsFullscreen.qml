@@ -14,7 +14,9 @@ Rectangle {
     property color tint: theme.primary
     readonly property var i18n: Window.window ? Window.window.i18n : null
     readonly property bool hasLines: vm.state === "synced" || vm.state === "plain"
-    readonly property bool wide: width >= 900
+    // The cover + controls column squeezed the lines into the right side on big windows, so it is off by default.
+    property bool showSide: false
+    readonly property bool wide: showSide && width >= 900
 
     property color topColor: Qt.hsla(tint.hslHue, Math.min(0.65, tint.hslSaturation), 0.27, 1)
     property color bottomColor: Qt.hsla(tint.hslHue, Math.min(0.55, tint.hslSaturation), 0.09, 1)
@@ -24,6 +26,14 @@ Rectangle {
     signal closeRequested()
 
     function tr(key) { return i18n ? i18n.t(key) : key }
+
+    // The background gradient color at a vertical fraction (0 top, 1 bottom).
+    function bgAt(t) {
+        const k = Math.max(0, Math.min(1, t))
+        return Qt.rgba(topColor.r + (bottomColor.r - topColor.r) * k,
+                       topColor.g + (bottomColor.g - topColor.g) * k,
+                       topColor.b + (bottomColor.b - topColor.b) * k, 1)
+    }
 
     gradient: Gradient {
         GradientStop { position: 0.0; color: root.topColor }
@@ -108,7 +118,11 @@ Rectangle {
 
             ListView {
                 id: list
-                anchors.fill: parent
+                // Lines keep a readable measure on wide windows and sit centred in the free space.
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: Math.min(parent.width, 1000)
                 visible: root.hasLines
                 clip: true
                 boundsBehavior: Flickable.StopAtBounds
@@ -156,6 +170,7 @@ Rectangle {
                     required property int index
                     required property var model
                     readonly property bool current: root.vm.synced && index === root.vm.currentIndex
+                    readonly property int distance: Math.abs(index - root.vm.currentIndex)
 
                     width: ListView.view.width
                     height: textColumn.implicitHeight + 18
@@ -165,8 +180,11 @@ Rectangle {
                         width: parent.width
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: 4
-                        opacity: row.current || !root.vm.synced ? 1 : 0.42
+                        opacity: row.current || !root.vm.synced ? 1 : Math.max(0.16, 0.5 - 0.09 * (row.distance - 1))
+                        scale: row.current || !root.vm.synced ? 1 : 0.95
+                        transformOrigin: Item.Left
                         Behavior on opacity { Anim { type: Anim.DefaultEffects } }
+                        Behavior on scale { Anim { type: Anim.DefaultSpatial } }
 
                         Label {
                             width: parent.width
@@ -192,6 +210,36 @@ Rectangle {
                         cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
                         onClicked: root.vm.seekToLine(row.index)
                     }
+                }
+            }
+
+            // Soft edges: overlays take the background color at their own height, so they blend with the gradient.
+            Rectangle {
+                id: topFade
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: 72
+                visible: root.hasLines
+                readonly property color c: root.bgAt((parent.mapToItem(root, 0, 0).y) / root.height)
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: topFade.c }
+                    GradientStop { position: 0.35; color: Qt.rgba(topFade.c.r, topFade.c.g, topFade.c.b, 0.7) }
+                    GradientStop { position: 1.0; color: Qt.rgba(topFade.c.r, topFade.c.g, topFade.c.b, 0) }
+                }
+            }
+            Rectangle {
+                id: bottomFade
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: 120
+                visible: root.hasLines
+                readonly property color c: root.bgAt((parent.mapToItem(root, 0, parent.height).y) / root.height)
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: Qt.rgba(bottomFade.c.r, bottomFade.c.g, bottomFade.c.b, 0) }
+                    GradientStop { position: 0.65; color: Qt.rgba(bottomFade.c.r, bottomFade.c.g, bottomFade.c.b, 0.7) }
+                    GradientStop { position: 1.0; color: bottomFade.c }
                 }
             }
 
