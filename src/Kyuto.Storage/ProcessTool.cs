@@ -48,7 +48,7 @@ public static class ProcessTool
             await process.WaitForExitAsync(cts.Token);
             await errors;
 
-            return new ToolResult(process.ExitCode, output.Result);
+            return new ToolResult(process.ExitCode, await output);
         }
         catch (Win32Exception)
         {

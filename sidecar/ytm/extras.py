@@ -131,6 +131,7 @@ def build(server):
         try:
             with server._resolving:
                 with lease() as ydl:
+                    ydl.cookiejar.clear()  # resolve is anonymous: with cookies yt-dlp drops visionos and finds no formats
                     ydl.params["extractor_args"] = LIGHT_ARGS
                     info = ydl.extract_info("https://music.youtube.com/watch?v=" + video, download=False)
             server._remember_stats(video, info)
