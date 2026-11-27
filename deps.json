@@ -21,8 +21,8 @@
   },
   {
     "pname": "QtGroup.Qt.Bridge.CSharp.linux-x64",
-    "version": "0.5.0",
-    "hash": "sha256-tQ4d4oJ9JFVLJ0s3+vB4/qBgbEP9tKoithI2G68ghuo="
+    "version": "0.5.1",
+    "hash": "sha256-bGUxcrZafxV2l46G9qvLvpQGvF8VS8RXi8/rFv7vMOc="
   },
   {
     "pname": "SQLitePCLRaw.bundle_e_sqlite3",
@@ -46,8 +46,8 @@
   },
   {
     "pname": "Tmds.DBus.Generator",
-    "version": "0.95.2",
-    "hash": "sha256-JhNy5J6Oor22dj/eWc+ZwgB45awEW+yW2g3ZqQKB030="
+    "version": "0.95.3",
+    "hash": "sha256-58yYBjb8DGcb4k1jopnJvFUhkQ1PhgcGTcWzrCGsDLo="
   },
   {
     "pname": "Tmds.DBus.Protocol",
