@@ -1,3 +1,5 @@
+import QtQuick
+
 // The color roles of the current Material 3 scheme, one property per role. tokensJson is what the
 // ThemeViewModel provides: a JSON object of "#rrggbb" strings. Until it arrives, and for any role it lacks,
 // the light Tonal spot defaults below are used. Everything else in the UI reads these through the window:
@@ -8,13 +10,6 @@
 // black (it only looked right on light surfaces). The keys of the JSON keep Material's names.
 //
 // Motion and type tokens are at the end. Do not name a token on<Uppercase> either.
-//
-// It is a singleton (Qt Bridge 0.5.1 writes the `singleton Theme` line of the qmldir by itself): any file that
-// imports this folder can read Theme.primary directly. Main.qml feeds tokensJson from ThemeViewModel with a Binding,
-// and still exposes it as Window.window.theme so the existing leaf components keep working unchanged.
-pragma Singleton
-import QtQuick
-
 QtObject {
     id: root
 

@@ -47,8 +47,7 @@ ApplicationWindow {
     FontLoader { source: themeVm.fontDir !== "" ? themeVm.fontDir + "/GoogleSans-Bold.ttf" : "" }
 
     // Leaf components find the theme and the texts through the window: Window.window.theme, Window.window.i18n.
-    readonly property var theme: Theme
-    readonly property var appTheme: Theme
+    readonly property var theme: appTheme
     readonly property var i18n: appTr
 
     function tr(key) { return appTr.t(key) }
@@ -220,7 +219,7 @@ ApplicationWindow {
     NavigationViewModel { id: navVm }
     HistoryViewModel { id: historyVm }
     // Theme is a singleton (pragma Singleton): the view model only feeds it.
-    Binding { target: Theme; property: "tokensJson"; value: themeVm.tokensJson }
+    Theme { id: appTheme; tokensJson: themeVm.tokensJson }
     Tr { id: appTr; json: localeVm.stringsJson }
 
     // The queue and lyrics panels are built once and only moved and faded. Creating and destroying them on every
