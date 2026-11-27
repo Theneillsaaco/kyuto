@@ -17,11 +17,14 @@
     <QtBridgeTemplateRid Condition="'$(QtBridgeTemplateRid)' == '' and $([MSBuild]::IsOSPlatform('Windows'))">win-$(QtBridgeTemplateArch)</QtBridgeTemplateRid>
     <QtBridgeTemplateRid Condition="'$(QtBridgeTemplateRid)' == '' and $([MSBuild]::IsOSPlatform('Linux'))">linux-$(QtBridgeTemplateArch)</QtBridgeTemplateRid>
     <QtBridgeTemplateRid Condition="'$(QtBridgeTemplateRid)' == '' and $([MSBuild]::IsOSPlatform('OSX'))">osx-$(QtBridgeTemplateArch)</QtBridgeTemplateRid>
+    <!-- Qt 0.5.1: default window icon (QGuiApplication::windowIcon). A file path, packaged as a Qt resource.
+         SVG works because the Nix build ships qtsvg; there is no ApplicationIcon (Windows .ico) on Linux. -->
+    <QtDefaultIcon>Assets/Kyuto.svg</QtDefaultIcon>
     <QtBridgePackageId>$(QtBridgePackagePrefix).$(QtBridgeTemplateRid)</QtBridgePackageId>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(QtBridgeTemplateRid)' == 'win-x64'&#xD;&#xA;                    or '$(QtBridgeTemplateRid)' == 'win-arm64'&#xD;&#xA;                    or '$(QtBridgeTemplateRid)' == 'linux-x64'&#xD;&#xA;                    or '$(QtBridgeTemplateRid)' == 'osx-x64'&#xD;&#xA;                    or '$(QtBridgeTemplateRid)' == 'osx-arm64'">
-    <PackageReference Include="QtGroup.Qt.Bridge.CSharp.linux-x64" Version="0.5.0" />
+    <PackageReference Include="QtGroup.Qt.Bridge.CSharp.linux-x64" Version="0.5.1" />
   </ItemGroup>
 
   <Target Name="EnsureSupportedQtBridgePlatform" BeforeTargets="Restore;Build" Condition="'$(QtBridgeTemplateRid)' != 'win-x64'&#xD;&#xA;                  and '$(QtBridgeTemplateRid)' != 'win-arm64'&#xD;&#xA;                  and '$(QtBridgeTemplateRid)' != 'linux-x64'&#xD;&#xA;                  and '$(QtBridgeTemplateRid)' != 'osx-x64'&#xD;&#xA;                  and '$(QtBridgeTemplateRid)' != 'osx-arm64'">

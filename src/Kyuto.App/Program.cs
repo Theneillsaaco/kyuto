@@ -10,8 +10,12 @@ TaskScheduler.UnobservedTaskException += (_, e) =>
     e.SetObserved();
 };
 
-// Initialize Qt
-Qml.LoadFromRootModule("Main");
+// The name of the .desktop file: Wayland uses it as the app_id (window rules) and shells use it to find the icon.
+// The Nix package installs kyuto.desktop, the Flatpak one is named after its app id.
+global::Qt.Application.DesktopFileName = Environment.GetEnvironmentVariable("FLATPAK_ID") ?? "kyuto";
+
+// Initialize Qt. The start-up options travel as initial properties of Main.qml.
+Qml.Load(new MainArgs { StartMini = args.Contains("--mini") });
 Qml.WaitForExit();
 
 AppServices.Shutdown();

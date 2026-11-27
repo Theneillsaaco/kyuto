@@ -47,7 +47,8 @@ ApplicationWindow {
     FontLoader { source: themeVm.fontDir !== "" ? themeVm.fontDir + "/GoogleSans-Bold.ttf" : "" }
 
     // Leaf components find the theme and the texts through the window: Window.window.theme, Window.window.i18n.
-    readonly property var theme: appTheme
+    readonly property var theme: Theme
+    readonly property var appTheme: Theme
     readonly property var i18n: appTr
 
     function tr(key) { return appTr.t(key) }
@@ -94,7 +95,11 @@ ApplicationWindow {
     function canLikeId(id) { return libraryVm.accountState === "signedIn" && id !== "" && !/^(https?:\/\/|\/)/i.test(id) }
     function toggleLikeOf(id) { libraryVm.toggleLikeOf(id) }
     function pickPlaylist(id) { playlistPicker.show(id) }
-
+    
+    // Comes from Program.cs as an initial property of Qml.Load (`kyuto --mini` opens the small window).
+    property bool startMini: false
+    Component.onCompleted: if (startMini) enterMini()
+    
     property int lastVolume: 60
     function toggleMute() {
         if (playback.volume > 0) {
@@ -214,7 +219,8 @@ ApplicationWindow {
     VideoViewModel { id: videoVm }
     NavigationViewModel { id: navVm }
     HistoryViewModel { id: historyVm }
-    Theme { id: appTheme; tokensJson: themeVm.tokensJson }
+    // Theme is a singleton (pragma Singleton): the view model only feeds it.
+    Binding { target: Theme; property: "tokensJson"; value: themeVm.tokensJson }
     Tr { id: appTr; json: localeVm.stringsJson }
 
     // The queue and lyrics panels are built once and only moved and faded. Creating and destroying them on every
@@ -800,7 +806,7 @@ ApplicationWindow {
     // The tray icon, only while the option is on.
     Loader {
         id: trayLoader
-        active: settingsVm.closeToTray
+        active: settingsVm.closeToTray && settingsVm.trayAvailable
         source: "../QML/Components/TrayHost.qml"
         onLoaded: {
             item.host = win
@@ -825,9 +831,12 @@ ApplicationWindow {
     }
     function syncKeepAlive() {
         const wanted = settingsVm.closeToTray && trayReady
-        if (wanted && keepAlive === null) {
+        const needWindow = wanted && !settingsVm.holdWithoutWindows(wanted)
+        if (!wanted)
+            settingsVm.holdWithoutWindows(false)
+        if (needWindow && keepAlive === null) {
             keepAlive = keepAliveComponent.createObject(null)
-        } else if (!wanted && keepAlive !== null) {
+        } else if (!needWindow && keepAlive !== null) {
             keepAlive.destroy()
             keepAlive = null
         }

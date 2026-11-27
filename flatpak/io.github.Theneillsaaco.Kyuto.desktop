@@ -8,3 +8,8 @@ Categories=AudioVideo;Audio;Player;Music;
 Keywords=Music;YouTube;Player;Audio;
 Terminal=false
 StartupNotify=true
+Actions=Mini;
+
+[Desktop Action Mini]
+Name=Mini player
+Exec=kyuto --mini
