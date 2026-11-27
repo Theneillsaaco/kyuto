@@ -16,8 +16,8 @@
   },
   {
     "pname": "QtGroup.Qt.Bridge.CSharp.linux-x64",
-    "version": "0.5.0",
-    "hash": "sha256-tQ4d4oJ9JFVLJ0s3+vB4/qBgbEP9tKoithI2G68ghuo="
+    "version": "0.5.1",
+    "hash": "sha256-bGUxcrZafxV2l46G9qvLvpQGvF8VS8RXi8/rFv7vMOc="
   },
   {
     "pname": "SQLite",
