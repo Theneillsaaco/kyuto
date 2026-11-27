@@ -60,6 +60,7 @@
           export QT_PLUGIN_PATH="${qtPrefix}/${qt.qtbase.qtPluginPrefix}"
           export QML_IMPORT_PATH="${qtPrefix}/${qt.qtbase.qtQmlPrefix}"
           export QT_QUICK_CONTROLS_STYLE=Basic
+          export QT_QPA_PLATFORMTHEME=generic
         '';
       };
 
@@ -97,6 +98,7 @@
           "--set" "QT_PLUGIN_PATH" "${qtPrefix}/${qt.qtbase.qtPluginPrefix}"
           "--set" "QML_IMPORT_PATH" "${qtPrefix}/${qt.qtbase.qtQmlPrefix}"
           "--set" "QT_QUICK_CONTROLS_STYLE" "Basic"
+          "--set" "QT_QPA_PLATFORMTHEME" "generic"
           "--unset QT_WAYLAND_DISABLE_WINDOWDECORATION"
           "--set" "KYUTO_SIDECAR_DIR" "${placeholder "out"}/share/kyuto/sidecar"
           "--prefix" "PATH" ":" "${lib.makeBinPath runtimeBins}" 
@@ -143,6 +145,11 @@
           Terminal=false
           StartupNotify=true
           Keywords=Music;YouTube;Player;Audio;
+          Actions=Mini;
+          
+          [Desktop Action Mini]
+          Name=Mini player
+          Exec=kyuto --mini
           EOF
         '';
 

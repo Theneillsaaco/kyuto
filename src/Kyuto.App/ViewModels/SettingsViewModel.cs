@@ -18,6 +18,7 @@ public class SettingsViewModel : ViewModelBase
         NormalizeVolume = AppServices.Prefs.Normalize;
         Notifications = AppServices.Prefs.Notify;
         CloseToTray = AppServices.Prefs.CloseToTray;
+        TrayAvailable = TrayProbe.HostRegistered();
         CacheLimit = AppServices.Cache?.Limit ?? AppServices.Prefs.CacheLimit;
         SyncCache();
         SyncScrobbler();
@@ -36,6 +37,7 @@ public class SettingsViewModel : ViewModelBase
 
     /// <summary>Closing the window keeps the player in the system tray.</summary>
     public bool CloseToTray { get; private set => Set(ref field, value); }
+    public bool TrayAvailable { get; private set => Set(ref field, value); }
     
     /// <summary>How many songs the disk cache keeps; 0 is off.</summary>
     public int CacheLimit { get; private set => Set(ref field, value); } = 30;
@@ -97,6 +99,8 @@ public class SettingsViewModel : ViewModelBase
         AppServices.Playback.RefreshSound();
     }
 
+    public bool HoldWithoutWindows(bool on) => QtApp.HoldWithoutWindows(on);
+    
     public void ChooseCloseToTray(bool on)
     {
         AppServices.Prefs.SaveCloseToTray(on);
